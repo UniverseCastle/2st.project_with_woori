@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.planner.mapper.MemberMapper">
+	
+	<!-- 회원 아이디로 객체 가져오기 -->
+	<select id="findByUser" resultType="MemberDTO">
+		select *
+		from member
+		where member_userid=#{member_userid}
+	</select>
+
+	<!-- 회원 아이디로 시퀀스 찾기 -->
+	<select id="findByMemberId" resultType="Long">
+		select member_id
+		from member
+		where member_userid=#{member_userid}
+	</select>
+	
+	<!-- 회원가입 -->
+	<insert id="memberInsert" parameterType="MemberDTO">
+		insert into member values(
+			member_seq.NEXTVAL,
+			#{member_userid},
+			#{member_password},
+			#{member_name},
+			#{member_birth},
+			#{member_email},
+			#{member_phone},
+			#{member_gender},
+			sysdate,
+			'B'
+		)
+	</insert>
+	
+	<!-- 로그인 -->
+	<select id="memberLogin" resultType="int">
+		select *
+		from member
+		where member_userid=#{member_userid}
+		and member_password=#{member_password}
+	</select>
+	
+	<!-- 모든회원 정보 -->
+	<!--  
+	<select id="memberList" resultType="MemberDTO">
+		select *
+		from member
+		where member_id != #{member_id}
+		and member_status = 'B'
+	</select>
+	-->
+	
+	<!-- 모든회원 정보 -->
+	<select id="memberList" resultType="MemberDTO">
+		select distinct m.*, fr.friend_request_status
+		from member m
+		left outer join friend_request fr
+		on m.member_id = fr.member_send_id
+		where m.member_id != #{member_id}
+		and m.member_status = 'B'
+	</select>
+	
+	<!-- 친구신청 받는 아이디(member_receive_id)로 'R' 상태의 회원 시퀀스 찾기 -->
+	<select id="findByMemberFriendStatus" resultType="String">
+		select fr.friend_request_status
+		from friend_request fr
+		left outer join member m
+		on fr.member_receive_id = m.member_id
+		where fr.member_receive_id = #{member_receive_id}
+		and fr.member_send_id = #{member_id}
+		and fr.friend_request_status = 'R'
+		and m.member_status = 'B'
+	</select>
+	
+	
+	<!-- 모든회원 정보 -->
+	<!--  
+	<select id="memberList" resultType="MemberDTO">
+		select m.*, fr.friend_request_status
+		from member m
+		left outer join friend_request fr
+		on (m.member_id=fr.member_send_id and fr.member_send_id=#{member_id})
+		where m.member_status='B'
+		and member_id!=#{member_id}
+	</select>
+	-->
+	  
+	<!-- 모든회원 정보 (본인 제외) -->
+	<!--  
+	<select id="memberList" resultType="MemberDTO">
+		select *
+		from member
+		where member_status='B'
+		and member_id != #{member_id}
+	</select>
+	-->
+	
+	<!--  
+	<select id="memberList" resultType="MemberDTO">
+		select m.*, fr.friend_request_status
+		from member m
+		left outer join friend_request fr
+		on m.member_id=fr.member_send_id
+		where m.member_status='B'
+	</select>
+	-->
+	
+	<!-- 회원 리스트 -->
+	<!--  
+	<select id="memberList" resultMap="requestList">
+		select m.*, fr.member_receive_id, fr.member_send_id, fr.friend_request_status
+		from member m
+		left outer join friend_request fr
+		on m.member_id=fr.member_send_id
+		where member_status='B'
+		and member_id != #{member_id}
+	</select>
+	-->
+	
+	<!-- MemberDTO.friendRequestList 변수 resultMap -->
+	<!--  
+	<resultMap type="MemberDTO" id="requestList">
+		<id property="member_id" 			column="member_id"			/>
+		<result property="member_userid" 	column="member_userid"		/>
+		<result property="member_password" 	column="member_password"	/>
+		<result property="member_name" 		column="member_name"		/>
+		<result property="member_birth" 	column="member_birth"		/>
+		<result property="member_email" 	column="member_email"		/>
+		<result property="member_phone" 	column="member_phone"		/>
+		<result property="member_gender" 	column="member_gender"		/>
+		<result property="member_reg" 		column="member_reg"			/>
+		<result property="member_status" 	column="member_status"		/>
+		<collection property="friendRequestList" resultMap="requestsMap"></collection>
+	</resultMap>
+	-->
+	<!-- friend_request 테이블 resultMap -->
+	<!--  
+	<resultMap type="FriendRequestDTO" id="requestsMap">
+		<result property="member_receive_id" 	 column="member_receive_id"		/>
+		<result property="member_send_id" 		 column="member_send_id"		/>
+		<result property="friend_request_status" column="friend_request_status"	/>
+	</resultMap>
+	-->
+	<!-- 친구신청 객체 -->
+	
+	
+</mapper>

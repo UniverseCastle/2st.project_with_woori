@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div align="center">
+		<table style="border: 1px solid; width: 100px; text-align: center;">
+			<tbody th:each="friendRequestDTO : ${receiveList}">
+				<tr>
+					<td>보낸사람</td>
+					<td th:text="${friendRequestDTO.member_send_id}"></td>	<!-- a태그로 유저 정보보기 -->
+				</tr>
+				<tr>
+					<td colspan="2">
+						<button>수락버튼</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>

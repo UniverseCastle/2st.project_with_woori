@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8">
+<title>메인</title>
+</head>
+<body>
+	<div align="center">
+		<h1>메인</h1>
+		<a sec:authorize="isAnonymous()"	 href="/member/insert">회원가입</a>
+		<a sec:authorize="isAnonymous()" 	 href="/member/login">로그인</a>
+		<a sec:authorize="isAuthenticated()" href="/member/logout">로그아웃</a>
+		<a sec:authorize="isAuthenticated()" href="/member/userInfo">모든유저</a>
+		<a sec:authorize="isAuthenticated()" href="/friend/receiveList">친추목록</a>
+		
+	</div>
+	
+	<script th:if="${result} == 1">
+		alert('가입이 완료되었습니다.');
+	</script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>모든회원 정보</title>
+<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+<script>
+	$(document).on("click", ".btn", function(){
+		let button = $(this);
+		let member_id = button.val();
+		$.ajax({
+			url		: "/friend/friendRequest",
+			type	: "post",
+			data	: {member_id : member_id},
+			success	: function(status){
+				if (status != null) {
+					button.prop("disabled", true);
+				}
+			}
+		});
+	});
+</script>
+</head>
+<body>
+	<div align="center">
+		<table>
+			<tr>
+				<th>아이디</th>
+				<th>이름</th>
+				<th>생년월일</th>
+				<th>이메일</th>
+				<th>전화번호</th>
+				<th>성별</th>
+				<th>친구추가</th>
+			</tr>
+			<tr th:each="memberDTO : ${list}">
+				<td th:text="${memberDTO.member_userid}"></td>
+				<td th:text="${memberDTO.member_name}"></td>
+				<td th:text="${memberDTO.member_birth}"></td>
+				<td th:text="${memberDTO.member_email}"></td>
+				<td th:text="${memberDTO.member_phone}"></td>
+				<td th:text="${memberDTO.member_gender}"></td>
+				<td>
+<!-- 						<div th:if="${memberDTO.friend_request_status == null}"> -->
+<!-- 						[[${friendStatus}]] -->
+<!-- 						[[${memberDTO.friend_request_status}]] -->
+							<div th:if="${memberDTO.friend_request_status != 'R' and memberDTO.friend_request_status != 'F'}">	<!-- 친구 요청상태 이거나 친구 이거나 -->
+<!-- 								<div th:each="receiveDTO : ${receiveList}"> -->
+									<div th:if="${@friendRoleUtils.getFriendRoleName(memberDTO.friend_request_status) != '요청중'}">
+										<button type="button" th:value="${memberDTO.member_id}" class="btn">친구추가</button>
+									</div>
+<!-- 								</div> -->
+							</div>
+							<div th:if="${memberDTO.friend_request_status == 'R' or memberDTO.friend_request_status == 'F'}">
+								<span th:text="${@friendRoleUtils.getFriendRoleName(memberDTO.friend_request_status)}"></span>
+							</div>
+							
+<!-- 							<div th:if="${}"> -->
+								
+<!-- 							</div> -->
+							
+<!-- 							<div th:if="${}"> -->
+								
+							
+<!-- 							<div th:each="sendId : ${sendIdList}"> -->
+<!-- 								<div th:if="${memberDTO.friend_request_status == 'R' and sendId.member_send_id != null"> -->
+<!-- 									<button>받은사람버튼</button> -->
+<!-- 								</div> -->
+<!-- 								<div th:if="${memberDTO.friend_request_status == 'R' and memberDTO.friend_request_status != 'F' and sendId.member_receive_id != memberDTO.member_id}"> -->
+<!-- 									<button>대기중</button> -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+							
+<!-- 							<div th:if="${memberDTO.friend_request_status == 'R' and memberDTO.friend_request_status != 'F'}"> -->
+<!-- 								<div>대기중</div> -->
+<!-- 							</div> -->
+<!-- 						<div th:each="sendId : ${sendIdList}">															나에게 요청보낸 아이디 리스트 -->
+<!-- 							<div th:if="${sendId.friend_request_status == 'R' and sendId.friend_request_status != 'F'}"> -->
+<!-- 								<div th:if="${sendId.member_send_id == memberDTO.member_id}"> -->
+<!-- 									<form action="/friend/friendAccept" method="post"> -->
+<!-- 										<input type="hidden" name="member_id" th:value="${memberDTO.member_id}"	/> -->
+<!-- 										<button type="submit">수락하기</button> -->
+<!-- 									</form> -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+<!-- 							<div th:if="${sendId.friend_request_status != 'R' and sendId.friend_request_status == 'F'}"> -->
+<!-- 								<div th:if="${sendId.friend_request_status == 'R' or sendId.friend_request_status == 'F'}"> -->
+<!-- 									<span th:text="${@friendRoleUtils.getFriendRoleName(memberDTO.friend_request_status)}"></span> -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+<!-- 						</div> -->
+							
+<!-- 							<button type="button" th:unless="${friendStatus} == null" disabled>친구추가</button> -->
+<!-- 						</div> -->
+<!-- 						<div th:unless="${memberDTO.friend_request_status == null}"> -->
+<!-- 						</div> -->
+<!-- 						<div th:unless="${result} != 1"> -->
+<!-- 							완료 -->
+<!-- 							<span th:text="${memberDTO.getFriend_request_status}"></span> -->
+<!-- 						</div> -->
+<!-- 						<div th:if="${result2} == 1"> -->
+<!-- 							<span>신청완료</span> -->
+<!-- 						</div> -->
+<!-- 							<a th:href="@{|/friend/friendRequest/member_id=${memberDTO.member_id}|}">친구추가</a> -->
+<!-- 						<a href="javascript:void(0);" onclick="document.forms['friendform'].submit();">친구추가</a> -->
+<!-- 						<input type="hidden" name="member_name" th:value="${memberDTO.member_name}"	/> -->
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>
