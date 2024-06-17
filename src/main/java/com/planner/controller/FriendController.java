@@ -40,7 +40,7 @@ public class FriendController {
 		return friendStatus;
 	}
 	
-//	(받은)친구신청 리스트
+//	(받은)친구신청 리스트 Get
 	@GetMapping("receiveList")
 	@PreAuthorize("isAuthenticated()")
 	public String receiveList(Principal principal, Model model) {
@@ -49,6 +49,28 @@ public class FriendController {
 		model.addAttribute("receiveList", receiveList);
 		
 		return "friend/friend_receive";
+	}
+	
+//	(받은)친구신청 리스트 Post
+	@PostMapping("receiveList")
+	public String receiveList() {
+		
+		return "";
+	}
+	
+//	(받은)친구신청 거절 Post
+	@PostMapping("receiveDelete")
+	@PreAuthorize("isAuthenticated()")
+	public String receiveDelete(Long member_receive_id) {
+		friendService.receiveDelete(null, null);
+	}
+	
+//	친구목록 Get
+	@GetMapping("friendList")
+	@PreAuthorize("isAuthenticated()")
+	public String friendList() {
+		
+		return "friend/friend_friendList";
 	}
 	
 	/*

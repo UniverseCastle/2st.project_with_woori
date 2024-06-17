@@ -33,4 +33,7 @@ public interface MemberMapper {
 //	친구신청 받는 아이디로 친구신청 상태 찾기
 	public String findByMemberFriendStatus(@Param("member_receive_id") Long member_receive_id,
 										   @Param("member_id") Long member_id);
+	
+//	친구신청 보낸 아이디 찾기
+	public List<MemberDTO> findBySendId(Long member_id);
 }

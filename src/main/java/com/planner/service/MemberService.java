@@ -49,6 +49,10 @@ public class MemberService {
 		Long myId = memberMapper.findByMemberId(principal.getName());
 		List<MemberDTO> list = memberMapper.memberList(myId);
 		
+		List<MemberDTO> sendIdList = memberMapper.findBySendId(myId);
+		
+		list.removeAll(sendIdList);
+		
 		for (MemberDTO memberDTO : list) {												// 리스트에서 신청상태를 표시하기 위해 set
 			String status = findByMemberFriendStatus(memberDTO.getMember_id(), myId);
 			memberDTO.setFriend_request_status(status);
@@ -59,6 +63,11 @@ public class MemberService {
 //	친구신청 받는 아이디로 친구신청 상태 찾기
 	public String findByMemberFriendStatus(Long member_receive_id, Long member_id) {	// member_receive_id : 친구신청 받는 아이디
 		return memberMapper.findByMemberFriendStatus(member_receive_id, member_id);		// member_id : 친구신청 보낸 (나의) 아이디
+	}
+	
+//	친구신청 보낸 아이디 찾기
+	public List<MemberDTO> findBySendId(Long member_id) {
+		return memberMapper.findBySendId(member_id);
 	}
 	
 //	친구신청 받은 아이디로 보낸 아이디 찾기 (친구신청 받았을 때)

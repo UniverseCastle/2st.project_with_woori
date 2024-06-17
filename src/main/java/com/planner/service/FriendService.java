@@ -39,6 +39,14 @@ public class FriendService {
 		}
 	}
 	
+//	(받은)친구신청 리스트
+	public List<FriendRequestDTO> receiveRequestList(Principal principal) {
+		Long myId = memberMapper.findByMemberId(principal.getName());
+		List<FriendRequestDTO> list = friendMapper.receiveRequestList(myId);
+		
+		return list;
+	}
+	
 //	친구수락
 	public void friendAccept(Long member_id, Principal principal) {
 		FriendRequestDTO friendRequestDTO = new FriendRequestDTO();
@@ -48,13 +56,17 @@ public class FriendService {
 		friendRequestDTO.setMember_send_id(myId);
 	}
 	
-//	(받은)친구신청 리스트
-	public List<FriendRequestDTO> receiveRequestList(Principal principal) {
+//	(받은)친구신청 거절
+	public void receiveDelete(Long member_send_id,
+							  Principal principal) {
 		Long myId = memberMapper.findByMemberId(principal.getName());
-		List<FriendRequestDTO> list = friendMapper.receiveRequestList(myId);
 		
-		return list;
 	}
+	
+//	친구신청 보낸 아이디 찾기
+//	public List<FriendRequestDTO> findBySendId(Long member_receive_id) {
+//		return friendMapper.findBySendId(member_receive_id);
+//	}
 	
 //	친구신청 받은 아이디로 보낸 아이디 찾기
 //	public List<FriendRequestDTO> findBySendIdList(Long member_receive_id) {

@@ -11,10 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.planner.dto.FriendRequestDTO;
 import com.planner.dto.MemberDTO;
 import com.planner.enums.FriendRole;
-import com.planner.service.FriendService;
 import com.planner.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 public class MemberController {
 	
 	private final MemberService memberService;
-	private final FriendService friendService;
 	
 //	메인
 	@GetMapping("main")
@@ -69,7 +66,12 @@ public class MemberController {
 		List<MemberDTO> list = memberService.memberList(principal);
 		model.addAttribute("list", list);						// 친구신청 리스트 (친구신청 상태 담겨있음)
 		model.addAttribute("friendRoles", FriendRole.values());	// FriendRole 상태 권한설정
+		
 //		Long myId = memberService.findByMemberId(principal.getName());
+		
+//		List<MemberDTO> sendIdList = memberService.findBySendId(myId);
+//		
+//		list.removeAll(sendIdList);
 //		List<FriendRequestDTO> sendIdList = memberService.findBySendIdList(principal);	// 나의(신청 받은) 아이디로 보낸아이디(들) 검색한 리스트
 //			System.out.println("컨트롤러 센드리스트"+sendIdList);
 		
@@ -79,9 +81,9 @@ public class MemberController {
 //			System.out.println(sendId.getFriend_request_status());
 //		}
 		
-		List<FriendRequestDTO> receiveList = friendService.receiveRequestList(principal);
+//		List<FriendRequestDTO> receiveList = friendService.receiveRequestList(principal);
 		
-		model.addAttribute("receiveList", receiveList);
+//		model.addAttribute("receiveList", receiveList);
 		
 		return "member/member_userInfo";
 	}

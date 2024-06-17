@@ -6,15 +6,23 @@
 </head>
 <body>
 	<div align="center">
-		<table style="border: 1px solid; width: 100px; text-align: center;">
+		<table style="border: 1px solid; width: 200px; text-align: center;">
 			<tbody th:each="friendRequestDTO : ${receiveList}">
 				<tr>
-					<td>보낸사람</td>
+					<td>보낸사람 id : </td>
 					<td th:text="${friendRequestDTO.member_send_id}"></td>	<!-- a태그로 유저 정보보기 -->
 				</tr>
 				<tr>
 					<td colspan="2">
-						<button>수락버튼</button>
+						<form action="/friend/receiveList" method="post">
+							<button type="submit">수락</button>
+						</form>
+					</td>
+					<td colspan="2">
+						<form action="/friend/receiveDelete" method="post">
+							<button type="submit">취소</button>
+							<input type="hidden" name="member_send_id" th:value="${friendRequestDTO.member_send_id}"	/>
+						</form>
 					</td>
 				</tr>
 			</tbody>

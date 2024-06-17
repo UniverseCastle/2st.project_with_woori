@@ -54,13 +54,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<!-- 모든회원 정보 -->
 	<select id="memberList" resultType="MemberDTO">
-		select distinct m.*, fr.friend_request_status
+		select distinct fr.member_send_id, m.*
+		from(
+			select *
+			from member
+			where member_id != #{member_receive_id}
+		) m
+		left outer join friend_request fr
+		on fr.member_send_id = m.member_id
+		where m.member_id != #{member_receive_id}
+		or fr.friend_request_status is null
+	</select>
+	
+	<select id="findBySendId" resultType="MemberDTO">
+		select m.*, fr.member_send_id
 		from member m
 		left outer join friend_request fr
 		on m.member_id = fr.member_send_id
-		where m.member_id != #{member_id}
-		and m.member_status = 'B'
+		where fr.member_receive_id=#{member_id}
 	</select>
+	
+	
 	
 	<!-- 친구신청 받는 아이디(member_receive_id)로 'R' 상태의 회원 시퀀스 찾기 -->
 	<select id="findByMemberFriendStatus" resultType="String">
@@ -74,6 +88,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		and m.member_status = 'B'
 	</select>
 	
+	<!-- R로 S찾기 -->
+	<!-- 
+	<select id="findBySendId">
+		select member_send_id
+		from friend_request
+		where member_receive_id=#{member_receive_id}
+	</select>
+	-->
 	
 	<!-- 모든회원 정보 -->
 	<!--  

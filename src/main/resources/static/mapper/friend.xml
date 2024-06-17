@@ -85,6 +85,44 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		and member_status = 'B'
 	</select>
 	
+	<!-- (받은)친구신청 거절 -->
+	<delete id="receiveDelete">
+		delete
+		from friend_request
+		where member_receive_id = #{member_receive_id}
+		and member_send_id = #{member_send_id}
+	</delete>
+	
+	<!-- 친구신청 보낸 아이디 찾기 -->
+	<!-- 
+	<select id="findBySendId" resultType="FriendRequestDTO">
+		select *
+		from friend_request
+		where member_receive_id=#{member_receive_id}
+		and member_send_id=#{member_send_id}
+	</select>
+	-->
+	
+	<!-- 친구신청 보낸 아이디 찾기 -->
+	<!-- 
+	<select id="findBySendId" resultType="FriendRequestDTO">
+		select member_send_id
+		from friend_request
+		where member_receive_id=#{member_receive_id}
+	</select>
+	-->
+	
+	<!-- 친구신청 보낸 아이디 찾기 -->
+	<!--  
+	<select id="findBySendId" resultType="FriendRequestDTO">
+		select *
+		from friend_request
+		where member_send_id = #{member_send_id}
+		and member_receive_id = #{member_receive_id}
+	</select>
+	-->
+	
+	
 	<!-- 친구 신청 (받을 때 / 받는사람 데이터 추가) -->
 <!-- 	<insert id="friendReceive" parameterType="FriendRequestDTO"> -->
 <!-- 		insert into friend_request values( -->

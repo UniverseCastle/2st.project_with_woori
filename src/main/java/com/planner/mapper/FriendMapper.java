@@ -3,6 +3,7 @@ package com.planner.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.planner.dto.FriendRequestDTO;
@@ -31,6 +32,13 @@ public interface FriendMapper {
 	
 //	(받은)친구신청 리스트
 	public List<FriendRequestDTO> receiveRequestList(Long member_receive_id);
+	
+//	(받은)친구신청 거절
+	public void receiveDelete(@Param("member_receive_id") Long member_receive_id,
+							  @Param("member_send_id") Long member_send_id);
+	
+//	친구신청 보낸 아이디 찾기
+//	public List<FriendRequestDTO> findBySendId(Long member_receive_id);
 	
 //	친구신청 (받음)
 //	public void friendReceive(FriendRequestDTO friendRequestDTO);
