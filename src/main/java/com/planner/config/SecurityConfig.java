@@ -30,7 +30,7 @@ public class SecurityConfig {
 						XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
 		.formLogin((formLogin) -> formLogin
 				.loginPage("/member/login")
-				.usernameParameter("member_userid")
+				.usernameParameter("member_email")
 				.passwordParameter("member_password")
 				.defaultSuccessUrl("/member/main", true))
 		.logout((logout) -> logout

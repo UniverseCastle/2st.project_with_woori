@@ -4,18 +4,32 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.planner.mapper.MemberMapper">
 	
-	<!-- 회원 아이디로 객체 가져오기 -->
+	<!-- 회원 이메일로 객체 가져오기 -->
 	<select id="findByUser" resultType="MemberDTO">
 		select *
 		from member
-		where member_userid=#{member_userid}
+		where member_email = #{member_email}
+	</select>
+	
+	<!-- 회원 시퀀스로 객체 가져오기 -->
+	<select id="findByMemberSeq" resultType="MemberDTO">
+		select *
+		from member
+		where member_id = #{member_id}
 	</select>
 
-	<!-- 회원 아이디로 시퀀스 찾기 -->
+	<!-- 회원 이메일로 시퀀스 찾기 -->
 	<select id="findByMemberId" resultType="Long">
 		select member_id
 		from member
-		where member_userid=#{member_userid}
+		where member_email = #{member_email}
+	</select>
+	
+	<!-- 회원 시퀀스로 이메일 찾기 -->
+	<select id="findByEmail" resultType="String">
+		select member_email
+		from member
+		where member_id = #{member_id}
 	</select>
 	
 	<!-- 회원가입 -->
@@ -38,7 +52,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="memberLogin" resultType="int">
 		select *
 		from member
-		where member_userid=#{member_userid}
+		where member_email=#{member_email}
 		and member_password=#{member_password}
 	</select>
 	
@@ -54,24 +68,57 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<!-- 모든회원 정보 -->
 	<select id="memberList" resultType="MemberDTO">
-		select distinct fr.member_send_id, m.*
-		from(
+		select distinct m.*, fr.member_send_id
+		from (
 			select *
 			from member
-			where member_id != #{member_receive_id}
-		) m
+			where member_id != #{member_id}
+			and member_status = 'B'
+		)m
+		left outer join friend f
+		on m.member_id = f.member_friend_id
 		left outer join friend_request fr
-		on fr.member_send_id = m.member_id
-		where m.member_id != #{member_receive_id}
-		or fr.friend_request_status is null
+		on m.member_id = fr.member_send_id
+		and m.member_id = fr.member_receive_id
+		where fr.friend_request_status != 'F'
+		or fr.member_receive_id is null
 	</select>
 	
+	<!-- 모든회원 정보 -->
+	<!--  
+	<select id="memberList" resultType="MemberDTO">
+		select distinct fr.member_send_id, fr.friend_request_status, m.*
+		from (
+			select *
+			from member
+			where member_id != #{member_id}
+		)m
+		left outer join friend f
+		on m.member_id = f.member_send_id
+		left outer join friend_request fr
+		on m.member_id = fr.member_send_id
+		where fr.friend_request_status != 'F'
+		or fr.member_receive_id is null
+	</select>
+	-->
+	<!-- (나에게) 친구신청 보낸 아이디 찾기 -->
 	<select id="findBySendId" resultType="MemberDTO">
 		select m.*, fr.member_send_id
 		from member m
 		left outer join friend_request fr
 		on m.member_id = fr.member_send_id
 		where fr.member_receive_id=#{member_id}
+	</select>
+	
+	<!-- 친구목록 -->
+	<select id="friendList" resultType="FriendDTO">
+		select m.*, f.member_send_id, f.member_receive_id
+		from member m
+		left outer join friend f
+		on m.member_id = f.member_send_id
+		where f.friend_status = 'F'
+		and f.member_receive_id = #{member_id}
+		or f.member_send_id = #{member_id}
 	</select>
 	
 	
@@ -84,7 +131,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		on fr.member_receive_id = m.member_id
 		where fr.member_receive_id = #{member_receive_id}
 		and fr.member_send_id = #{member_id}
-		and fr.friend_request_status = 'R'
 		and m.member_status = 'B'
 	</select>
 	

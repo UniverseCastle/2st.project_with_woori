@@ -5,6 +5,22 @@
 <title>친구목록</title>
 </head>
 <body>
-
+	<div align="center">
+		<table>
+			<tbody th:each="friendDTO : ${friendList}">
+				<tr>
+					<th>친구아이디</th>
+					<th>친구별명</th>
+					<th>친구메모</th>
+				</tr>
+				<tr>
+					<td th:text="${friendDTO.member_friend_id}"></td>
+					<td th:if="${friendDTO.friend_status == 'F'}" th:text="${friendDTO.member_userid}"></td>
+					<td th:if="${friendDTO.friend_status == 'N'}" th:text="${friendDTO.friend_name}"></td>
+					<td th:text="${friendDTO.friend_memo}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 </body>
 </html>

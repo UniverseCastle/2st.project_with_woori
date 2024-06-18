@@ -19,17 +19,17 @@ public class MemberService {
 	private final MemberMapper memberMapper;
 	private final PasswordEncoder passwordEncoder;
 	
-//	회원 아이디로 객체 가져오기
-	public MemberDTO findByMember(String member_userid) {
-		return memberMapper.findByMember(member_userid);
+//	회원 이메일로 객체 가져오기
+	public MemberDTO findByMember(String member_email) {
+		return memberMapper.findByMember(member_email);
 	}
-	public Optional<MemberDTO> findByUser(String member_userid){
-		return memberMapper.findByUser(member_userid);
+	public Optional<MemberDTO> findByUser(String member_email){
+		return memberMapper.findByUser(member_email);
 	}
 	
-//	아이디로 시퀀스 불러오기
-	public Long findByMemberId(String member_userid) {
-		return memberMapper.findByMemberId(member_userid);
+//	회원 이메일로 시퀀스 불러오기
+	public Long findByMemberId(String member_email) {
+		return memberMapper.findByMemberId(member_email);
 	}
 	
 //	회원가입
@@ -40,8 +40,8 @@ public class MemberService {
 	}
 	
 //	로그인
-	public int memberLogin(String member_userid, String member_password) {
-		return memberMapper.memberLogin(member_userid, member_password);
+	public int memberLogin(String member_email, String member_password) {
+		return memberMapper.memberLogin(member_email, member_password);
 	}
 	
 //	모든유저 정보
@@ -51,7 +51,13 @@ public class MemberService {
 		
 		List<MemberDTO> sendIdList = memberMapper.findBySendId(myId);
 		
+//		List<MemberDTO> friendList = memberMapper.friendList(myId);
+		
+//		System.out.println(list.size());
 		list.removeAll(sendIdList);
+//		System.out.println(list.size());
+//		list.removeAll(friendList);
+//		System.out.println(list.size());
 		
 		for (MemberDTO memberDTO : list) {												// 리스트에서 신청상태를 표시하기 위해 set
 			String status = findByMemberFriendStatus(memberDTO.getMember_id(), myId);

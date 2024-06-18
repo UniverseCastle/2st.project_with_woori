@@ -25,19 +25,19 @@
 	<div align="center">
 		<table>
 			<tr>
+				<th>이메일</th>
 				<th>아이디</th>
 				<th>이름</th>
 				<th>생년월일</th>
-				<th>이메일</th>
 				<th>전화번호</th>
 				<th>성별</th>
 				<th>친구추가</th>
 			</tr>
 			<tr th:each="memberDTO : ${list}">
+				<td th:text="${memberDTO.member_email}"></td>
 				<td th:text="${memberDTO.member_userid}"></td>
 				<td th:text="${memberDTO.member_name}"></td>
 				<td th:text="${memberDTO.member_birth}"></td>
-				<td th:text="${memberDTO.member_email}"></td>
 				<td th:text="${memberDTO.member_phone}"></td>
 				<td th:text="${memberDTO.member_gender}"></td>
 				<td>

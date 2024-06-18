@@ -5,7 +5,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.planner.dto.FriendDTO;
 import com.planner.dto.FriendRequestDTO;
+import com.planner.dto.MemberDTO;
 import com.planner.mapper.FriendMapper;
 import com.planner.mapper.MemberMapper;
 
@@ -31,12 +33,12 @@ public class FriendService {
 		friendRequestDTO.setMember_receive_id(member_id);				// 내가 친구신청 보낸 친구의 시퀀스
 		friendRequestDTO.setMember_send_id(myId);						// 나의 시퀀스
 		
-		String status = friendMapper.friendCheck(friendRequestDTO);		// 친구신청 상태 컬럼으로 중복 여부 판단
-		if (status != null) {											// null : 신청 상태가 없음 = 요청/친구 아님
-			throw new IllegalArgumentException();
-		}else {
+//		String status = friendMapper.friendCheck(friendRequestDTO);		// 친구신청 상태 컬럼으로 중복 여부 판단
+//		if (status != null) {											// null : 신청 상태가 없음 = 요청/친구 아님
+//			throw new IllegalArgumentException();
+//		}else {
 			friendMapper.friendRequest(friendRequestDTO);				// 친구신청 void 메서드
-		}
+//		}
 	}
 	
 //	(받은)친구신청 리스트
@@ -44,24 +46,54 @@ public class FriendService {
 		Long myId = memberMapper.findByMemberId(principal.getName());
 		List<FriendRequestDTO> list = friendMapper.receiveRequestList(myId);
 		
+//		MemberDTO friendRequestDTO = memberMapper.findByMember(principal.getName());
+		for (FriendRequestDTO friendRequestDTO : list) {
+			if (friendRequestDTO.getMember_send_id() != null) {
+				String email = memberMapper.findByEmail(friendRequestDTO.getMember_send_id());
+				friendRequestDTO.setMember_email(email);
+			}
+		}
+		
 		return list;
 	}
 	
-//	친구수락
-	public void friendAccept(Long member_id, Principal principal) {
-		FriendRequestDTO friendRequestDTO = new FriendRequestDTO();
-		Long myId = memberMapper.findByMemberId(principal.getName());	// 나의(보낸) 시퀀스
-		
-		friendRequestDTO.setMember_receive_id(member_id);				// 내가 친구신청 보낸 친구의 시퀀스
-		friendRequestDTO.setMember_send_id(myId);
+//	(받은)친구신청 거절
+	public void receiveDelete(Principal principal,
+			Long member_send_id) {
+		Long myId = memberMapper.findByMemberId(principal.getName());
+		friendMapper.receiveDelete(myId, member_send_id);
 	}
 	
-//	(받은)친구신청 거절
-	public void receiveDelete(Long member_send_id,
-							  Principal principal) {
-		Long myId = memberMapper.findByMemberId(principal.getName());
+//	친구수락 (친구상태 업데이트)
+	public void friendAccept(Principal principal, Long member_send_id) {
+//		FriendRequestDTO friendRequestDTO = new FriendRequestDTO();
+		MemberDTO memberDTO = memberMapper.findByMemberSeq(member_send_id);
+		FriendDTO friendDTO = new FriendDTO();
+		Long myId = memberMapper.findByMemberId(principal.getName());	// 나의(보낸) 시퀀스
 		
+		friendMapper.friendAccept(myId, member_send_id);				// 친구 상태 업데이트 메서드
+		
+		friendDTO.setMember_my_id(myId);
+		friendDTO.setMember_friend_id(member_send_id);
+		friendDTO.setMember_userid(memberDTO.getMember_userid());
+		friendMapper.friendAdd(friendDTO);					// 친구 테이블에 추가 메서드
+		
+//		friendRequestDTO.setMember_receive_id(member_id);				// 내가 친구신청 보낸 친구의 시퀀스
+//		friendRequestDTO.setMember_send_id(myId);
 	}
+	
+//	친구목록
+	public List<FriendDTO> friendList(Principal principal) {
+		long myId = memberMapper.findByMemberId(principal.getName());
+		
+		List<FriendDTO> list = friendMapper.friendList(myId);
+		
+		return list;
+	}
+
+//	친구 테이블에 추가
+//	public void friendAdd(Principal principal, Long member_send_id) {	
+//	}
 	
 //	친구신청 보낸 아이디 찾기
 //	public List<FriendRequestDTO> findBySendId(Long member_receive_id) {

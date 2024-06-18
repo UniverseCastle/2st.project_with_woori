@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.planner.dto.FriendDTO;
 import com.planner.dto.FriendRequestDTO;
 import com.planner.service.FriendService;
 import com.planner.service.MemberService;
@@ -51,41 +52,41 @@ public class FriendController {
 		return "friend/friend_receive";
 	}
 	
-//	(받은)친구신청 리스트 Post
-	@PostMapping("receiveList")
-	public String receiveList() {
+//	친구수락 (친구상태 업데이트) Post
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("friendAccept")
+//	@ResponseBody
+	public String friendAccept(@RequestParam("member_send_id") Long member_send_id,
+							   Principal principal, Model model) {
+		friendService.friendAccept(principal, member_send_id);			// 요청 상태 업데이트 메서드
+//		friendService.friendAdd(principal, member_send_id);				// 친구 테이블에 추가 메서드
 		
-		return "";
+//		Long myid = memberService.findByMemberId(principal.getName());
+//		String friendStatus = memberService.findByMemberFriendStatus(member_id, myid);
+		
+		return "redirect:/friend/receiveList";
 	}
 	
 //	(받은)친구신청 거절 Post
 	@PostMapping("receiveDelete")
 	@PreAuthorize("isAuthenticated()")
-	public String receiveDelete(Long member_receive_id) {
-		friendService.receiveDelete(null, null);
+	public String receiveDelete(Principal principal,
+							  @RequestParam("member_send_id") Long member_send_id) {
+		friendService.receiveDelete(principal, member_send_id);
+		
+		return "redirect:/friend/receiveList";
 	}
 	
 //	친구목록 Get
 	@GetMapping("friendList")
 	@PreAuthorize("isAuthenticated()")
-	public String friendList() {
+	public String friendList(Principal principal, Model model) {
+		List<FriendDTO> friendList = friendService.friendList(principal);
+		model.addAttribute("friendList", friendList);
 		
 		return "friend/friend_friendList";
 	}
 	
-	/*
-//	친구수락 Post
-	@PreAuthorize("isAuthenticated()")
-	@PostMapping("friendAccept")
-//	@ResponseBody
-	public String friendAccept(@RequestParam("member_id") Long member_id,
-								Principal principal, Model model) {
-		friendService.friendAccept(member_id, principal);			// 친구수락 void 메서드
-		
-//		Long myid = memberService.findByMemberId(principal.getName());
-//		String friendStatus = memberService.findByMemberFriendStatus(member_id, myid);
-		
-		return "redirect:/member/member_userInfo";
-	}
-	*/
+
+
 }

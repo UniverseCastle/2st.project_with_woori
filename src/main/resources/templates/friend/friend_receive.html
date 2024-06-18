@@ -2,25 +2,24 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>받은 친구목록</title>
 </head>
 <body>
 	<div align="center">
-		<table style="border: 1px solid; width: 200px; text-align: center;">
+		<table style="border: 1px solid; width: 400px; text-align: center;">
 			<tbody th:each="friendRequestDTO : ${receiveList}">
 				<tr>
-					<td>보낸사람 id : </td>
-					<td th:text="${friendRequestDTO.member_send_id}"></td>	<!-- a태그로 유저 정보보기 -->
+					<th>보낸사람 아이디</th>
 				</tr>
 				<tr>
-					<td colspan="2">
-						<form action="/friend/receiveList" method="post">
+					<td th:text="${friendRequestDTO.member_email}"></td>	<!-- a태그로 유저 정보보기 -->
+					<td>
+						<form action="/friend/friendAccept" method="post">
 							<button type="submit">수락</button>
+							<input type="hidden" name="member_send_id" th:value="${friendRequestDTO.member_send_id}"	/>
 						</form>
-					</td>
-					<td colspan="2">
 						<form action="/friend/receiveDelete" method="post">
-							<button type="submit">취소</button>
+							<button type="submit">거절</button>
 							<input type="hidden" name="member_send_id" th:value="${friendRequestDTO.member_send_id}"	/>
 						</form>
 					</td>

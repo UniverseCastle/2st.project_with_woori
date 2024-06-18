@@ -59,7 +59,7 @@ public class MemberController {
 		return "member/member_main";
 	}
 	
-//	모든유저 정보
+//	(친추하기위한) 모든유저 정보
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("userInfo")
 	public String userInfo(Model model, Principal principal) {
