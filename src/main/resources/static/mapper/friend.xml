@@ -101,25 +101,82 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			#{member_my_id},
 			#{member_friend_id},
 			'none',
+			#{friend_nickname},
 			'none',
-			'F'
+			'none',
+			'B',
+			'B'
 		)
 	</insert>
+	
+	<!-- 친구 정보 테이블에 추가 -->
+	<!--  
+	<insert id="friendInfoAdd" parameterType="FriendInfoDTO">
+		insert into friend_info values(
+			#{member_my_id},
+			#{member_friend_id},
+			'none',
+			'none',
+			'none',
+			'none'
+		)
+	</insert>
+	-->
 	
 	<!-- 친구목록 -->
 	<select id="friendList" resultType="FriendDTO">
 		select *
 		from(
-			select friend_id, member_friend_id, friend_name, friend_memo, friend_status
+			select 
+				friend_id, 
+				member_friend_id, 
+				friend_my_nickname, 
+				friend_nickname, 
+				friend_my_memo, 
+				friend_memo, 
+				friend_nickname_status, 
+				friend_memo_status
 			from friend
-			where member_my_id = #{member_my_id}
+			where member_my_id = 1
 			union all
-			select friend_id, member_my_id as member_friend_id, friend_name, friend_memo, friend_status
+			select 
+				friend_id, 
+				member_my_id as member_friend_id, 
+				friend_my_nickname, 
+				friend_nickname, 
+				friend_my_memo, 
+				friend_memo, 
+				friend_nickname_status, 
+				friend_memo_status
 			from friend
-			where member_friend_id = #{member_my_id}) f
+			where member_friend_id = 1) f
 		left outer join member m
 		on f.member_friend_id = m.member_id
 	</select>
+	
+	<!-- 친구 닉네임 변경 (추가) -->
+	<select id="friendNickNameAdd">
+		insert into friend_info(
+			member_my_id,
+			member_friend_id,
+			friend_my_nickname,
+			friend_nickname,
+			friend_nickname_status
+		) values(
+			#{member_my_id},
+			#{member_friend_id},
+			'none',
+			#{friend_nickname},
+			'R'
+		)
+	</select>
+	
+	<!-- 친구 닉네임 변경 (수정) (친구에게 등록당한 나의 아이디 = member_friend_id) -->
+	<update id="friendNickNameUpdate" parameterType="friendInfoDTO">
+		update friend_info
+		set	friend_my_nickname = #{friend_nickname}
+		where member_friend_id = #{member_my_id}
+	</update>
 	
 	<!-- 친구신청 보낸 아이디 찾기 -->
 	<!-- 

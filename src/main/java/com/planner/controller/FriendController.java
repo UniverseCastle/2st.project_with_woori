@@ -70,8 +70,8 @@ public class FriendController {
 //	(받은)친구신청 거절 Post
 	@PostMapping("receiveDelete")
 	@PreAuthorize("isAuthenticated()")
-	public String receiveDelete(Principal principal,
-							  @RequestParam("member_send_id") Long member_send_id) {
+	public String receiveDelete(@RequestParam("member_send_id") Long member_send_id,
+							    Principal principal) {
 		friendService.receiveDelete(principal, member_send_id);
 		
 		return "redirect:/friend/receiveList";
@@ -85,6 +85,17 @@ public class FriendController {
 		model.addAttribute("friendList", friendList);
 		
 		return "friend/friend_friendList";
+	}
+	
+//	친구 닉네임 변경 Post
+	@PostMapping("friendName")
+	@PreAuthorize("isAuthenticated()")
+	public String friendName(@RequestParam("member_friend_id") Long member_friend_id,
+							 @RequestParam("member_name") String member_name,
+							 Principal principal) {
+		friendService.friendNickNameAdd(member_friend_id, member_name, principal);
+		
+		return "redirect:/friend/friendList";
 	}
 	
 

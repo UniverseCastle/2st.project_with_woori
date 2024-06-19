@@ -6,21 +6,68 @@
 </head>
 <body>
 	<div align="center">
-		<table>
+		<table style="border: 1px solid; width: 800px; text-align: center;">
 			<tbody th:each="friendDTO : ${friendList}">
 				<tr>
-					<th>친구아이디</th>
-					<th>친구별명</th>
-					<th>친구메모</th>
+					<th>친구이메일</th>
+					<th>친구이름</th>		<!-- 조건식 별명상태 'R' -->
+					<th>친구메모</th>		<!-- 조건식 메모상태 'R' -->
 				</tr>
 				<tr>
-					<td th:text="${friendDTO.member_friend_id}"></td>
-					<td th:if="${friendDTO.friend_status == 'F'}" th:text="${friendDTO.member_userid}"></td>
-					<td th:if="${friendDTO.friend_status == 'N'}" th:text="${friendDTO.friend_name}"></td>
+					<td th:text="${friendDTO.member_email}"></td>	<!-- 링크 걸기 / 이메일에 걸지, 이름에 걸지, 통으로 걸지 선택 -->
+					<td th:text="${friendDTO.member_name}"></td>
 					<td th:text="${friendDTO.friend_memo}"></td>
 				</tr>
 			</tbody>
+<!-- 					<td> -->
+<!-- 						<div id="nickInput" th:attr="id='nickInput' + ${friendDTO.member_friend_id}" style="display: none;"> -->
+<!-- 							<form action="/friend/friendName" method="post"> -->
+<!-- 								<input type="hidden" name="member_friend_id" th:value="${friendDTO.member_friend_id}"	/> -->
+<!-- 								<input type="text" name="member_name" th:value="${friendDTO.member_name}" style="width: 70px;"	/> -->
+<!-- 								<button class="submitBtn" type="submit">변경</button> -->
+<!-- 							</form> -->
+<!-- 						</div> -->
+<!-- 						<div id="nickText" th:attr="id='nickText' + ${friendDTO.member_friend_id}" th:if="${friendDTO.friend_status == 'F'}"> -->
+<!-- 							<div th:if="${friendDTO.}"> -->
+<!-- 								<span th:text="${friendDTO.member_name}"></span> -->
+<!-- 							</div> -->
+<!-- 							<span> -->
+<!-- 								<button class="btn-hide" type="button" -->
+<!-- 								 th:attr="data-hide='nickText' + ${friendDTO.member_friend_id}" -->
+<!-- 								 th:attrappend="data-show='nickInput' + ${friendDTO.member_friend_id}" -->
+<!-- 								 onclick="style.display='none'"> -->
+<!-- 								 	변경 -->
+<!-- 								</button> -->
+<!-- 							</span> -->
+<!-- 						</div> -->
+<!-- 					</td> -->
+<!-- 					<td> -->
+<!-- 						<div th:text="${friendDTO.friend_memo}"></div> -->
+<!-- 					</td> -->
 		</table>
 	</div>
+	<script>
+	
+	<!--
+		const hideButtons = document.querySelectorAll('.btn-hide');
+		hideButtons.forEach(button => {
+			button.addEventListener('click', () => {
+				const hideId = button.getAttribute('data-hide');
+				const showId = button.getAttribute('data-show');
+				const nickText = document.getElementById(hideId);
+				const nickInput = document.getElementById(showId);
+				nickText.style.display='none';
+				nickInput.style.display='';
+			});
+		});
+	-->
+// 		const showButtons = document.querySelectorAll('.cancel');
+// 		hideButtons.forEach(button => {
+// 			button.addEventListener('click', () => {
+// 				nickText.style.display='';
+// 				nickInput.style.display='none';
+// 			});
+// 		});
+	</script>
 </body>
 </html>

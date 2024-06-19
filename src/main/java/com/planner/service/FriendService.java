@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.planner.dto.FriendDTO;
+import com.planner.dto.FriendInfoDTO;
 import com.planner.dto.FriendRequestDTO;
 import com.planner.dto.MemberDTO;
 import com.planner.mapper.FriendMapper;
@@ -64,19 +65,24 @@ public class FriendService {
 		friendMapper.receiveDelete(myId, member_send_id);
 	}
 	
-//	친구수락 (친구상태 업데이트)
+//	친구수락 (+친구상태 업데이트)
 	public void friendAccept(Principal principal, Long member_send_id) {
-//		FriendRequestDTO friendRequestDTO = new FriendRequestDTO();
+		Long myId = memberMapper.findByMemberId(principal.getName());		// 나의(받은) 시퀀스
 		MemberDTO memberDTO = memberMapper.findByMemberSeq(member_send_id);
 		FriendDTO friendDTO = new FriendDTO();
-		Long myId = memberMapper.findByMemberId(principal.getName());	// 나의(보낸) 시퀀스
-		
-		friendMapper.friendAccept(myId, member_send_id);				// 친구 상태 업데이트 메서드
+//		FriendInfoDTO friendInfoDTO = new FriendInfoDTO();
 		
 		friendDTO.setMember_my_id(myId);
 		friendDTO.setMember_friend_id(member_send_id);
-		friendDTO.setMember_userid(memberDTO.getMember_userid());
-		friendMapper.friendAdd(friendDTO);					// 친구 테이블에 추가 메서드
+		friendDTO.setFriend_nickname(memberDTO.getMember_name());
+		
+//		friendInfoDTO.setMember_my_id(myId);
+//		friendInfoDTO.setMember_friend_id(member_send_id);
+//		friendInfoDTO.setMember_userid(memberDTO.getMember_userid());
+		
+		friendMapper.friendAccept(myId, member_send_id);				// 친구 상태 업데이트 메서드
+		friendMapper.friendAdd(friendDTO);								// 친구 테이블에 추가 메서드
+//		friendMapper.friendInfoAdd(friendInfoDTO);						// 친구 정보 테이블에 추가 메서드
 		
 //		friendRequestDTO.setMember_receive_id(member_id);				// 내가 친구신청 보낸 친구의 시퀀스
 //		friendRequestDTO.setMember_send_id(myId);
@@ -89,6 +95,23 @@ public class FriendService {
 		List<FriendDTO> list = friendMapper.friendList(myId);
 		
 		return list;
+	}
+	
+//	친구 닉네임 변경 (추가)
+	public void friendNickNameAdd(Long member_friend_id, String member_name, Principal principal) {
+		Long myId = memberMapper.findByMemberId(principal.getName());
+		
+		FriendInfoDTO friendInfoDTO = new FriendInfoDTO();
+		friendInfoDTO.setMember_my_id(myId);
+		friendInfoDTO.setMember_friend_id(member_friend_id);
+		friendInfoDTO.setFriend_nickname(member_name);			// 친구 별칭	/ member_name : DB에 없음
+		
+		friendMapper.friendNickNameAdd(friendInfoDTO);			// 닉네임 변경(추가) 메서드
+	}
+	
+//	친구 닉네임 변경 (수정)
+	public void friendNickNameUpdate(String friend_nickname, Long member_my_id) {
+		
 	}
 
 //	친구 테이블에 추가

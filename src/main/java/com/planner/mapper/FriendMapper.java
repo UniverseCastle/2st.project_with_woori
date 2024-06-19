@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.planner.dto.FriendDTO;
+import com.planner.dto.FriendInfoDTO;
 import com.planner.dto.FriendRequestDTO;
 
 @Mapper
@@ -35,15 +36,28 @@ public interface FriendMapper {
 	public void friendAccept(@Param("member_receive_id") Long member_receive_id,
 							 @Param("member_send_id") Long member_send_id);
 	
-//	친구 테이블에 추가
+//	친구 테이블에 추가 (friend)
 	public void friendAdd(FriendDTO friendDTO);
 	
+//	친구 정보 테이블에 추가 (friend_info)
+//	public void friendInfoAdd(FriendInfoDTO friendInfoDTO);
+
 //	(받은)친구신청 거절
 	public void receiveDelete(@Param("member_receive_id") Long member_receive_id,
 							  @Param("member_send_id") Long member_send_id);
 	
 //	친구목록
 	public List<FriendDTO> friendList(@Param("member_my_id") Long member_my_id);
+	
+//	친구 정보 목록
+//	public Friend
+	
+//	친구 닉네임 변경 (추가)
+	public void friendNickNameAdd(FriendInfoDTO friendInfoDTO);
+	
+//	친구 닉네임 변경 (수정)
+	public void friendNickNameUpdate(@Param("friend_nickname") String friend_nickname,
+									 @Param("member_my_id") Long member_my_id);
 	
 //	친구신청 보낸 아이디 찾기
 //	public List<FriendRequestDTO> findBySendId(Long member_receive_id);
