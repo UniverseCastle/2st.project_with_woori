@@ -6,7 +6,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.planner.dto.FriendDTO;
+<<<<<<< HEAD
 import com.planner.dto.FriendInfoDTO;
+=======
+>>>>>>> f3b7617 (friend_nickname)
 import com.planner.dto.FriendRequestDTO;
 import com.planner.dto.MemberDTO;
 import com.planner.mapper.FriendMapper;
@@ -97,6 +100,7 @@ public class FriendService {
 		return list;
 	}
 	
+<<<<<<< HEAD
 //	친구 닉네임 변경 (추가)
 	public void friendNickNameAdd(Long member_friend_id, String member_name, Principal principal) {
 		Long myId = memberMapper.findByMemberId(principal.getName());
@@ -111,6 +115,22 @@ public class FriendService {
 	
 //	친구 닉네임 변경 (수정)
 	public void friendNickNameUpdate(String friend_nickname, Long member_my_id) {
+=======
+//	친구 닉네임 변경
+	public void friendNickNameSend(Long member_friend_id, String member_name, Principal principal) {
+		Long myId = memberMapper.findByMemberId(principal.getName());
+		
+		FriendDTO friendDTO = new FriendDTO();
+		friendDTO.setMember_my_id(myId);
+		friendDTO.setMember_friend_id(member_friend_id);
+		friendDTO.setFriend_nickname(member_name);			// 친구 별칭	/ member_name : DB에 없음
+		
+		friendMapper.friendNickNameSend(friendDTO);				// 닉네임 변경(추가) 메서드
+	}
+	
+//	친구 닉네임 변경 ()
+	public void friendNickNameReceive(String friend_nickname, Long member_my_id) {
+>>>>>>> f3b7617 (friend_nickname)
 		
 	}
 

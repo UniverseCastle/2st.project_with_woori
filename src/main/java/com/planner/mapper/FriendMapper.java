@@ -7,7 +7,10 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.planner.dto.FriendDTO;
+<<<<<<< HEAD
 import com.planner.dto.FriendInfoDTO;
+=======
+>>>>>>> f3b7617 (friend_nickname)
 import com.planner.dto.FriendRequestDTO;
 
 @Mapper
@@ -52,11 +55,19 @@ public interface FriendMapper {
 //	친구 정보 목록
 //	public Friend
 	
+<<<<<<< HEAD
 //	친구 닉네임 변경 (추가)
 	public void friendNickNameAdd(FriendInfoDTO friendInfoDTO);
 	
 //	친구 닉네임 변경 (수정)
 	public void friendNickNameUpdate(@Param("friend_nickname") String friend_nickname,
+=======
+//	친구 닉네임 변경
+	public void friendNickNameSend(FriendDTO friendDTO);
+	
+//	친구 닉네임 변경 (수정)
+	public void friendNickNameReceive(@Param("friend_nickname") String friend_nickname,
+>>>>>>> f3b7617 (friend_nickname)
 									 @Param("member_my_id") Long member_my_id);
 	
 //	친구신청 보낸 아이디 찾기

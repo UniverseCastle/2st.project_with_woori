@@ -93,7 +93,11 @@ public class FriendController {
 	public String friendName(@RequestParam("member_friend_id") Long member_friend_id,
 							 @RequestParam("member_name") String member_name,
 							 Principal principal) {
+<<<<<<< HEAD
 		friendService.friendNickNameAdd(member_friend_id, member_name, principal);
+=======
+		friendService.friendNickNameSend(member_friend_id, member_name, principal);
+>>>>>>> f3b7617 (friend_nickname)
 		
 		return "redirect:/friend/friendList";
 	}

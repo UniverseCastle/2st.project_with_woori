@@ -137,7 +137,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 				friend_nickname_status, 
 				friend_memo_status
 			from friend
+<<<<<<< HEAD
 			where member_my_id = 1
+=======
+			where member_my_id = #{member_my_id}
+>>>>>>> f3b7617 (friend_nickname)
 			union all
 			select 
 				friend_id, 
@@ -149,12 +153,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 				friend_nickname_status, 
 				friend_memo_status
 			from friend
+<<<<<<< HEAD
 			where member_friend_id = 1) f
+=======
+			where member_friend_id = #{member_my_id}) f
+>>>>>>> f3b7617 (friend_nickname)
 		left outer join member m
 		on f.member_friend_id = m.member_id
 	</select>
 	
 	<!-- 친구 닉네임 변경 (추가) -->
+<<<<<<< HEAD
 	<select id="friendNickNameAdd">
 		insert into friend_info(
 			member_my_id,
@@ -173,6 +182,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<!-- 친구 닉네임 변경 (수정) (친구에게 등록당한 나의 아이디 = member_friend_id) -->
 	<update id="friendNickNameUpdate" parameterType="friendInfoDTO">
+=======
+	<update id="friendNickNameSend" parameterType="friendDTO">
+		update friend
+		set
+			friend_nickname = #{friend_nickname},
+			friend_nickname_status = 'R'
+		where member_my_id = #{member_my_id}
+		and member_friend_id = #{member_friend_id}
+	</update>
+	
+	<!-- 친구 닉네임 변경 (수정) (친구에게 등록당한 나의 아이디 = member_friend_id) -->
+	<update id="friendNickNameReceive" parameterType="friendDTO">
+>>>>>>> f3b7617 (friend_nickname)
 		update friend_info
 		set	friend_my_nickname = #{friend_nickname}
 		where member_friend_id = #{member_my_id}
