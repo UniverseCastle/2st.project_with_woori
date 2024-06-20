@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>받은 친구목록</title>
+</head>
+<body>
+	<div align="center">
+		<table style="border: 1px solid; width: 400px; text-align: center;">
+			<tbody th:each="friendRequestDTO : ${receiveList}">
+				<tr>
+					<th>보낸사람 아이디</th>
+				</tr>
+				<tr>
+					<td th:text="${friendRequestDTO.member_email}"></td>	<!-- a태그로 유저 정보보기 -->
+					<td>
+						<form action="/friend/friendAccept" method="post">
+							<button type="submit">수락</button>
+							<input type="hidden" name="member_send_id" th:value="${friendRequestDTO.member_send_id}"	/>
+						</form>
+						<form action="/friend/receiveDelete" method="post">
+							<button type="submit">거절</button>
+							<input type="hidden" name="member_send_id" th:value="${friendRequestDTO.member_send_id}"	/>
+						</form>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>
