@@ -7,104 +7,34 @@
 <body>
 	<div align="center">
 		<table style="border: 1px solid; width: 800px; text-align: center;">
-<<<<<<< HEAD
-			<tbody th:each="friendDTO : ${friendList}">
-				<tr>
-					<th>친구이메일</th>
-					<th>친구이름</th>		<!-- 조건식 별명상태 'R' -->
-					<th>친구메모</th>		<!-- 조건식 메모상태 'R' -->
-				</tr>
-				<tr>
-					<td th:text="${friendDTO.member_email}"></td>	<!-- 링크 걸기 / 이메일에 걸지, 이름에 걸지, 통으로 걸지 선택 -->
-					<td th:text="${friendDTO.member_name}"></td>
-					<td th:text="${friendDTO.friend_memo}"></td>
-				</tr>
-			</tbody>
-<!-- 					<td> -->
-<!-- 						<div id="nickInput" th:attr="id='nickInput' + ${friendDTO.member_friend_id}" style="display: none;"> -->
-<!-- 							<form action="/friend/friendName" method="post"> -->
-<!-- 								<input type="hidden" name="member_friend_id" th:value="${friendDTO.member_friend_id}"	/> -->
-<!-- 								<input type="text" name="member_name" th:value="${friendDTO.member_name}" style="width: 70px;"	/> -->
-<!-- 								<button class="submitBtn" type="submit">변경</button> -->
-<!-- 							</form> -->
-<!-- 						</div> -->
-<!-- 						<div id="nickText" th:attr="id='nickText' + ${friendDTO.member_friend_id}" th:if="${friendDTO.friend_status == 'F'}"> -->
-<!-- 							<div th:if="${friendDTO.}"> -->
-<!-- 								<span th:text="${friendDTO.member_name}"></span> -->
-<!-- 							</div> -->
-<!-- 							<span> -->
-<!-- 								<button class="btn-hide" type="button" -->
-<!-- 								 th:attr="data-hide='nickText' + ${friendDTO.member_friend_id}" -->
-<!-- 								 th:attrappend="data-show='nickInput' + ${friendDTO.member_friend_id}" -->
-<!-- 								 onclick="style.display='none'"> -->
-<!-- 								 	변경 -->
-<!-- 								</button> -->
-<!-- 							</span> -->
-<!-- 						</div> -->
-<!-- 					</td> -->
-<!-- 					<td> -->
-<!-- 						<div th:text="${friendDTO.friend_memo}"></div> -->
-<!-- 					</td> -->
-		</table>
-	</div>
-	<script>
-	
-	<!--
-		const hideButtons = document.querySelectorAll('.btn-hide');
-		hideButtons.forEach(button => {
-			button.addEventListener('click', () => {
-				const hideId = button.getAttribute('data-hide');
-				const showId = button.getAttribute('data-show');
-				const nickText = document.getElementById(hideId);
-				const nickInput = document.getElementById(showId);
-				nickText.style.display='none';
-				nickInput.style.display='';
-			});
-		});
-	-->
-// 		const showButtons = document.querySelectorAll('.cancel');
-// 		hideButtons.forEach(button => {
-// 			button.addEventListener('click', () => {
-// 				nickText.style.display='';
-// 				nickInput.style.display='none';
-// 			});
-// 		});
-=======
 			<tr>
 				<th width="200">친구이메일</th>
-				<th width="250" colspan="2">친구이름</th>		<!-- 조건식 별명상태 'R' -->
-				<th width="350">친구메모</th>					<!-- 조건식 메모상태 'R' -->
+				<th width="250" colspan="2">친구이름</th>
+				<th width="350">친구메모</th>
 			</tr>
 			<tr th:each="friendDTO : ${friendList}">
 				<td th:text="${friendDTO.member_email}"></td>
 				<td width="20%">
 					<div th:attr="id='nameT' + ${friendDTO.friend_id}"
-					 th:text="${friendDTO.member_name}">
-					 </div>			<!-- 닉네임 변경 이력이 없을 시 회원정보에서 이름을 가져오는 조건 -->
-<!-- 					<div th:if="${friendDTO.friend_nickname_status == 'R'}" -->
-<!-- 					 th:attr="id='nameT' + ${friendDTO.friend_id}" -->
-<!-- 					 th:text="${friendDTO.friend_nickname}"> -->
-<!-- 					 </div> -->
-					 <!-- 인풋박스 / 닉네임 변경 이력 없을 때 -->
+					 th:text="${friendDTO.friend_nickname}">
+					</div>
 					<div>
 						<input type="text" style="display: none; width: 60px;"
 						 th:attr="id='nameI' + ${friendDTO.friend_id}"
-						 th:value="${friendDTO.member_name}"		/>
+						 th:value="${friendDTO.friend_nickname}"/>
 					</div>
-					<!-- 인풋박스 / 닉네임 변경 후 -->
-<!-- 					<div th:if="${friendDTO.friend_nickname_status == 'R'}"> -->
-<!-- 						<input type="text" style="display: none; width: 60px;" -->
-<!-- 						 th:attr="id='nameI' + ${friendDTO.friend_id}" -->
-<!-- 						 th:value="${friendDTO.friend_nickname}"	/> -->
-<!-- 					</div> -->
 				</td>
 				<td align="left">
-					<form action="/friend/friendName" method="post">
+					<form action="/friend/friendName" method="post" th:attr="id='nickForm' + ${friendDTO.friend_id}">
 						<input type="hidden" name="friend_id" th:value="${friendDTO.friend_id}"	/>
-						<input type="hidden" name="member_friend_id" th:value="${friendDTO.member_friend_id}"	/>
-						<input type="hidden" name="member_name" id="h_member_name"	/>
+						<input type="hidden" name="friend_status" th:value="${friendDTO.friend_status}"	/>
+						<input type="hidden" name="friend_my_nickname" th:value="${friendDTO.friend_my_nickname}"	/>
+						<!-- 텍스트박스에 입력된 밸류 가져와서 서밋 (텍스트박스가 form 밖에있음) -->
+						<input type="hidden" name="friend_nickname"
+						 th:attr="id='nameH' + ${friendDTO.friend_id}"	/>
+						
 						<!-- 서밋 버튼 -->
-						<button class="submitBtn" style="display: none;"
+						<button type="button" style="display: none;"
 						 th:attr="id='submitBtn' + ${friendDTO.friend_id}">
 							변경
 						</button>
@@ -114,61 +44,124 @@
 					<button class="hideBtn" type="button"
 					 th:attr="data-hide='nameT' + ${friendDTO.friend_id},
 					 data-show='nameI' + ${friendDTO.friend_id},
-					 data-submit='submitBtn' + ${friendDTO.friend_id}">
+					 data-submit='submitBtn' + ${friendDTO.friend_id},
+					 data-hidden='nameH' + ${friendDTO.friend_id},
+					 data-nick='nickForm' + ${friendDTO.friend_id}">
 						변경
 					</button>
 				</td>
-				<td th:text="${friendDTO.friend_memo}"></td>
+				
+				<td width="20%">
+					<div th:attr="id='memoT' + ${friendDTO.friend_id}"
+					 th:text="${friendDTO.friend_memo}">
+					</div>
+					<div>
+						<input type="text" style="display: none; width: 60px;"
+						 th:attr="id='memoI' + ${friendDTO.friend_id}"
+						 th:value="${friendDTO.friend_memo}"/>
+					</div>
+				</td>
+				<td align="left">
+					<form action="/friend/friendMemo" method="post" th:attr="id='memoForm' + ${friendDTO.friend_id}">
+						<input type="hidden" name="friend_id" th:value="${friendDTO.friend_id}"	/>
+						<input type="hidden" name="friend_status" th:value="${friendDTO.friend_status}"	/>
+						<input type="hidden" name="friend_my_memo" th:value="${friendDTO.friend_my_memo}"	/>
+						<!-- 텍스트박스에 입력된 밸류 가져와서 서밋 (텍스트박스가 form 밖에있음) -->
+						<input type="hidden" name="friend_memo"
+						 th:attr="id='memoH' + ${friendDTO.friend_id}"	/>
+						
+						<!-- 서밋 버튼 -->
+						<button type="button" style="display: none;"
+						 th:attr="id='submitMemoBtn' + ${friendDTO.friend_id}">
+							변경
+						</button>
+					</form>
+					
+					<!-- 숨김 버튼 / 클릭 시 인풋박스, 서밋버튼 나타냄 / 텍스트, 클릭한 버튼 숨김-->
+					<button class="hideMemoBtn" type="button"
+					 th:attr="data-mhide='memoT' + ${friendDTO.friend_id},
+					 data-mshow='memoI' + ${friendDTO.friend_id},
+					 data-msubmit='submitMemoBtn' + ${friendDTO.friend_id},
+					 data-mhidden='memoH' + ${friendDTO.friend_id},
+					 data-memo='memoForm' + ${friendDTO.friend_id}">
+						변경
+					</button>
+				</td>
+				
 			</tr>
 		</table>
 	</div>
-	<script>		<!-- 반복문으로 꺼낸 숨김버튼에 속성을 부여해서 특정성을 갖게함 -->
+	
+	<script>		<!-- 반복문으로 꺼낸 숨김버튼에 속성을 부여함 -->
 		const hideBtns = document.querySelectorAll('.hideBtn');
-// 		const submitBtns = document.querySelectorAll('.submitBtn');
-			hideBtns.forEach(button => {
-				button.addEventListener('click', () => {
-					const hideId = button.getAttribute('data-hide');
-					const showId = button.getAttribute('data-show');
-					const submitId = button.getAttribute('data-submit');
-					const nameT = document.getElementById(hideId);
-					const nameI = document.getElementById(showId);
-					const submitBtn = document.getElementById(submitId);
-					if (nameT) {
-						nameT.style.display = 'none';
+		hideBtns.forEach(button => {
+			button.addEventListener('click', () => {
+				const hideId = button.getAttribute('data-hide');
+				const showId = button.getAttribute('data-show');
+				const submitId = button.getAttribute('data-submit');
+				const hiddenId = button.getAttribute('data-hidden');
+				const nickId = button.getAttribute('data-nick');
+				const nameT = document.getElementById(hideId);
+				const nameI = document.getElementById(showId);
+				const submitBtn = document.getElementById(submitId);
+				const nameH = document.getElementById(hiddenId);
+				const nickF = document.getElementById(nickId);
+				
+				hideBtns.forEach(btn => {
+					if (btn !== button) {
+						btn.disabled = true;
 					}
-					if (submitBtn) {
-						submitBtn.style.display = 'inline-block';
-						nameI.style.display = 'inline-block';
-					}
-					
-					nameI.addEventListener('input', function() {
-						document.getElementById('h_member_name').value = nameI.value;
-					});
-					
+				});
+				
+				if (nameT) {
+					nameT.style.display = 'none';
+				}
+				if (nameI && submitBtn) {
+					submitBtn.style.display = 'inline-block';
+					nameI.style.display = 'inline-block';
+				}
+				submitBtn.addEventListener('click', () => {
+					nameH.value = nameI.value;
+					nickF.submit();
+				});
 				button.style.display = 'none';
 			});
-				
-// 			submitBtns.forEach(sbutton => {
-// 				sbutton.addEventListener('click', () => {
-// 					const showId = button.getAttribute('data-show');
-// 					let nameI_val = document.getElementById('showId').value;
-// 					document.getElementById('h_member_name').value = nameI_val;
-// 					sbutton.style.display = 'none';
-// 				});
-// 			});
-				
-			
-// 			submitBtns.forEach(button => {
-// 				button.addEventListener('click', () => {
-// 					const showId = button.getAttribute();
-// 				});
-// 			});
-				
-				
-				
-			
 		});
->>>>>>> f3b7617 (friend_nickname)
+		
+		const hideMemoBtns = document.querySelectorAll('.hideMemoBtn');
+		hideMemoBtns.forEach(button => {
+			button.addEventListener('click', () => {
+				const mhideId = button.getAttribute('data-mhide');
+				const mshowId = button.getAttribute('data-mshow');
+				const msubmitId = button.getAttribute('data-msubmit');
+				const mhiddenId = button.getAttribute('data-mhidden');
+				const memoId = button.getAttribute('data-memo');
+				const memoT = document.getElementById(mhideId);
+				const memoI = document.getElementById(mshowId);
+				const submitMemoBtn = document.getElementById(msubmitId);
+				const memoH = document.getElementById(mhiddenId);
+				const memoF = document.getElementById(memoId);
+				
+				hideMemoBtns.forEach(btn => {
+					if (btn !== button) {
+						btn.disabled = true;
+					}
+				});
+				
+				if (memoT) {
+					memoT.style.display = 'none';
+				}
+				if (memoI && submitMemoBtn) {
+					submitMemoBtn.style.display = 'inline-block';
+					memoI.style.display = 'inline-block';
+				}
+				submitMemoBtn.addEventListener('click', () => {
+					memoH.value = memoI.value;
+					memoF.submit();
+				});
+				button.style.display = 'none';
+			});
+		});
 	</script>
 </body>
 </html>

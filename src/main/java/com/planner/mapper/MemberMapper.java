@@ -24,7 +24,10 @@ public interface MemberMapper {
 	public Long findByMemberId(String member_email);
 	
 //	회원 시퀀스로 이메일 찾기
-	public String findByEmail(Long member_id);
+	public String findByMemberEmail(Long member_id);
+	
+//	회원 시퀀스로 회원이름 찾기
+	public String findByMemberName(Long member_id);
 
 //	회원가입
 	public int memberInsert(MemberDTO memberDTO);

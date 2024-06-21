@@ -26,8 +26,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<!-- 회원 시퀀스로 이메일 찾기 -->
-	<select id="findByEmail" resultType="String">
+	<select id="findByMemberEmail" resultType="String">
 		select member_email
+		from member
+		where member_id = #{member_id}
+	</select>
+	
+	<!-- 회원 시퀀스로 이름 찾기 -->
+	<select id="findByMemberName" resultType="String">
+		select member_name
 		from member
 		where member_id = #{member_id}
 	</select>
@@ -111,6 +118,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<!-- 친구목록 -->
+	<!-- 
 	<select id="friendList" resultType="FriendDTO">
 		select m.*, f.member_send_id, f.member_receive_id
 		from member m
@@ -120,7 +128,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		and f.member_receive_id = #{member_id}
 		or f.member_send_id = #{member_id}
 	</select>
-	
+	 -->
 	
 	
 	<!-- 친구신청 받는 아이디(member_receive_id)로 'R' 상태의 회원 시퀀스 찾기 -->

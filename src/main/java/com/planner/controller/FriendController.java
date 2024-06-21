@@ -90,14 +90,17 @@ public class FriendController {
 //	친구 닉네임 변경 Post
 	@PostMapping("friendName")
 	@PreAuthorize("isAuthenticated()")
-	public String friendName(@RequestParam("member_friend_id") Long member_friend_id,
-							 @RequestParam("member_name") String member_name,
-							 Principal principal) {
-<<<<<<< HEAD
-		friendService.friendNickNameAdd(member_friend_id, member_name, principal);
-=======
-		friendService.friendNickNameSend(member_friend_id, member_name, principal);
->>>>>>> f3b7617 (friend_nickname)
+	public String friendName(FriendDTO friendDTO) {
+		friendService.friendNickName(friendDTO);
+		
+		return "redirect:/friend/friendList";
+	}
+	
+//	친구 메모 변경 Post
+	@PostMapping("friendMemo")
+	@PreAuthorize("isAuthenticated()")
+	public String friendMemo(FriendDTO friendDTO) {
+		friendService.friendMemo(friendDTO);
 		
 		return "redirect:/friend/friendList";
 	}

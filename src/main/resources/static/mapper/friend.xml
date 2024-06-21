@@ -11,23 +11,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where member_send_id=#{member_send_id}
 	</select>
 	
-	<!-- 친구신청 상태 찾기 -->
-<!-- 	<select id="RequestStatus" resultType="String"> -->
-<!-- 		select friend_request_status -->
-<!-- 		from friend_request -->
-<!-- 		where member_receive_id=#{member_receive_id}; -->
-<!-- 		and member_send_id=#{member_send_id} -->
-<!-- 	</select> -->
-	
-	<!-- 친구요청 (보낸)시퀀스 찾기 -->
-<!-- 	<select id="findByMemberId" resultType="Long"> -->
-<!-- 		select fr.member_send_id, m.member_name -->
-<!-- 		from friend_request fr -->
-<!-- 		left outer join member m -->
-<!-- 		on fr.member_send_id=m.member_id -->
-<!-- 		where fr.member_send_id=#{member_id} -->
-<!-- 	</select> -->
-
 	<!-- 친구신청 (보낼 때 / 보낸사람 데이터 추가) -->
 	<insert id="friendRequest" parameterType="FriendRequestDTO">
 		insert into friend_request values(
@@ -37,35 +20,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			'R'
 		)
 	</insert>
-	
-	<!-- 친구신청 전 중복검사 -->
-	<!--  
-	<select id="friendCheck" resultType="String">
-		select friend_request_status
-		from friend_request
-		where member_receive_id = #{member_receive_id}
-		and member_send_id = #{member_send_id}
-		and friend_request_status = 'R'
-		or friend_request_status ='F'
-	</select>
-	-->
-	
-	<!-- 받은 아이디로 보낸 아이디 찾기 -->
-<!-- 	<select id=""> -->
-	
-<!-- 	</select> -->
-	
-	<!-- 친구신청 받은 아이디로 보낸 아이디 찾기 -->
-	<!--  
-	<select id="findBySendIdList" resultType="FriendRequestDTO">
-		select fr.*, m.member_id
-		from friend_request fr
-		left outer join member m
-		on fr.member_receive_id = m.member_id
-		where member_receive_id = #{member_receive_id}
-		and friend_request_status='R'
-	</select>
-	-->
 	
 	<!-- (받은)친구신청 리스트 -->
 	<select id="receiveRequestList" resultType="FriendRequestDTO">
@@ -100,7 +54,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			friend_seq.NEXTVAL,
 			#{member_my_id},
 			#{member_friend_id},
-			'none',
+			#{friend_my_nickname},
 			#{friend_nickname},
 			'none',
 			'none',
@@ -109,95 +63,30 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		)
 	</insert>
 	
-	<!-- 친구 정보 테이블에 추가 -->
-	<!--  
-	<insert id="friendInfoAdd" parameterType="FriendInfoDTO">
-		insert into friend_info values(
-			#{member_my_id},
-			#{member_friend_id},
-			'none',
-			'none',
-			'none',
-			'none'
-		)
-	</insert>
-	-->
-	
 	<!-- 친구목록 -->
 	<select id="friendList" resultType="FriendDTO">
 		select *
-		from(
-			select 
-				friend_id, 
-				member_friend_id, 
-				friend_my_nickname, 
-				friend_nickname, 
-				friend_my_memo, 
-				friend_memo, 
-				friend_nickname_status, 
-				friend_memo_status
-			from friend
-<<<<<<< HEAD
-			where member_my_id = 1
-=======
-			where member_my_id = #{member_my_id}
->>>>>>> f3b7617 (friend_nickname)
-			union all
-			select 
-				friend_id, 
-				member_my_id as member_friend_id, 
-				friend_my_nickname, 
-				friend_nickname, 
-				friend_my_memo, 
-				friend_memo, 
-				friend_nickname_status, 
-				friend_memo_status
-			from friend
-<<<<<<< HEAD
-			where member_friend_id = 1) f
-=======
-			where member_friend_id = #{member_my_id}) f
->>>>>>> f3b7617 (friend_nickname)
-		left outer join member m
-		on f.member_friend_id = m.member_id
+		from friend
+		where member_my_id = #{member_my_id}
+		or member_friend_id = #{member_my_id}
 	</select>
 	
-	<!-- 친구 닉네임 변경 (추가) -->
-<<<<<<< HEAD
-	<select id="friendNickNameAdd">
-		insert into friend_info(
-			member_my_id,
-			member_friend_id,
-			friend_my_nickname,
-			friend_nickname,
-			friend_nickname_status
-		) values(
-			#{member_my_id},
-			#{member_friend_id},
-			'none',
-			#{friend_nickname},
-			'R'
-		)
-	</select>
-	
-	<!-- 친구 닉네임 변경 (수정) (친구에게 등록당한 나의 아이디 = member_friend_id) -->
-	<update id="friendNickNameUpdate" parameterType="friendInfoDTO">
-=======
-	<update id="friendNickNameSend" parameterType="friendDTO">
+	<!-- 친구 닉네임 변경 -->
+	<update id="friendNickName" parameterType="friendDTO">
 		update friend
 		set
-			friend_nickname = #{friend_nickname},
-			friend_nickname_status = 'R'
-		where member_my_id = #{member_my_id}
-		and member_friend_id = #{member_friend_id}
+			friend_my_nickname = #{friend_my_nickname},
+			friend_nickname = #{friend_nickname}
+		where friend_id = #{friend_id}
 	</update>
 	
-	<!-- 친구 닉네임 변경 (수정) (친구에게 등록당한 나의 아이디 = member_friend_id) -->
-	<update id="friendNickNameReceive" parameterType="friendDTO">
->>>>>>> f3b7617 (friend_nickname)
-		update friend_info
-		set	friend_my_nickname = #{friend_nickname}
-		where member_friend_id = #{member_my_id}
+	<!-- 친구 메모 변경 -->
+	<update id="friendMemo" parameterType="friendDTO">
+		update friend
+		set
+			friend_my_memo = #{friend_my_memo},
+			friend_memo = #{friend_memo}
+		where friend_id = #{friend_id}
 	</update>
 	
 	<!-- 친구신청 보낸 아이디 찾기 -->
