@@ -11,7 +11,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where member_send_id=#{member_send_id}
 	</select>
 	
-	<!-- 친구신청 (보낼 때 / 보낸사람 데이터 추가) -->
+	<!-- 친구찾기 리스트 -->
+	<select id="findFriend" resultType="FriendDTO">
+		
+	</select>
+	
+	<!-- 친구신청 (보낼 때) -->
 	<insert id="friendRequest" parameterType="FriendRequestDTO">
 		insert into friend_request values(
 			friend_request_seq.NEXTVAL,
@@ -20,6 +25,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			'R'
 		)
 	</insert>
+	
+	<!-- 친구신청 상태 찾기 -->
+	<select id="friendRequestStatus" resultType="String">
+		select friend_request_status
+		from friend_request
+		where member_receive_id = #{member_receive_id}
+		and member_send_id = #{member_send_id}
+	</select>
 	
 	<!-- (받은)친구신청 리스트 -->
 	<select id="receiveRequestList" resultType="FriendRequestDTO">

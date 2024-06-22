@@ -15,7 +15,7 @@ public class FriendDTO {
 	private String friend_nickname;			// 친구 닉네임
 	private String friend_my_memo;			// 나의 메모
 	private String friend_memo;				// 친구 메모
-	private String member_email;			// 회원 이메일 					/ DB에 없음
+	private String member_email;			// 회원 이메일 						/ DB에 없음
 	private String member_name;				// 별명 생성 전까지 보여줄 회원 이름	/ DB에 없음
-	private String friend_status;			// 친구 상태 (기본 : B, 바뀜 : C)	/ DB에 없음
+	private String friend_status;			// 친구 상태 (기본 : B, 바뀜 : C)		/ DB에 없음
 }

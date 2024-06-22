@@ -3,6 +3,7 @@ package com.planner.service;
 import java.security.Principal;
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 import com.planner.dto.FriendDTO;
@@ -25,6 +26,11 @@ public class FriendService {
 		return friendMapper.findByFriendRequest(member_id);
 	}
 	
+//	친구찾기 리스트
+	public List<FriendDTO> findFriend(@Param("member_my_id") Long member_my_id) {
+		return friendMapper.findFriend(member_my_id);
+	}
+	
 //	친구신청 (보냄)
 	public void friendRequest(Long member_id, Principal principal) {	// member_id : 친구(신청 받은) 시퀀스
 		FriendRequestDTO friendRequestDTO = new FriendRequestDTO();
@@ -34,6 +40,12 @@ public class FriendService {
 		friendRequestDTO.setMember_send_id(myId);						// 나의 시퀀스
 		
 		friendMapper.friendRequest(friendRequestDTO);					// 친구신청 void 메서드
+	}
+	
+//	친구신청 상태 찾기
+	public String friendRequestStatus(@Param("member_receive_id") Long member_receive_id,
+							   		  @Param("member_send_id") Long member_send_id) {
+		return friendMapper.friendRequestStatus(member_receive_id, member_send_id);
 	}
 	
 //	(받은)친구신청 리스트
@@ -51,8 +63,7 @@ public class FriendService {
 	}
 	
 //	(받은)친구신청 거절
-	public void receiveDelete(Principal principal,
-			Long member_send_id) {
+	public void receiveDelete(Principal principal, Long member_send_id) {
 		Long myId = memberMapper.findByMemberId(principal.getName());
 		friendMapper.receiveDelete(myId, member_send_id);
 	}

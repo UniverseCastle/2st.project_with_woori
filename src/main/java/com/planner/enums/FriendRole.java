@@ -6,6 +6,8 @@ import lombok.Getter;
 public enum FriendRole {
 
 	REQUEST("R", "요청중"),
+//	SEND("S", "요청보냄"),
+//	RECEIVE("R", "요청받음"),
 	SUCCESS("F", "친구");
 	
 	private String code;

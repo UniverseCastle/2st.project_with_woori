@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.planner.dto.MemberDTO;
+import com.planner.mapper.FriendMapper;
 import com.planner.mapper.MemberMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberService {
 
 	private final MemberMapper memberMapper;
+	private final FriendMapper friendMapper;
 	private final PasswordEncoder passwordEncoder;
 	
 //	회원 이메일로 객체 가져오기
@@ -44,37 +46,34 @@ public class MemberService {
 		return memberMapper.memberLogin(member_email, member_password);
 	}
 	
+//	전체 회원 수
+	public int memberCount(String keyword) {
+		return memberMapper.memberCount(keyword);
+	}
+	
 //	모든유저 정보
-	public List<MemberDTO> memberList(Principal principal){
+	public List<MemberDTO> memberList(Principal principal, String keyword, int start, int end){
 		Long myId = memberMapper.findByMemberId(principal.getName());
-		List<MemberDTO> list = memberMapper.memberList(myId);
-		
+		List<MemberDTO> list = memberMapper.memberList(myId, keyword, start, end);
 		List<MemberDTO> sendIdList = memberMapper.findBySendId(myId);
 		
-//		List<MemberDTO> friendList = memberMapper.friendList(myId);
-		
-//		System.out.println(list.size());
-		list.removeAll(sendIdList);
-//		System.out.println(list.size());
-//		list.removeAll(friendList);
-//		System.out.println(list.size());
-		
-		for (MemberDTO memberDTO : list) {												// 리스트에서 신청상태를 표시하기 위해 set
-			String status = findByMemberFriendStatus(memberDTO.getMember_id(), myId);
+		list.removeAll(sendIdList);				// 보낸사람 기준 여러명에게 보낸 만큼 중복되어 나오는 데이터 삭제
+		for (MemberDTO memberDTO : list) {		// 리스트에서 신청상태를 표시하기 위해 set
+			String status = friendMapper.friendRequestStatus(memberDTO.getMember_id(), myId);
 			memberDTO.setFriend_request_status(status);
 		}
 		return list;
 	}
 	
 //	친구신청 받는 아이디로 친구신청 상태 찾기
-	public String findByMemberFriendStatus(Long member_receive_id, Long member_id) {	// member_receive_id : 친구신청 받는 아이디
-		return memberMapper.findByMemberFriendStatus(member_receive_id, member_id);		// member_id : 친구신청 보낸 (나의) 아이디
-	}
+//	public String findByMemberFriendStatus(Long member_receive_id, Long member_id) {	// member_receive_id : 친구신청 받는 아이디
+//		return memberMapper.findByMemberFriendStatus(member_receive_id, member_id);		// member_id : 친구신청 보낸 (나의) 아이디
+//	}
 	
 //	친구신청 보낸 아이디 찾기
-	public List<MemberDTO> findBySendId(Long member_id) {
-		return memberMapper.findBySendId(member_id);
-	}
+//	public List<MemberDTO> findBySendId(Long member_id) {
+//		return memberMapper.findBySendId(member_id);
+//	}
 	
 //	친구신청 받은 아이디로 보낸 아이디 찾기 (친구신청 받았을 때)
 //	public List<FriendRequestDTO> findBySendIdList(Principal principal) {

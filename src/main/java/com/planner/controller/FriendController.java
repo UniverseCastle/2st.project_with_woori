@@ -27,6 +27,14 @@ public class FriendController {
 	private final FriendService friendService;
 	private final MemberService memberService;
 	
+//	친구찾기 리스트 Get
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("findFriend")
+	public String findFriend() {
+		
+		return "friend_findFriend";
+	}
+	
 //	친구추가 Post
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("friendRequest")
@@ -36,7 +44,7 @@ public class FriendController {
 		friendService.friendRequest(member_id, principal);			// 친구신청 void 메서드
 		
 		Long myid = memberService.findByMemberId(principal.getName());
-		String friendStatus = memberService.findByMemberFriendStatus(member_id, myid);
+		String friendStatus = friendService.friendRequestStatus(member_id, myid);	// 친구신청 상태 찾는 메서드 / (받는 아이디, 보낸 아이디)
 		
 		return friendStatus;
 	}
