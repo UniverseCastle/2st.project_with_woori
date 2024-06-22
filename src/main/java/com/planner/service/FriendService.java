@@ -152,4 +152,8 @@ public class FriendService {
 		friendMapper.friendMemo(friendDTO);						// 메모 변경 메서드
 	}
 
+//	친구정보
+	public FriendDTO friendInfo(@Param("member_friend_id") Long member_friend_id) {
+		return friendMapper.friendInfo(member_friend_id);
+	}
 }

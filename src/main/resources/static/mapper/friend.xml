@@ -102,6 +102,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where friend_id = #{friend_id}
 	</update>
 	
+	<!-- 친구정보 -->
+<!-- 	<select id="friendInfo"> -->
+		
+<!-- 	</select> -->
+	
 	<!-- 친구신청 보낸 아이디 찾기 -->
 	<!-- 
 	<select id="findBySendId" resultType="FriendRequestDTO">

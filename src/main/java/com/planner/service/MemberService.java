@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -55,14 +56,27 @@ public class MemberService {
 	public List<MemberDTO> memberList(Principal principal, String keyword, int start, int end){
 		Long myId = memberMapper.findByMemberId(principal.getName());
 		List<MemberDTO> list = memberMapper.memberList(myId, keyword, start, end);
-		List<MemberDTO> sendIdList = memberMapper.findBySendId(myId);
+		List<MemberDTO> sendIdList = memberMapper.findBySendId(myId, keyword);
 		
-		list.removeAll(sendIdList);				// 보낸사람 기준 여러명에게 보낸 만큼 중복되어 나오는 데이터 삭제
+		if (!sendIdList.isEmpty()) {
+			list.removeAll(sendIdList);			// 보낸사람 기준 여러명에게 보낸 만큼 중복되어 나오는 데이터 삭제
+		}
 		for (MemberDTO memberDTO : list) {		// 리스트에서 신청상태를 표시하기 위해 set
 			String status = friendMapper.friendRequestStatus(memberDTO.getMember_id(), myId);
 			memberDTO.setFriend_request_status(status);
 		}
 		return list;
+	}
+	
+//	친구신청 보낸 아이디 찾기
+	public List<MemberDTO> findBySendId(Principal principal, @Param("keyword") String keyword) {
+		Long member_id = memberMapper.findByMemberId(principal.getName());
+		return memberMapper.findBySendId(member_id, keyword);
+	}
+	
+//	내 (회원)정보
+	public MemberDTO myInfo(String member_email) {
+		return memberMapper.myInfo(member_email);
 	}
 	
 //	친구신청 받는 아이디로 친구신청 상태 찾기

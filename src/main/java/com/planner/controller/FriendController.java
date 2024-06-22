@@ -28,12 +28,12 @@ public class FriendController {
 	private final MemberService memberService;
 	
 //	친구찾기 리스트 Get
-	@PreAuthorize("isAuthenticated()")
-	@GetMapping("findFriend")
-	public String findFriend() {
-		
-		return "friend_findFriend";
-	}
+//	@PreAuthorize("isAuthenticated()")
+//	@GetMapping("findFriend")
+//	public String findFriend() {
+//		
+//		return "friend_findFriend";
+//	}
 	
 //	친구추가 Post
 	@PreAuthorize("isAuthenticated()")

@@ -48,7 +48,10 @@ public interface MemberMapper {
 //										   @Param("member_id") Long member_id);
 	
 //	친구신청 보낸 아이디 찾기
-	public List<MemberDTO> findBySendId(Long member_id);
+	public List<MemberDTO> findBySendId(@Param("member_id") Long member_id, @Param("keyword") String keyword);
+	
+//	내 (회원)정보
+	public MemberDTO myInfo(String member_email);
 	
 //	친구목록
 //	public List<MemberDTO> friendList(Long member_id);

@@ -64,8 +64,9 @@ public class MemberController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("userInfo")
 	public String userInfo(@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
-						   @RequestParam(name = "keyword", defaultValue = "@dk@)dK)@DJ@(") String keyword,
+						   @RequestParam(name = "keyword", defaultValue = "!@#$%^&*()") String keyword,		// 키워드 기본값 특수문자로 초기 화면 없애기
 						   Model model, Principal principal) {
+//		페이징 처리
 		int pageSize = 10;
 		int currentPage = pageNum;
 		int start = (currentPage - 1) * pageSize + 1;
@@ -75,6 +76,7 @@ public class MemberController {
 		List<MemberDTO> list = null;
 		if (count > 0) {
 			list = memberService.memberList(principal, keyword, start, end);
+			memberService.findBySendId(principal, keyword);
 		}
 		
 		int pageCount = count / pageSize + (count % pageSize == 0 ? 0 : 1);
@@ -87,17 +89,16 @@ public class MemberController {
 		}
 		
 //		List<MemberDTO> list = memberService.memberList(principal);
+//		model.addAttribute("pageBlock", pageBlock);
+//		model.addAttribute("pageSize", pageSize);
+//		model.addAttribute("start", start);
+//		model.addAttribute("end", end);
 		
+		model.addAttribute("count", count);
 		model.addAttribute("pageCount", pageCount);
 		model.addAttribute("startPage", startPage);
-//		model.addAttribute("pageBlock", pageBlock);
 		model.addAttribute("endPage", endPage);
-		
-		model.addAttribute("pageSize", pageSize);
 		model.addAttribute("pageNum", pageNum);
-		model.addAttribute("start", start);
-		model.addAttribute("end", end);
-		model.addAttribute("count", count);
 		
 		model.addAttribute("keyword", keyword);
 		
@@ -105,6 +106,16 @@ public class MemberController {
 		model.addAttribute("friendRoles", FriendRole.values());	// FriendRole 상태 권한설정
 		
 		return "member/member_userInfo";
+	}
+	
+//	내 (회원)정보
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("myInfo")
+	public String myInfo(Principal principal, Model model) {
+		MemberDTO memberDTO = memberService.myInfo(principal.getName());
+		model.addAttribute("memberDTO", memberDTO);
+		
+		return "member/member_myInfo";
 	}
 	
 	
