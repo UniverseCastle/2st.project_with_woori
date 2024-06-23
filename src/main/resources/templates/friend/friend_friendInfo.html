@@ -5,6 +5,121 @@
 <title>친구정보</title>
 </head>
 <body>
-
+	<div align="center">
+		<table style="border: 1px solid; width: 600px; text-align: center;">
+			<tbody th:each="memberDTO : ${friendDTO.memberInfo}">
+				<tr>
+					<td>이메일</td>
+					<td th:text="${memberDTO.member_email}" colspan="3"></td>
+				</tr>
+				<tr>
+					<td>별명<span style="font-size: 12px; color: gray;">(이름)</span></td>
+					<td>
+						<div id="nameT" th:if="${friendDTO.friend_status == 'B'}">
+							[[${friendDTO.friend_nickname}]]
+						</div>
+						<div id="nameT" th:if="${friendDTO.friend_status != 'B'}">
+							[[${friendDTO.friend_my_nickname}]]
+						</div>
+						<!-- 숨겨져있는 인풋박스 / 변경버튼 클릭 시 활성화됨 -->
+						<div th:if="${friendDTO.friend_status == 'B'}">
+							<input type="text" style="display: none; width: 60px;"
+							 id="nameI" th:value="${friendDTO.friend_nickname}"		/>
+						</div>
+						<div th:if="${friendDTO.friend_status != 'B'}">
+							<input type="text" style="display: none; width: 60px;"
+							 id="nameI" th:value="${friendDTO.friend_my_nickname}"	/>
+						</div>
+					</td>
+					
+					<!-- 친구 별명 변경했을 경우 원래 이름 옆에 달아줌 -->
+					<td>
+						<div th:if="${friendDTO.friend_status == 'B'}">
+							<div th:if="${friendDTO.friend_nickname != memberDTO.member_name}">
+								<span th:utext="'<font size=2px color=gray> (' + ${memberDTO.member_name} + ') </font>'"></span>
+							</div>
+						</div>
+						<div th:if="${friendDTO.friend_status != 'B'}">
+							<div th:if="${friendDTO.friend_my_nickname != memberDTO.member_name}">
+								<span th:utext="'<font size=2px color=gray> (' + ${memberDTO.member_name} + ') </font>'"></span>
+							</div>
+						</div>
+					</td>
+					
+					<td align="left" width="50">
+						<form action="/friend/friendInfo" method="post" id="nickForm">
+<!-- 							<input type="hidden" name="friend_change" value="nick"	/>		별명을 서버로 전송하기 위한 숨겨진 입력 요소  -->
+							<input type="hidden" name="friend_id" th:value="${friendDTO.friend_id}"			/>
+							<input type="hidden" name="friend_status" th:value="${friendDTO.friend_status}"	/>
+							<!-- 텍스트박스에 입력된 밸류 가져와서 서밋 (텍스트박스가 form 밖에있음) -->
+							<input type="hidden" name="friend_nickname" id="nameH"	/>
+							
+							<!-- 친구 닉네임은 위에서 조건문에 걸러져서 nickname + status 한 쌍으로 들어감 -->
+							<div th:if="${friendDTO.friend_status == 'B'}">
+							<!-- 나의 닉네임은 걸러주는 조건문이 없기때문에 따로 변환해줌 -->
+								<input type="hidden" name="friend_my_nickname" th:value="${friendDTO.friend_my_nickname}"	/>
+							</div>
+							
+							<div th:if="${friendDTO.friend_status != 'B'}">
+								<input type="hidden" name="friend_my_nickname" th:value="${friendDTO.friend_nickname}"		/>
+							</div>
+							
+							<!-- 서밋 버튼 -->
+							<button type="button" style="display: none;" id="submitBtn">
+								변경
+							</button>
+						</form>
+					
+						<!-- 숨김 버튼 / 클릭 시 인풋박스, 서밋버튼 나타냄 / 텍스트, 클릭한 버튼 숨김 -->
+						<button id="hideBtn" type="button">
+							변경
+						</button>
+					</td>
+				</tr>
+				<tr>
+					<td>생년월일</td>
+					<td th:text="${memberDTO.member_birth}" colspan="3"></td>
+				</tr>
+				<tr>
+					<td>전화번호</td>
+					<td th:text="${memberDTO.member_phone}" colspan="3"></td>
+				</tr>
+				<tr>
+					<td>성별</td>
+					<td th:text="${memberDTO.member_gender}" colspan="3"></td>
+				</tr>
+				<tr>
+					<td>메모</td>
+					<td th:if="${friendDTO.friend_status == 'B'}" th:text="${friendDTO.friend_memo}"></td>
+					<td th:if="${friendDTO.friend_status != 'B'}" th:text="${friendDTO.friend_my_memo}"></td>
+					<td align="left" width="50">
+						<button>변경</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<script>
+		const hideBtn = document.getElementById('hideBtn');
+		const nameT = document.getElementById('nameT');
+		const nameI = document.getElementById('nameI');
+		const submitBtn = document.getElementById('submitBtn');
+		const nameH = document.getElementById('nameH');
+		const nickForm = document.getElementById('nickForm');
+		hideBtn.addEventListener('click', () => {
+			if (nameT) {
+				nameT.style.display = 'none';
+			}
+			if (nameI && submitBtn) {
+				submitBtn.style.display = 'inline-block';
+				nameI.style.display = 'inline-block';
+			}
+			submitBtn.addEventListener('click', () => {
+				nameH.value = nameI.value;
+				nickForm.submit();
+			});
+			hideBtn.style.display = 'none';
+		});
+	</script>
 </body>
 </html>

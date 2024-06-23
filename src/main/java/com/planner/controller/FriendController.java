@@ -7,10 +7,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.planner.dto.FriendDTO;
 import com.planner.dto.FriendRequestDTO;
@@ -105,14 +107,42 @@ public class FriendController {
 	}
 	
 //	친구 메모 변경 Post
-	@PostMapping("friendMemo")
 	@PreAuthorize("isAuthenticated()")
+	@PostMapping("friendMemo")
 	public String friendMemo(FriendDTO friendDTO) {
 		friendService.friendMemo(friendDTO);
 		
 		return "redirect:/friend/friendList";
 	}
 	
+//	친구정보 Post
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("friendInfo")
+	public String friendInfo(FriendDTO frndDTO, RedirectAttributes rttr) {
+		FriendDTO friendDTO = friendService.friendInfo(frndDTO);
+		friendDTO.setFriend_status(frndDTO.getFriend_status());		// 정방향 / 역방향 여부를 알려주는 변수
+		rttr.addFlashAttribute("friendDTO", friendDTO);
+		return "redirect:/friend/friendInfo";
+	}
 
-
+//	친구정보 Get
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("friendInfo")
+	public String friendInfo(@ModelAttribute("friendDTO")FriendDTO friendDTO, Model model) {
+		model.addAttribute("friendDTO", friendDTO);
+		return "friend/friend_friendInfo";
+	}
+	
+	
+//	친구정보 수정 Post
+//	@PreAuthorize("isAuthenticated()")
+//	@PostMapping("friendInfo")
+//	public String friendInfo(FriendDTO friendDTO) {
+//		if (friend_change.equals("nick")) {
+//			System.out.println("========================");
+//			System.out.println(friendDTO.getFriend_status());
+//		}
+//		friendService.friendNickName(friendDTO);
+//		return "redirect:/friend/friendInfo";
+//	}
 }

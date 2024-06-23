@@ -92,9 +92,8 @@ public class FriendService {
 		
 		for (FriendDTO friendDTO : list) {
 			if (!friendDTO.getMember_my_id().equals(myId)) {		// 'C' 역방향 상태 / 나의 정보와 친구 정보의 위치가 바뀜
-				String friendEmail = memberMapper.findByMemberEmail(friendDTO.getMember_my_id());	// my_id = 친구 시퀀스
-				
 				// 값의 위치를 바꿔주기 위해 변수에 대입
+				String friendEmail = memberMapper.findByMemberEmail(friendDTO.getMember_my_id());	// my_id = 친구 시퀀스
 				Long member_my_id = friendDTO.getMember_my_id();
 				Long member_friend_id = friendDTO.getMember_friend_id();
 				String friend_my_nickname = friendDTO.getFriend_my_nickname();
@@ -123,20 +122,23 @@ public class FriendService {
 //	친구 닉네임 변경
 	public void friendNickName(FriendDTO frndDTO) {
 		FriendDTO friendDTO = new FriendDTO();
-		
 		if (frndDTO.getFriend_status().equals("B")) {			// 정방향 배치일 때
 			friendDTO.setFriend_id(frndDTO.getFriend_id());
 			friendDTO.setFriend_my_nickname(frndDTO.getFriend_my_nickname());
 			friendDTO.setFriend_nickname(frndDTO.getFriend_nickname());
 		}else if (frndDTO.getFriend_status().equals("C")) {		// 역방향 배치일 때
+			// 값의 위치를 바꿔주기 위해 변수에 대입
+			String friend_my_nickname = frndDTO.getFriend_my_nickname();
+			String friend_nickname = frndDTO.getFriend_nickname();
+			
 			friendDTO.setFriend_id(frndDTO.getFriend_id());
-			friendDTO.setFriend_my_nickname(frndDTO.getFriend_nickname());
-			friendDTO.setFriend_nickname(frndDTO.getFriend_my_nickname());
+			friendDTO.setFriend_my_nickname(friend_nickname);
+			friendDTO.setFriend_nickname(friend_my_nickname);
 		}
 		friendMapper.friendNickName(friendDTO);					// 닉네임 변경 메서드
 	}
 	
-//	친구 별명 변경
+//	친구 매모 변경
 	public void friendMemo(FriendDTO frndDTO) {
 		FriendDTO friendDTO = new FriendDTO();
 		
@@ -145,15 +147,36 @@ public class FriendService {
 			friendDTO.setFriend_my_memo(frndDTO.getFriend_my_memo());
 			friendDTO.setFriend_memo(frndDTO.getFriend_memo());
 		}else if (frndDTO.getFriend_status().equals("C")) {		// 역방향 배치일 때
+			// 값의 위치를 바꿔주기 위해 변수에 대입
+			String friend_my_memo = frndDTO.getFriend_my_memo();
+			String friend_memo = frndDTO.getFriend_memo();
+			
 			friendDTO.setFriend_id(frndDTO.getFriend_id());
-			friendDTO.setFriend_my_memo(frndDTO.getFriend_memo());
-			friendDTO.setFriend_memo(frndDTO.getFriend_my_memo());
+			friendDTO.setFriend_my_memo(friend_memo);
+			friendDTO.setFriend_memo(friend_my_memo);
 		}
 		friendMapper.friendMemo(friendDTO);						// 메모 변경 메서드
 	}
 
 //	친구정보
-	public FriendDTO friendInfo(@Param("member_friend_id") Long member_friend_id) {
-		return friendMapper.friendInfo(member_friend_id);
+	public FriendDTO friendInfo(FriendDTO frndDTO) {
+		FriendDTO friendDTO = new FriendDTO();
+		if (frndDTO.getFriend_status().equals("B")) {			// 정방향 배치일 때
+			friendDTO.setMember_my_id(frndDTO.getMember_my_id());
+			friendDTO.setMember_friend_id(frndDTO.getMember_friend_id());
+			
+			return friendMapper.friendInfo(friendDTO);
+		}else if (frndDTO.getFriend_status().equals("C")) {		// 역방향 배치일 때
+			// 값의 위치를 바꿔주기 위해 변수에 대입
+			Long member_my_id = frndDTO.getMember_my_id();
+			Long member_friend_id = frndDTO.getMember_friend_id();
+						
+			friendDTO.setMember_my_id(member_friend_id);
+			friendDTO.setMember_friend_id(member_my_id);
+			
+			return friendMapper.friendInfoC(friendDTO);			// 역방향일 경우 join 문 변경됨 / on f.member_my_id = m.member_id
+		}else {
+			throw new IllegalArgumentException();
+		}
 	}
 }

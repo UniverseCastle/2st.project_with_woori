@@ -61,8 +61,11 @@ public interface FriendMapper {
 //	친구 별명 변경
 	public void friendMemo(FriendDTO friendDTO);
 	
-//	친구정보
-	public FriendDTO friendInfo(@Param("member_friend_id") Long member_friend_id);
+//	친구정보 (정방향)
+	public FriendDTO friendInfo(FriendDTO friendDTO);
+	
+//	친구정보 (역방향)
+	public FriendDTO friendInfoC(FriendDTO friendDTO);
 	
 //	친구신청 보낸 아이디 찾기
 //	public List<FriendRequestDTO> findBySendId(Long member_receive_id);
