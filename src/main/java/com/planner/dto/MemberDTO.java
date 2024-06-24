@@ -21,7 +21,9 @@ public class MemberDTO {
 	private LocalDateTime member_reg;		// 가입일시	(default: sysdate)
 	private String member_status;			// 회원상태	(기본: b, 탈퇴: d, 정지: j)
 	private String oauth_id;				// 소셜 로그인
-	private String friend_request_status;	// 친구신청 상태 리스트 (요청 : R, 친구 : F)
+	private String friend_request_status;	// 친구신청 상태 리스트 (요청 : R, 친구 : F)	/ DB에 없음
+	
+//	private int member_count;				// 리스트에 포함된 회원 수 (페이징 처리에 사용)/ DB에 없음
 //	private Long member_receive_id;			// 친구신청 받은 아이디	/ DB에 없음
 //	private Long member_send_id;			// 친구신청 보낸 아이디	/ DB에 없음
 	

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div align="center">
+		<div align="right" style="width: 800px;">
+			<a sec:authorize="isAuthenticated()" href="/friend/friendList">친구목록</a>
+			<a sec:authorize="isAuthenticated()" href="/member/main">메인</a>
+		</div>
+		<table style="border: 1px solid; width: 400px; text-align: center;">
+			<tr>
+				<th>받는사람 아이디</th>
+				<th>취소</th>
+			</tr>
+			<tr th:each="friendRequestDTO : ${sendList}">
+				<td th:text="${friendRequestDTO.member_email}"></td>	<!-- a태그로 유저 정보보기 -->
+				<td>
+					<form action="/friend/requestDelete" method="post">
+						<button type="submit">취소</button>
+						<input type="hidden" name="member_receive_id" th:value="${friendRequestDTO.member_receive_id}"	/>
+						<input type="hidden" name="delete_who" value="receive"	/>		<!-- 나에게 요청을 받은 삭제 대상을 구분짓는 숨김요소 -->
+					</form>
+				</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

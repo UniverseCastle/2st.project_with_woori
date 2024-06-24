@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.planner.dto.MemberDTO;
 import com.planner.enums.FriendRole;
+import com.planner.service.FriendService;
 import com.planner.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberController {
 	
 	private final MemberService memberService;
+	private final FriendService friendService;
 	
 //	메인
 	@GetMapping("main")
@@ -66,17 +68,18 @@ public class MemberController {
 	public String userInfo(@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
 						   @RequestParam(name = "keyword", defaultValue = "!@#$%^&*()") String keyword,		// 키워드 기본값 특수문자로 초기 화면 없애기
 						   Model model, Principal principal) {
+//		TODO 페이징처리 유효성검사 하기
 //		페이징 처리
 		int pageSize = 10;
 		int currentPage = pageNum;
 		int start = (currentPage - 1) * pageSize + 1;
 		int end = currentPage * pageSize;
-		int count = memberService.memberCount(keyword);
+		int count = 0;
 		
-		List<MemberDTO> list = null;
-		if (count > 0) {
-			list = memberService.memberList(principal, keyword, start, end);
+		List<MemberDTO> list = memberService.memberList(principal, keyword, start, end);
+		if (list.size() > 0) {
 			memberService.findBySendId(principal, keyword);
+			count = list.size();
 		}
 		
 		int pageCount = count / pageSize + (count % pageSize == 0 ? 0 : 1);
@@ -88,12 +91,6 @@ public class MemberController {
 			endPage = pageCount;
 		}
 		
-//		List<MemberDTO> list = memberService.memberList(principal);
-//		model.addAttribute("pageBlock", pageBlock);
-//		model.addAttribute("pageSize", pageSize);
-//		model.addAttribute("start", start);
-//		model.addAttribute("end", end);
-		
 		model.addAttribute("count", count);
 		model.addAttribute("pageCount", pageCount);
 		model.addAttribute("startPage", startPage);
@@ -104,6 +101,9 @@ public class MemberController {
 		
 		model.addAttribute("list", list);						// 친구신청 리스트 (친구신청 상태 담겨있음)
 		model.addAttribute("friendRoles", FriendRole.values());	// FriendRole 상태 권한설정
+		
+		int receive_count = friendService.receiveRequestCount(principal);	// 받은 친구신청 수
+		model.addAttribute("receive_count", receive_count);
 		
 		return "member/member_userInfo";
 	}
@@ -118,16 +118,10 @@ public class MemberController {
 		return "member/member_myInfo";
 	}
 	
-	
-	
-//	@PreAuthorize("isAuthenticated()")
-//	@GetMapping("userInfo")
-//	public String userInfo(Principal principal, Model model) {
-//		List<MemberDTO> list = memberService.memberList(principal);
-//		
-//		model.addAttribute("list", list);
-//		
-//		return "member/member_userInfo";
-//	}
-
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("test")
+	public String test () {
+		
+		return "member/test";
+	}
 }

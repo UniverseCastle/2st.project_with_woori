@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}">
 <head>
 <meta charset="UTF-8">
-<title>모든회원 정보</title>
+<title>회원찾기</title>
 <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
 <script>
 	$(document).on("click", ".btn", function(){
@@ -22,59 +25,62 @@
 </script>
 </head>
 <body>
-	<div align="center">
-		<h1 >회원 목록</h1>
-		<form action="/member/userInfo" method="get" id="keywordForm">
-			<input type="text" name="keyword" id="keywordInput"	/>
-			<button type="button" id="keywordBtn">검색</button>
-		</form>
-<!-- 		<h2 th:if="${count == 0}">회원을 찾을 수 없습니다.</h2> -->
-	</div>
-	<div th:if="${count != 0}" align="center">
-<!-- 		<form action="/member/userInfo" method="get"> -->
-<!-- 			<input type="text" name="keyword"	/> -->
-<!-- 			<button type="submit">검색</button> -->
-<!-- 		</form> -->
-		<table>
-			<tr>
-				<th>이메일</th>
-				<th>생년월일</th>
-				<th>성별</th>
-				<th>친구추가</th>
-			</tr>
-			<tr th:each="memberDTO : ${list}">
-				<td th:text="${memberDTO.member_email}"></td>
-				<td th:text="${memberDTO.member_birth}"></td>
-				<td th:text="${memberDTO.member_gender}"></td>
-				<td>
-					<div th:if="${memberDTO.friend_request_status != 'R' and memberDTO.friend_request_status != 'F'}">	<!-- 친구 요청상태 이거나 친구 이거나 -->
-						<button type="button" th:value="${memberDTO.member_id}" class="btn">친구추가</button>
-					</div>
-					<div>
-						<span th:text="${@friendRoleUtils.getFriendRoleName(memberDTO.friend_request_status)}"></span>
-					</div>
-				</td>
-			</tr>
-		</table>
-		
-		<!-- 페이징 처리 시작 -->
-		<div th:if="${count > 0}">
-			<span th:if="${startPage > 10}">
-				<a th:href="@{|/member/userInfo?keyword=${keyword}&pageNum=${startPage - 10}|}" th:text="'[이전]'"></a>
-			</span>
-			<span th:each="i : ${#numbers.sequence(startPage, endPage)}">
-				<a th:if="${pageNum != i}" th:href="@{|/member/userInfo?keyword=${keyword}&pageNum=${i}|}" th:text="'['+${i}+']'"></a>
-				<span th:if="${pageNum == i}">
-					[<b th:text="${i}"></b>]
-				</span>
-			</span>
-			<span th:if="${endPage} < ${pageCount}">
-				<a th:href="@{|/member/userInfo?keyword=${keyword}&pageNum=${startPage + 10}|}" th:text="'[다음]'"></a>
-			</span>
+	<div align="center" layout:fragment="content">
+		<div align="right" style="width: 800px;">
+			<a sec:authorize="isAuthenticated()" href="/friend/receiveList">친구신청</a><span th:if="${receive_count > 0}" th:utext="'('+ ${receive_count}+')'" style="font-size: 12px;"></span>
+			<a sec:authorize="isAuthenticated()" href="/friend/friendList">친구목록</a>
 		</div>
-		<!-- 페이징 처리 끝 -->
+		<div>
+			<h1>Friend Search</h1>
+			<form action="/member/userInfo" method="get" id="keywordForm">
+				<input type="text" name="keyword" id="keywordInput"	/>
+				<button type="button" id="keywordBtn">검색</button>
+			</form>
+		</div>
+			<div th:if="${#lists.isEmpty(list) && keyword != '!@#$%^&*()'}" align="center">
+				<h2>검색 결과가 없습니다.</h2>
+			</div>
+		<div th:if="${count != 0}" align="center">
+			<table>
+				<tr>
+					<th>이메일</th>
+					<th>생년월일</th>
+					<th>성별</th>
+					<th>친구추가</th>
+				</tr>
+				<tr th:each="memberDTO : ${list}">
+					<td th:text="${memberDTO.member_email}"></td>
+					<td th:text="${memberDTO.member_birth}"></td>
+					<td th:text="${memberDTO.member_gender}"></td>
+					<td>
+						<div th:if="${memberDTO.friend_request_status != 'R' and memberDTO.friend_request_status != 'F'}">	<!-- 친구 요청상태 이거나 친구 이거나 -->
+							<button type="button" th:value="${memberDTO.member_id}" class="btn">친구추가</button>
+						</div>
+						<div>
+							<span th:text="${@friendRoleUtils.getFriendRoleName(memberDTO.friend_request_status)}"></span>
+						</div>
+					</td>
+				</tr>
+			</table>
+			
+			<!-- 페이징 처리 시작 -->
+			<div th:if="${count > 0}">
+				<span th:if="${startPage > 10}">
+					<a th:href="@{|/member/userInfo?keyword=${keyword}&pageNum=${startPage - 10}|}" th:text="'[이전]'"></a>
+				</span>
+				<span th:each="i : ${#numbers.sequence(startPage, endPage)}">
+					<a th:if="${pageNum != i}" th:href="@{|/member/userInfo?keyword=${keyword}&pageNum=${i}|}" th:text="'['+${i}+']'"></a>
+					<span th:if="${pageNum == i}">
+						[<b th:text="${i}"></b>]
+					</span>
+				</span>
+				<span th:if="${endPage} < ${pageCount}">
+					<a th:href="@{|/member/userInfo?keyword=${keyword}&pageNum=${startPage + 10}|}" th:text="'[다음]'"></a>
+				</span>
+			</div>
+			<!-- 페이징 처리 끝 -->
+		</div>
 	</div>
-	
 	<script>	<!-- 키워드 검색 글자수 3글자 미만 알림창 띄우는 메서드 (input type="text" : maxlength 밖에 없음) -->
 		const keywordInput = document.getElementById('keywordInput');
 		const keywordBtn = document.getElementById('keywordBtn');

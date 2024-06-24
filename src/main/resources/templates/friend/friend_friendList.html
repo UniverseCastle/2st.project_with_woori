@@ -1,18 +1,25 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}">
 <head>
 <meta charset="UTF-8">
 <title>친구목록</title>
 </head>
 <body>
-	<div align="center">
+	<div layout:fragment="content" align="center">
+		<div align="right" style="width: 800px;">
+			<a sec:authorize="isAuthenticated()" href="/member/main">메인</a>
+		</div>
 		<table style="border: 1px solid; width: 600px; text-align: center;">	<!-- 이 페이지에서는 정/역 방향 설정 완료 my_id=나, friend_id=친구 -->
 			<tr>
 				<th width="200">친구이메일</th>
-				<th width="200" colspan="2">친구이름</th>
+				<th width="200" colspan="2">친구별명</th>
 				<th width="200" colspan="2">친구메모</th>
 			</tr>
 			<tr th:each="friendDTO : ${friendList}">
+				<!-- 이메일 -->
 				<td>
 					<form action="/friend/friendInfo" method="post" th:attr="id='infoForm' + ${friendDTO.friend_id}">
 						<a onclick="infoForm()" class="infoA" th:attr="data-info='infoForm' + ${friendDTO.friend_id}" href="javascript:void(0);">
@@ -23,6 +30,7 @@
 						<input type="hidden" name="friend_status" th:value="${friendDTO.friend_status}"			/>
 					</form>
 				</td>
+				<!-- 별명 -->
 				<td>
 					<div th:attr="id='nameT' + ${friendDTO.friend_id}"
 					 th:text="${friendDTO.friend_nickname}">
@@ -59,8 +67,8 @@
 						변경
 					</button>
 				</td>
-				
-				<td>
+				<!-- 메모 -->
+				<td colspan="2">
 					<div th:attr="id='memoT' + ${friendDTO.friend_id}"
 					 th:text="${friendDTO.friend_memo}">
 					</div>
@@ -70,38 +78,39 @@
 						 th:value="${friendDTO.friend_memo}"/>
 					</div>
 				</td>
-				<td align="left">
-					<form action="/friend/friendMemo" method="post" th:attr="id='memoForm' + ${friendDTO.friend_id}">
-						<input type="hidden" name="friend_id" th:value="${friendDTO.friend_id}"	/>
-						<input type="hidden" name="friend_status" th:value="${friendDTO.friend_status}"	/>
-						<input type="hidden" name="friend_my_memo" th:value="${friendDTO.friend_my_memo}"	/>
+<!-- 				<td align="left"> -->
+<!-- 					<form action="/friend/friendMemo" method="post" th:attr="id='memoForm' + ${friendDTO.friend_id}"> -->
+<!-- 						<input type="hidden" name="friend_id" th:value="${friendDTO.friend_id}"	/> -->
+<!-- 						<input type="hidden" name="friend_status" th:value="${friendDTO.friend_status}"	/> -->
+<!-- 						<input type="hidden" name="friend_my_memo" th:value="${friendDTO.friend_my_memo}"	/> -->
 						<!-- 텍스트박스에 입력된 밸류 가져와서 서밋 (텍스트박스가 form 밖에있음) -->
-						<input type="hidden" name="friend_memo"
-						 th:attr="id='memoH' + ${friendDTO.friend_id}"	/>
+<!-- 						<input type="hidden" name="friend_memo" -->
+<!-- 						 th:attr="id='memoH' + ${friendDTO.friend_id}"	/> -->
 						
 						<!-- 서밋 버튼 -->
-						<button type="button" style="display: none;"
-						 th:attr="id='submitMemoBtn' + ${friendDTO.friend_id}">
-							변경
-						</button>
-					</form>
+<!-- 						<button type="button" style="display: none;" -->
+<!-- 						 th:attr="id='submitMemoBtn' + ${friendDTO.friend_id}"> -->
+<!-- 							변경 -->
+<!-- 						</button> -->
+<!-- 					</form> -->
 					
 					<!-- 숨김 버튼 / 클릭 시 인풋박스, 서밋버튼 나타냄 / 텍스트, 클릭한 버튼 숨김-->
-					<button class="hideMemoBtn" type="button"
-					 th:attr="data-mhide='memoT' + ${friendDTO.friend_id},
-					 data-mshow='memoI' + ${friendDTO.friend_id},
-					 data-msubmit='submitMemoBtn' + ${friendDTO.friend_id},
-					 data-mhidden='memoH' + ${friendDTO.friend_id},
-					 data-memo='memoForm' + ${friendDTO.friend_id}">
-						변경
-					</button>
-				</td>
+<!-- 					<button class="hideMemoBtn" type="button" -->
+<!-- 					 th:attr="data-mhide='memoT' + ${friendDTO.friend_id}, -->
+<!-- 					 data-mshow='memoI' + ${friendDTO.friend_id}, -->
+<!-- 					 data-msubmit='submitMemoBtn' + ${friendDTO.friend_id}, -->
+<!-- 					 data-mhidden='memoH' + ${friendDTO.friend_id}, -->
+<!-- 					 data-memo='memoForm' + ${friendDTO.friend_id}"> -->
+<!-- 						변경 -->
+<!-- 					</button> -->
+<!-- 				</td> -->
 				
 			</tr>
 		</table>
 	</div>
 	
-	<script>		<!-- 반복문으로 꺼낸 숨김버튼에 속성을 부여함 -->
+	<script layout:fragment="script" type="text/javascript" src="/js/friendList.js">		<!-- 반복문으로 꺼낸 숨김버튼에 속성을 부여함 -->
+/*
 		const hideBtns = document.querySelectorAll('.hideBtn');
 		hideBtns.forEach(button => {
 			button.addEventListener('click', () => {
@@ -136,7 +145,8 @@
 				button.style.display = 'none';
 			});
 		});
-		
+*/
+/*		메모 서밋 중단 / 친구 정보에서 수정 가능
 		const hideMemoBtns = document.querySelectorAll('.hideMemoBtn');
 		hideMemoBtns.forEach(button => {
 			button.addEventListener('click', () => {
@@ -171,7 +181,8 @@
 				button.style.display = 'none';
 			});
 		});
-		
+*/
+/*
 		const infoA = document.querySelectorAll('.infoA');
 		infoA.forEach(button => {
 			button.addEventListener('click', () => {
@@ -180,6 +191,7 @@
 				infoForm.submit();
 			});
 		});
+*/
 	</script>
 </body>
 </html>

@@ -54,6 +54,7 @@ public class MemberService {
 	
 //	모든유저 정보
 	public List<MemberDTO> memberList(Principal principal, String keyword, int start, int end){
+//		int count = 0;
 		Long myId = memberMapper.findByMemberId(principal.getName());
 		List<MemberDTO> list = memberMapper.memberList(myId, keyword, start, end);
 		List<MemberDTO> sendIdList = memberMapper.findBySendId(myId, keyword);
@@ -64,6 +65,7 @@ public class MemberService {
 		for (MemberDTO memberDTO : list) {		// 리스트에서 신청상태를 표시하기 위해 set
 			String status = friendMapper.friendRequestStatus(memberDTO.getMember_id(), myId);
 			memberDTO.setFriend_request_status(status);
+//			memberDTO.setMember_count(count);	// 중복되어 나오는 데이터를 삭제하고 난 후 회원 수를 리턴
 		}
 		return list;
 	}

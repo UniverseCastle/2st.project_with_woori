@@ -52,14 +52,23 @@ public class FriendController {
 	}
 	
 //	(받은)친구신청 리스트 Get
-	@GetMapping("receiveList")
 	@PreAuthorize("isAuthenticated()")
+	@GetMapping("receiveList")
 	public String receiveList(Principal principal, Model model) {
 		List<FriendRequestDTO> receiveList = friendService.receiveRequestList(principal);
-		
 		model.addAttribute("receiveList", receiveList);
 		
 		return "friend/friend_receive";
+	}
+	
+//	(보낸)친구신청 리스트 Get
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("sendList")
+	public String sendList(Principal principal, Model model) {
+		List<FriendRequestDTO> sendList = friendService.sendRequestList(principal);
+		model.addAttribute("sendList", sendList);
+		
+		return "friend/friend_send";
 	}
 	
 //	친구수락 (친구상태 업데이트) Post
@@ -77,15 +86,32 @@ public class FriendController {
 		return "redirect:/friend/receiveList";
 	}
 	
-//	(받은)친구신청 거절 Post
-	@PostMapping("receiveDelete")
+//	친구신청 취소/거절 Post
+	@PostMapping("requestDelete")
 	@PreAuthorize("isAuthenticated()")
-	public String receiveDelete(@RequestParam("member_send_id") Long member_send_id,
-							    Principal principal) {
-		friendService.receiveDelete(principal, member_send_id);
+	public String requestDelete(@RequestParam(name = "delete_who", defaultValue = "none") String delete_who,
+								FriendRequestDTO friendRequestDTO, Principal principal) {
+		Long myId = memberService.findByMemberId(principal.getName());
+		if (delete_who.equals("send")) {
+			friendService.requestDelete(myId, friendRequestDTO.getMember_send_id());
+		}else if (delete_who.equals("receive")) {
+			friendService.requestDelete(friendRequestDTO.getMember_receive_id(), myId);
+			
+			return "redirect:/friend/sendList";
+		}
 		
 		return "redirect:/friend/receiveList";
 	}
+	
+//	(보낸)친구신청 취소 Post
+//	@PostMapping("receiveDelete")
+//	@PreAuthorize("isAuthenticated()")
+//	public String sendDelete(@RequestParam("member_receive_id") Long member_receive_id,
+//			Principal principal) {
+//		friendService.sendDelete(member_receive_id, principal);
+//		
+//		return "redirect:/friend/receiveList";
+//	}
 	
 //	친구목록 Get
 	@GetMapping("friendList")
@@ -107,21 +133,29 @@ public class FriendController {
 	}
 	
 //	친구 메모 변경 Post
-	@PreAuthorize("isAuthenticated()")
-	@PostMapping("friendMemo")
-	public String friendMemo(FriendDTO friendDTO) {
-		friendService.friendMemo(friendDTO);
-		
-		return "redirect:/friend/friendList";
-	}
+//	@PreAuthorize("isAuthenticated()")
+//	@PostMapping("friendMemo")
+//	public String friendMemo(FriendDTO friendDTO) {
+//		friendService.friendMemo(friendDTO);
+//		
+//		return "redirect:/friend/friendList";
+//	}
 	
 //	친구정보 Post
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("friendInfo")
-	public String friendInfo(FriendDTO frndDTO, RedirectAttributes rttr) {
+	public String friendInfo(FriendDTO frndDTO, RedirectAttributes rttr,
+							 @RequestParam(name = "friend_change", defaultValue = "none") String friend_change) {
+		if (friend_change.equals("nick")) {
+			friendService.friendNickName(frndDTO);
+		}else if (friend_change.equals("memo")) {
+			friendService.friendMemo(frndDTO);
+		}
+		
 		FriendDTO friendDTO = friendService.friendInfo(frndDTO);
 		friendDTO.setFriend_status(frndDTO.getFriend_status());		// 정방향 / 역방향 여부를 알려주는 변수
 		rttr.addFlashAttribute("friendDTO", friendDTO);
+		
 		return "redirect:/friend/friendInfo";
 	}
 
@@ -130,7 +164,20 @@ public class FriendController {
 	@GetMapping("friendInfo")
 	public String friendInfo(@ModelAttribute("friendDTO")FriendDTO friendDTO, Model model) {
 		model.addAttribute("friendDTO", friendDTO);
+		
 		return "friend/friend_friendInfo";
+	}
+	
+//	친구삭제 Post
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("friendDelete")
+	public String friendDelete(@RequestParam("friend_id") Long friend_id,
+							   @RequestParam("member_my_id") Long member_my_id,
+							   @RequestParam("member_friend_id") Long member_friend_id) {
+		// 친구테이블(member_my_id) == 친구요청테이블(member_receive_id)
+		friendService.friendDelete(friend_id, member_my_id, member_friend_id);	// 친구, 친구요청 삭제 메서드
+		
+		return "redirect:/friend/friendList";
 	}
 	
 	

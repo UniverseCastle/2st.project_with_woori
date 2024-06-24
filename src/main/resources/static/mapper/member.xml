@@ -64,6 +64,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<!-- 전체 회원 수(키워드 적용 / 이메일 '@' 전까지만 검색한 결과값) -->
+	<!--  
+	<select id="memberCount" resultType="int">
+		select count(*)
+		from (
+			select *
+			from member
+			where member_id != #{member_id}
+			and substr (member_email, 1, instr(member_email, '@') - 1) like '%'||#{keyword}||'%'
+			and member_status = 'B'
+		)m
+		left outer join friend_request fr
+		on m.member_id = fr.member_send_id
+		and m.member_id = fr.member_receive_id
+		where fr.friend_request_status != 'F'
+		or fr.member_receive_id is null
+	</select>
+	-->
+	<!-- 전체 회원 수(키워드 적용 / 이메일 '@' 전까지만 검색한 결과값) -->
 	<select id="memberCount" resultType="int">
 		select count(*)
 		from member

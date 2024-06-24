@@ -48,25 +48,46 @@ public class FriendService {
 		return friendMapper.friendRequestStatus(member_receive_id, member_send_id);
 	}
 	
+//	(받은)친구신청 갯수
+	public int receiveRequestCount(Principal principal) {
+		Long myId = memberMapper.findByMemberId(principal.getName());
+		
+		return friendMapper.receiveRequestCount(myId);
+	}
+	
 //	(받은)친구신청 리스트
 	public List<FriendRequestDTO> receiveRequestList(Principal principal) {
 		Long myId = memberMapper.findByMemberId(principal.getName());
 		List<FriendRequestDTO> list = friendMapper.receiveRequestList(myId);
 		
-		for (FriendRequestDTO friendRequestDTO : list) {
-			if (friendRequestDTO.getMember_send_id() != null) {
-				String email = memberMapper.findByMemberEmail(friendRequestDTO.getMember_send_id());
-				friendRequestDTO.setMember_email(email);
-			}
-		}
+//		for (FriendRequestDTO friendRequestDTO : list) {
+//			if (friendRequestDTO.getMember_send_id() != null) {
+//				String email = memberMapper.findByMemberEmail(friendRequestDTO.getMember_send_id());
+//				friendRequestDTO.setMember_email(email);
+//			}
+//		}
 		return list;
 	}
 	
-//	(받은)친구신청 거절
-	public void receiveDelete(Principal principal, Long member_send_id) {
+//	(보낸)친구신청 리스트
+	public List<FriendRequestDTO> sendRequestList(Principal principal) {
 		Long myId = memberMapper.findByMemberId(principal.getName());
-		friendMapper.receiveDelete(myId, member_send_id);
+		List<FriendRequestDTO> list = friendMapper.sendRequestList(myId);
+		
+		return list;
 	}
+	
+//	친구신청 취소/거절
+	public void requestDelete(Long member_receive_id, Long member_send_id) {
+		friendMapper.requestDelete(member_receive_id, member_send_id);
+	}
+	
+//	(보낸)친구신청 취소
+//	public void sendDelete(@Param("member_receive_id") Long member_receive_id,
+//			  			   Principal principal) {
+//		Long myId = memberMapper.findByMemberId(principal.getName());
+//		friendMapper.sendDelete(member_receive_id, myId);
+//	}
 	
 //	친구수락 (+친구상태 업데이트)
 	public void friendAccept(Principal principal, Long member_send_id) {
@@ -178,5 +199,13 @@ public class FriendService {
 		}else {
 			throw new IllegalArgumentException();
 		}
+	}
+	
+//	친구삭제
+	public void friendDelete(Long friend_id, Long member_my_id, Long member_friend_id) {
+		Long member_receive_id = member_my_id;
+		Long member_send_id = member_friend_id;
+		friendMapper.friendDelete(friend_id);
+		friendMapper.requestDelete(member_receive_id, member_send_id);
 	}
 }

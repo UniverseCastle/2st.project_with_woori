@@ -1,30 +1,36 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 <meta charset="UTF-8">
 <title>받은 친구목록</title>
 </head>
 <body>
 	<div align="center">
+		<div align="right" style="width: 800px;">
+			<a sec:authorize="isAuthenticated()" href="/friend/sendList">보낸신청</a>
+			<a sec:authorize="isAuthenticated()" href="/friend/friendList">친구목록</a>
+			<a sec:authorize="isAuthenticated()" href="/member/main">메인</a>
+		</div>
 		<table style="border: 1px solid; width: 400px; text-align: center;">
-			<tbody th:each="friendRequestDTO : ${receiveList}">
-				<tr>
-					<th>보낸사람 아이디</th>
-				</tr>
-				<tr>
-					<td th:text="${friendRequestDTO.member_email}"></td>	<!-- a태그로 유저 정보보기 -->
-					<td>
-						<form action="/friend/friendAccept" method="post">
-							<button type="submit">수락</button>
-							<input type="hidden" name="member_send_id" th:value="${friendRequestDTO.member_send_id}"	/>
-						</form>
-						<form action="/friend/receiveDelete" method="post">
-							<button type="submit">거절</button>
-							<input type="hidden" name="member_send_id" th:value="${friendRequestDTO.member_send_id}"	/>
-						</form>
-					</td>
-				</tr>
-			</tbody>
+			<tr>
+				<th>보낸사람 이메일</th>
+				<th>수락/거절</th>
+			</tr>
+			<tr th:each="friendRequestDTO : ${receiveList}">
+				<td th:text="${friendRequestDTO.member_email}"></td>	<!-- a태그로 유저 정보보기 -->
+				<td>
+					<form action="/friend/friendAccept" method="post">
+						<button type="submit">수락</button>
+						<input type="hidden" name="member_send_id" th:value="${friendRequestDTO.member_send_id}"	/>
+					</form>
+					<form action="/friend/requestDelete" method="post">
+						<button type="submit">거절</button>
+						<input type="hidden" name="member_send_id" th:value="${friendRequestDTO.member_send_id}"	/>
+						<input type="hidden" name="delete_who" value="send"	/>		<!-- 나에게 요청을 보낸 삭제 대상을 구분짓는 숨김요소 -->
+					</form>
+				</td>
+			</tr>
 		</table>
 	</div>
 </body>
