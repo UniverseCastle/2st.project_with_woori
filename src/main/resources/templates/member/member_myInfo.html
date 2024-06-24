@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>회원 정보</title>
+</head>
+<body>
+	<div align="center">
+		<table style="border: 1px solid; width: 400px; text-align: center;">
+			<tr>
+				<td>이메일</td>
+				<td th:text="${memberDTO.member_email}"></td>
+			</tr>
+			<tr>
+				<td>이름</td>
+				<td th:text="${memberDTO.member_name}"></td>
+			</tr>
+			<tr>
+				<td>생년월일</td>
+				<td th:text="${memberDTO.member_birth}"></td>
+			</tr>
+			<tr>
+				<td>전화번호</td>
+				<td th:text="${memberDTO.member_phone}"></td>
+			</tr>
+			<tr>
+				<td>성별</td>
+				<td th:text="${memberDTO.member_gender}"></td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

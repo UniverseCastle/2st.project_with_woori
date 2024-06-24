@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.planner.dto.MemberDTO;
@@ -62,31 +63,62 @@ public class MemberController {
 //	(친추하기위한) 모든유저 정보
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("userInfo")
-	public String userInfo(Model model, Principal principal) {
-		List<MemberDTO> list = memberService.memberList(principal);
+	public String userInfo(@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
+						   @RequestParam(name = "keyword", defaultValue = "!@#$%^&*()") String keyword,		// 키워드 기본값 특수문자로 초기 화면 없애기
+						   Model model, Principal principal) {
+//		페이징 처리
+		int pageSize = 10;
+		int currentPage = pageNum;
+		int start = (currentPage - 1) * pageSize + 1;
+		int end = currentPage * pageSize;
+		int count = memberService.memberCount(keyword);
+		
+		List<MemberDTO> list = null;
+		if (count > 0) {
+			list = memberService.memberList(principal, keyword, start, end);
+			memberService.findBySendId(principal, keyword);
+		}
+		
+		int pageCount = count / pageSize + (count % pageSize == 0 ? 0 : 1);
+		int startPage = (int)((currentPage - 1) / 10) * 10 + 1;
+		int pageBlock = 10;
+		int endPage = startPage + pageBlock - 1;
+		
+		if (endPage >= pageCount) {
+			endPage = pageCount;
+		}
+		
+//		List<MemberDTO> list = memberService.memberList(principal);
+//		model.addAttribute("pageBlock", pageBlock);
+//		model.addAttribute("pageSize", pageSize);
+//		model.addAttribute("start", start);
+//		model.addAttribute("end", end);
+		
+		model.addAttribute("count", count);
+		model.addAttribute("pageCount", pageCount);
+		model.addAttribute("startPage", startPage);
+		model.addAttribute("endPage", endPage);
+		model.addAttribute("pageNum", pageNum);
+		
+		model.addAttribute("keyword", keyword);
+		
 		model.addAttribute("list", list);						// 친구신청 리스트 (친구신청 상태 담겨있음)
 		model.addAttribute("friendRoles", FriendRole.values());	// FriendRole 상태 권한설정
 		
-//		Long myId = memberService.findByMemberId(principal.getName());
-		
-//		List<MemberDTO> sendIdList = memberService.findBySendId(myId);
-//		
-//		list.removeAll(sendIdList);
-//		List<FriendRequestDTO> sendIdList = memberService.findBySendIdList(principal);	// 나의(신청 받은) 아이디로 보낸아이디(들) 검색한 리스트
-//			System.out.println("컨트롤러 센드리스트"+sendIdList);
-		
-//		model.addAttribute("sendIdList", sendIdList);
-		
-//		for (FriendRequestDTO sendId : sendIdList) {
-//			System.out.println(sendId.getFriend_request_status());
-//		}
-		
-//		List<FriendRequestDTO> receiveList = friendService.receiveRequestList(principal);
-		
-//		model.addAttribute("receiveList", receiveList);
-		
 		return "member/member_userInfo";
 	}
+	
+//	내 (회원)정보
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("myInfo")
+	public String myInfo(Principal principal, Model model) {
+		MemberDTO memberDTO = memberService.myInfo(principal.getName());
+		model.addAttribute("memberDTO", memberDTO);
+		
+		return "member/member_myInfo";
+	}
+	
+	
 	
 //	@PreAuthorize("isAuthenticated()")
 //	@GetMapping("userInfo")

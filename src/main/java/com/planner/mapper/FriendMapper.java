@@ -19,6 +19,9 @@ public interface FriendMapper {
 //	아이디 받아서 (보낸)시퀀스 찾기 (principal 사용)
 //	public Long findByMemberId(String member_name);
 	
+//	친구찾기 리스트
+	public List<FriendDTO> findFriend(@Param("member_my_id") Long member_my_id);
+	
 //	친구신청 (보냄)
 	public void friendRequest(FriendRequestDTO friendRequestDTO);
 	
@@ -27,6 +30,10 @@ public interface FriendMapper {
 	
 //	친구신청 받은 아이디로 보낸 아이디 찾기
 //	public List<FriendRequestDTO> findBySendIdList(Long member_receive_id);
+	
+//	친구신청 상태 찾기
+	public String friendRequestStatus(@Param("member_receive_id") Long member_receive_id,
+							   @Param("member_send_id") Long member_send_id);
 	
 //	(받은)친구신청 리스트
 	public List<FriendRequestDTO> receiveRequestList(@Param("member_receive_id") Long member_receive_id);
@@ -53,6 +60,12 @@ public interface FriendMapper {
 	
 //	친구 별명 변경
 	public void friendMemo(FriendDTO friendDTO);
+	
+//	친구정보 (정방향)
+	public FriendDTO friendInfo(FriendDTO friendDTO);
+	
+//	친구정보 (역방향)
+	public FriendDTO friendInfoC(FriendDTO friendDTO);
 	
 //	친구신청 보낸 아이디 찾기
 //	public List<FriendRequestDTO> findBySendId(Long member_receive_id);

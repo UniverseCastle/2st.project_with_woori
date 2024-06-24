@@ -11,7 +11,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where member_send_id=#{member_send_id}
 	</select>
 	
-	<!-- 친구신청 (보낼 때 / 보낸사람 데이터 추가) -->
+	<!-- 친구찾기 리스트 -->
+	<select id="findFriend" resultType="FriendDTO">
+		
+	</select>
+	
+	<!-- 친구신청 (보낼 때) -->
 	<insert id="friendRequest" parameterType="FriendRequestDTO">
 		insert into friend_request values(
 			friend_request_seq.NEXTVAL,
@@ -20,6 +25,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			'R'
 		)
 	</insert>
+	
+	<!-- 친구신청 상태 찾기 -->
+	<select id="friendRequestStatus" resultType="String">
+		select friend_request_status
+		from friend_request
+		where member_receive_id = #{member_receive_id}
+		and member_send_id = #{member_send_id}
+	</select>
 	
 	<!-- (받은)친구신청 리스트 -->
 	<select id="receiveRequestList" resultType="FriendRequestDTO">
@@ -86,6 +99,47 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			friend_memo = #{friend_memo}
 		where friend_id = #{friend_id}
 	</update>
+	
+	<!-- 친구정보 (정방향) -->
+	<select id="friendInfo" resultMap="resultInfo">
+		select f.*, m.*
+		from friend f
+		left outer join member m
+		on f.member_friend_id = m.member_id
+		where member_my_id = #{member_my_id}
+		and member_friend_id = #{member_friend_id}
+	</select>
+	
+	<!-- 친구정보 (역방향) join 시 상대 회원 정보로 반환하기 위함 -->
+	<select id="friendInfoC" resultMap="resultInfo">
+		select f.*, m.*
+		from friend f
+		left outer join member m
+		on f.member_my_id = m.member_id
+		where member_my_id = #{member_my_id}
+		and member_friend_id = #{member_friend_id}
+	</select>
+	
+	<resultMap id="resultInfo" type="FriendDTO">
+		<id column="friend_id" property="friend_id"	/>
+		<result column="member_my_id" property="member_my_id"	/>
+		<result column="member_friend_id" property="member_friend_id"	/>
+		<result column="friend_my_nickname" property="friend_my_nickname"	/>
+		<result column="friend_nickname" property="friend_nickname"	/>
+		<result column="friend_my_memo" property="friend_my_memo"	/>
+		<result column="friend_memo" property="friend_memo"	/>
+		<collection property="memberInfo" resultMap="selectMemberInfo"></collection>
+	</resultMap>
+	
+	<resultMap id="selectMemberInfo" type="MemberDTO">
+		<result column="member_id" property="member_id"	/>
+		<result column="member_email" property="member_email"	/>
+		<result column="member_password" property="member_password"	/>
+		<result column="member_name" property="member_name"	/>
+		<result column="member_birth" property="member_birth"	/>
+		<result column="member_phone" property="member_phone"	/>
+		<result column="member_gender" property="member_gender"	/>
+	</resultMap>
 	
 	<!-- 친구신청 보낸 아이디 찾기 -->
 	<!-- 

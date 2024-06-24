@@ -43,15 +43,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<insert id="memberInsert" parameterType="MemberDTO">
 		insert into member values(
 			member_seq.NEXTVAL,
-			#{member_userid},
+			#{member_email},
 			#{member_password},
 			#{member_name},
 			#{member_birth},
-			#{member_email},
 			#{member_phone},
 			#{member_gender},
 			sysdate,
-			'B'
+			'B',
+			'none'
 		)
 	</insert>
 	
@@ -63,34 +63,65 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		and member_password=#{member_password}
 	</select>
 	
+	<!-- 전체 회원 수(키워드 적용 / 이메일 '@' 전까지만 검색한 결과값) -->
+	<select id="memberCount" resultType="int">
+		select count(*)
+		from member
+		where substr (member_email, 1, instr(member_email, '@') - 1) like '%'||#{keyword}||'%'
+	</select>
+	
+	<!-- 내 (회원)정보 -->
+	<select id="myInfo" resultType="MemberDTO">
+		select *
+		from member
+		where member_email = #{member_email}
+	</select>
+	
 	<!-- 모든회원 정보 -->
 	<!--  
 	<select id="memberList" resultType="MemberDTO">
-		select *
-		from member
-		where member_id != #{member_id}
-		and member_status = 'B'
+		select distinct m.*, fr.member_send_id
+		from member m
+		left outer join friend_request fr
+		on m.member_id = fr.member_receive_id
+		or m.member_id = fr.member_send_id
+		where m.member_id != #{member_id}
+		order by m.member_id asc
 	</select>
 	-->
-	
-	<!-- 모든회원 정보 -->
+	<!-- 모든 회원 정보 / 페이징 처리 / 키워드 추가 / 이메일 '@' 앞 부분만 검색 가능 / 회원 목록 숨김 / 검색으로만 찾을 수 있음 -->
 	<select id="memberList" resultType="MemberDTO">
-		select distinct m.*, fr.member_send_id
-		from (
+		<![CDATA[
 			select *
-			from member
-			where member_id != #{member_id}
-			and member_status = 'B'
-		)m
-		left outer join friend f
-		on m.member_id = f.member_friend_id
+			from
+			(select distinct m.*, fr.member_send_id, rownum r
+			from (
+				select *
+				from member
+				where member_id != #{member_id}
+				and substr (member_email, 1, instr(member_email, '@') - 1) like '%' || #{keyword} || '%'
+				and member_status = 'B'
+			)m
+			left outer join friend_request fr
+			on m.member_id = fr.member_send_id
+			and m.member_id = fr.member_receive_id
+			where fr.friend_request_status != 'F'
+			or fr.member_receive_id is null)
+			where r between #{start} and #{end}
+		]]>
+	</select>	<!-- friend 테이블 조인 삭제 6/22 send_id 값 2개나옴 -->
+	
+	
+	<!-- (나에게) 친구신청 보낸 아이디 찾기 -->
+	<select id="findBySendId" resultType="MemberDTO">
+		select m.*, fr.member_send_id, rownum r
+		from member m
 		left outer join friend_request fr
 		on m.member_id = fr.member_send_id
-		and m.member_id = fr.member_receive_id
-		where fr.friend_request_status != 'F'
-		or fr.member_receive_id is null
+		where fr.member_receive_id=#{member_id}
+		and substr (member_email, 1, instr(member_email, '@') - 1) like '%' || #{keyword} || '%'
 	</select>
-	
+
 	<!-- 모든회원 정보 -->
 	<!--  
 	<select id="memberList" resultType="MemberDTO">
@@ -108,14 +139,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		or fr.member_receive_id is null
 	</select>
 	-->
-	<!-- (나에게) 친구신청 보낸 아이디 찾기 -->
-	<select id="findBySendId" resultType="MemberDTO">
-		select m.*, fr.member_send_id
-		from member m
-		left outer join friend_request fr
-		on m.member_id = fr.member_send_id
-		where fr.member_receive_id=#{member_id}
-	</select>
+
 	
 	<!-- 친구목록 -->
 	<!-- 
@@ -132,15 +156,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	
 	<!-- 친구신청 받는 아이디(member_receive_id)로 'R' 상태의 회원 시퀀스 찾기 -->
-	<select id="findByMemberFriendStatus" resultType="String">
-		select fr.friend_request_status
-		from friend_request fr
-		left outer join member m
-		on fr.member_receive_id = m.member_id
-		where fr.member_receive_id = #{member_receive_id}
-		and fr.member_send_id = #{member_id}
-		and m.member_status = 'B'
-	</select>
+<!-- 	<select id="findByMemberFriendStatus" resultType="String"> -->
+<!-- 		select fr.friend_request_status -->
+<!-- 		from friend_request fr -->
+<!-- 		left outer join member m -->
+<!-- 		on fr.member_receive_id = m.member_id -->
+<!-- 		where fr.member_receive_id = #{member_receive_id} -->
+<!-- 		and fr.member_send_id = #{member_id} -->
+<!-- 		and m.member_status = 'B' -->
+<!-- 	</select> -->
 	
 	<!-- R로 S찾기 -->
 	<!-- 
