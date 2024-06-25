@@ -3,6 +3,128 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.planner.mapper.MemberMapper">
+	<!-- =========================민형이 자료========================= -->
+	<!-- 소셜로그인 회원생성 -->
+	<insert id="createMember" parameterType="ReqOAuth2MemberAdd">
+		INSERT INTO member(
+			member_id,
+			member_birth,
+			member_phone,
+			member_gender,
+			member_email,
+			member_password,
+			member_name,
+			oauth_id,
+			member_status,
+			oauth_type,
+			member_role,
+			member_reg
+		)	VALUES	(
+			member_seq.nextval,
+			'2020-02-01',
+			'none',
+			'none',
+			#{member_email},
+			#{member_password},
+			#{member_name},
+			#{oauth_id},
+			#{member_status},
+			#{oauth_type},
+			#{member_role},
+			sysdate
+		)
+	</insert>
+		<!--member_seq.NEXTVAL , sysdate -->
+	<!-- 회원가입 -->
+	<insert id="memberInsert" parameterType="MemberDTO">
+			INSERT INTO member(
+				member_id,
+				member_password,
+				member_name,
+				member_birth,
+				member_email,
+				member_phone,
+				member_gender,
+				member_reg,
+				member_status,
+				member_role,
+				oauth_id
+				) values (
+				member_seq.nextval,
+				#{member_password},
+				#{member_name},
+				#{member_birth},
+				#{member_email},
+				#{member_phone},
+				#{member_gender},
+				sysdate,
+				'B',
+				#{member_role},
+				'none'
+			)
+	</insert>
+	<!--member_seq.NEXTVAL , sysdate -->
+	
+	<!-- 소셜로그인 추가 회원정보 -->
+	<update id="fetchAdditionalUserInfo" parameterType="ReqOAuth2Signup">
+		UPDATE member
+		SET	
+			member_birth = #{member_birth},
+			member_phone = #{member_phone},
+			member_gender = #{member_gender},
+			member_status = #{member_status}
+		<if test="member_email != null">
+            , member_email = #{member_email}
+        </if>
+		WHERE
+			oauth_id = #{oauth_id}
+	</update>
+	
+	<!-- 회원 수정 -->
+	<update id="memberUpdate" parameterType="ReqMemberUpdate">
+		UPDATE member
+		SET
+			member_name = #{member_name},
+			member_birth = #{member_birth},
+			member_phone = #{member_phone}
+		WHERE
+			member_id = #{member_id}
+	</update>
+	
+	<!-- 회원 상태변경 -->
+	<update id="changeMemberStatus">
+		UPDATE member
+		SET
+			member_status = #{member_status}
+		WHERE
+			member_id = #{member_id}
+	</update>
+	
+	<!-- OAtuhID 고유번호로 회원찾기 -->
+	<select id="findByOAuthID" resultType="ResMemberDetail">
+		SELECT *
+		FROM member
+		WHERE oauth_id = #{oauthId}
+	</select>
+	
+	<!-- 내 정보 -->
+	<select id="findByEmail">
+		SELECT * 
+		FROM member
+		WHERE
+			member_email = #{member_email}
+	</select>
+	
+	<!-- 회원이메일, 소셜로그인 타입으로 유저 정보 가져오기 -->
+	<select id="findByEmailAndOAuthType" >
+		SELECT *
+		FROM member
+		WHERE
+			member_email = #{member_email},
+			oauth_tpye = #{oauth_tpye}
+	</select>
+	
+	<!-- =========================민형이 자료========================= -->
 	
 	<!-- 회원 이메일로 객체 가져오기 -->
 	<select id="findByUser" resultType="MemberDTO">
@@ -39,22 +161,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where member_id = #{member_id}
 	</select>
 	
-	<!-- 회원가입 -->
-	<insert id="memberInsert" parameterType="MemberDTO">
-		insert into member values(
-			member_seq.NEXTVAL,
-			#{member_email},
-			#{member_password},
-			#{member_name},
-			#{member_birth},
-			#{member_phone},
-			#{member_gender},
-			sysdate,
-			'B',
-			'none'
-		)
-	</insert>
-	
 	<!-- 로그인 -->
 	<select id="memberLogin" resultType="int">
 		select *
@@ -67,26 +173,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<!--  
 	<select id="memberCount" resultType="int">
 		select count(*)
-		from (
-			select *
-			from member
-			where member_id != #{member_id}
-			and substr (member_email, 1, instr(member_email, '@') - 1) like '%'||#{keyword}||'%'
-			and member_status = 'B'
-		)m
-		left outer join friend_request fr
-		on m.member_id = fr.member_send_id
-		and m.member_id = fr.member_receive_id
-		where fr.friend_request_status != 'F'
-		or fr.member_receive_id is null
-	</select>
-	-->
-	<!-- 전체 회원 수(키워드 적용 / 이메일 '@' 전까지만 검색한 결과값) -->
-	<select id="memberCount" resultType="int">
-		select count(*)
 		from member
 		where substr (member_email, 1, instr(member_email, '@') - 1) like '%'||#{keyword}||'%'
 	</select>
+	-->
 	
 	<!-- 내 (회원)정보 -->
 	<select id="memberInfo" resultType="MemberDTO">
@@ -95,18 +185,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where member_email = #{member_email}
 	</select>
 	
-	<!-- 모든회원 정보 -->
-	<!--  
-	<select id="memberList" resultType="MemberDTO">
-		select distinct m.*, fr.member_send_id
-		from member m
-		left outer join friend_request fr
-		on m.member_id = fr.member_receive_id
-		or m.member_id = fr.member_send_id
-		where m.member_id != #{member_id}
-		order by m.member_id asc
-	</select>
-	-->
 	<!-- 모든 회원 정보 / 페이징 처리 / 키워드 추가 / 이메일 '@' 앞 부분만 검색 가능 / 회원 목록 숨김 / 검색으로만 찾을 수 있음 -->
 	<select id="memberSearch" resultType="MemberDTO">
 		<![CDATA[
@@ -127,7 +205,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			or fr.member_receive_id is null)
 			where r between #{start} and #{end}
 		]]>
-	</select>	<!-- friend 테이블 조인 삭제 6/22 send_id 값 2개나옴 -->
+	</select>
 	
 	
 	<!-- (나에게) 친구신청 보낸 아이디 찾기 -->
@@ -140,128 +218,4 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		and substr (member_email, 1, instr(member_email, '@') - 1) like '%' || #{keyword} || '%'
 	</select>
 
-	<!-- 모든회원 정보 -->
-	<!--  
-	<select id="memberList" resultType="MemberDTO">
-		select distinct fr.member_send_id, fr.friend_request_status, m.*
-		from (
-			select *
-			from member
-			where member_id != #{member_id}
-		)m
-		left outer join friend f
-		on m.member_id = f.member_send_id
-		left outer join friend_request fr
-		on m.member_id = fr.member_send_id
-		where fr.friend_request_status != 'F'
-		or fr.member_receive_id is null
-	</select>
-	-->
-
-	
-	<!-- 친구목록 -->
-	<!-- 
-	<select id="friendList" resultType="FriendDTO">
-		select m.*, f.member_send_id, f.member_receive_id
-		from member m
-		left outer join friend f
-		on m.member_id = f.member_send_id
-		where f.friend_status = 'F'
-		and f.member_receive_id = #{member_id}
-		or f.member_send_id = #{member_id}
-	</select>
-	 -->
-	
-	
-	<!-- 친구신청 받는 아이디(member_receive_id)로 'R' 상태의 회원 시퀀스 찾기 -->
-<!-- 	<select id="findByMemberFriendStatus" resultType="String"> -->
-<!-- 		select fr.friend_request_status -->
-<!-- 		from friend_request fr -->
-<!-- 		left outer join member m -->
-<!-- 		on fr.member_receive_id = m.member_id -->
-<!-- 		where fr.member_receive_id = #{member_receive_id} -->
-<!-- 		and fr.member_send_id = #{member_id} -->
-<!-- 		and m.member_status = 'B' -->
-<!-- 	</select> -->
-	
-	<!-- R로 S찾기 -->
-	<!-- 
-	<select id="findBySendId">
-		select member_send_id
-		from friend_request
-		where member_receive_id=#{member_receive_id}
-	</select>
-	-->
-	
-	<!-- 모든회원 정보 -->
-	<!--  
-	<select id="memberList" resultType="MemberDTO">
-		select m.*, fr.friend_request_status
-		from member m
-		left outer join friend_request fr
-		on (m.member_id=fr.member_send_id and fr.member_send_id=#{member_id})
-		where m.member_status='B'
-		and member_id!=#{member_id}
-	</select>
-	-->
-	  
-	<!-- 모든회원 정보 (본인 제외) -->
-	<!--  
-	<select id="memberList" resultType="MemberDTO">
-		select *
-		from member
-		where member_status='B'
-		and member_id != #{member_id}
-	</select>
-	-->
-	
-	<!--  
-	<select id="memberList" resultType="MemberDTO">
-		select m.*, fr.friend_request_status
-		from member m
-		left outer join friend_request fr
-		on m.member_id=fr.member_send_id
-		where m.member_status='B'
-	</select>
-	-->
-	
-	<!-- 회원 리스트 -->
-	<!--  
-	<select id="memberList" resultMap="requestList">
-		select m.*, fr.member_receive_id, fr.member_send_id, fr.friend_request_status
-		from member m
-		left outer join friend_request fr
-		on m.member_id=fr.member_send_id
-		where member_status='B'
-		and member_id != #{member_id}
-	</select>
-	-->
-	
-	<!-- MemberDTO.friendRequestList 변수 resultMap -->
-	<!--  
-	<resultMap type="MemberDTO" id="requestList">
-		<id property="member_id" 			column="member_id"			/>
-		<result property="member_userid" 	column="member_userid"		/>
-		<result property="member_password" 	column="member_password"	/>
-		<result property="member_name" 		column="member_name"		/>
-		<result property="member_birth" 	column="member_birth"		/>
-		<result property="member_email" 	column="member_email"		/>
-		<result property="member_phone" 	column="member_phone"		/>
-		<result property="member_gender" 	column="member_gender"		/>
-		<result property="member_reg" 		column="member_reg"			/>
-		<result property="member_status" 	column="member_status"		/>
-		<collection property="friendRequestList" resultMap="requestsMap"></collection>
-	</resultMap>
-	-->
-	<!-- friend_request 테이블 resultMap -->
-	<!--  
-	<resultMap type="FriendRequestDTO" id="requestsMap">
-		<result property="member_receive_id" 	 column="member_receive_id"		/>
-		<result property="member_send_id" 		 column="member_send_id"		/>
-		<result property="friend_request_status" column="friend_request_status"	/>
-	</resultMap>
-	-->
-	<!-- 친구신청 객체 -->
-	
-	
 </mapper>

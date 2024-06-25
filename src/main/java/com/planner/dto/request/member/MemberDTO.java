@@ -1,4 +1,4 @@
-package com.planner.dto;
+package com.planner.dto.request.member;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,7 +20,6 @@ public class MemberDTO {
 	private String member_gender;			// 성별		(남: M, 여: W)
 	private LocalDateTime member_reg;		// 가입일시	(default: sysdate)
 	private String member_status;			// 회원상태	(기본: b, 탈퇴: d, 정지: j)
-	private String oauth_id;				// 소셜 로그인
-	private String friend_request_status;	// 친구신청 상태 리스트 (요청 : R, 친구 : F)	/ DB에 없음
-	
+	private String friend_request_status;	// 친구신청 상태 리스트 (요청 : R, 친구 : F)
+	private String member_role;				// 회원권한
 }

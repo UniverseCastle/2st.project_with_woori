@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.planner.dto.FriendDTO;
-import com.planner.dto.FriendRequestDTO;
+import com.planner.dto.request.friend.FriendDTO;
+import com.planner.dto.request.friend.FriendRequestDTO;
 import com.planner.service.FriendService;
 import com.planner.service.MemberService;
 

@@ -2,15 +2,23 @@ package com.planner.service;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.ibatis.annotations.Param;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.planner.dto.MemberDTO;
+import com.planner.dto.request.member.MemberDTO;
+import com.planner.dto.request.member.ReqMemberRestore;
+import com.planner.dto.request.member.ReqMemberUpdate;
+import com.planner.dto.response.member.ResMemberDetail;
+import com.planner.enums.MemberRole;
+import com.planner.enums.MemberStatus;
+import com.planner.exception.CustomException;
+import com.planner.exception.ErrorCode;
 import com.planner.mapper.FriendMapper;
 import com.planner.mapper.MemberMapper;
+import com.planner.util.CommonUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,35 +30,130 @@ public class MemberService {
 	private final FriendMapper friendMapper;
 	private final PasswordEncoder passwordEncoder;
 	
-//	회원 이메일로 객체 가져오기
-	public MemberDTO findByMember(String member_email) {
-		return memberMapper.findByMember(member_email);
-	}
-	public Optional<MemberDTO> findByUser(String member_email){
-		return memberMapper.findByUser(member_email);
-	}
+//	<!-- =========================민형이 자료========================= -->
+	// 회원가입
+		@Transactional
+		public int memberInsert(MemberDTO memberDTO) {
+			if (isMember(memberDTO.getMember_email())) {
+				throw new CustomException(ErrorCode.ID_DUPLICATE);// 이메일(아이디 중복)에 대한 커스텀예외
+			}
+			memberDTO.setMember_role(MemberRole.USER.getType());
+			memberDTO.setMember_password(passwordEncoder.encode(memberDTO.getMember_password()));
+			return memberMapper.memberInsert(memberDTO);
+		}
+
+		/* 내 정보 */
+		@Transactional(readOnly = true)
+		public ResMemberDetail memberDetail(String member_email) {
+			ResMemberDetail detail = memberMapper.findByEmail(member_email);
+			return detail;
+		}
+
+		/* 회원 정보 수정 */
+		@Transactional
+		public void memberUpdate(ReqMemberUpdate req) {
+			memberMapper.memberUpdate(req);
+		}
+
+		/* 비번체크 */
+		@Transactional(readOnly = true)
+		public int passwordChk(String currnetPw, ResMemberDetail member) {
+			int result = 0;
+			if (member != null && !member.getOauth_id().equals("none")) {
+				return result = 1;
+			}
+			if (member != null && passwordEncoder.matches(currnetPw, member.getMember_password())) {
+				return result = 1;
+			}
+			return result;
+		}
+
+		/* 회원 탈퇴 */
+		@Transactional
+		public void memberDelete(Long member_id) {
+			memberMapper.changeMemberStatus(member_id, MemberStatus.DELETE.getCode());
+		}
+
+		/* 회원 복구 */
+		@Transactional
+		public int memberRestore(ReqMemberRestore req) {
+			int result = 0;
+			if (!CommonUtils.isEmpty(req.getOauth_type())) { // 소셜 로그인일때
+				ResMemberDetail memberDetail = memberMapper.findByEmailAndOAuthType(req.getCurrentEmail(),
+						req.getOauth_type());
+				result = changeMemberStatus(memberDetail);
+				return result;
+			}
+			if (CommonUtils.isEmpty(req.getOauth_type())) {	// 일반로그인일때
+				ResMemberDetail memberDetail = memberMapper.findByEmail(req.getCurrentEmail());
+				int pwChk = passwordChk(req.getCurrentPassword(), memberDetail);
+
+				if (pwChk == 1) {
+					result = changeMemberStatus(memberDetail);
+					return result;
+				}
+			}
+			return result;
+		}
+
+		/* 회원 상태변경 */
+		@Transactional
+		private int changeMemberStatus(ResMemberDetail memberDetail) {
+			int result = 0;
+			if (!CommonUtils.isEmpty(memberDetail)) {
+				result = memberMapper.changeMemberStatus(memberDetail.getMember_id(), MemberStatus.BASIC.getCode());
+				return result;
+			}
+			throw new CustomException(ErrorCode.NO_ACCOUNT);
+		}
+
+		/* 회원체크 */
+		@Transactional
+		public boolean isMember(String email) {
+			boolean result = true;
+			ResMemberDetail user = memberMapper.findByEmail(email);
+			if (user == null) {
+				result = false;
+			}
+			// 탈퇴한 회원이면 예외 발생
+			if (user != null && user.getMember_status().equals(MemberStatus.DELETE.getCode())) {
+				throw new CustomException(ErrorCode.WITHDRAWN_MEMBER);
+			}
+			return result;
+
+		}
 	
-//	회원 이메일로 시퀀스 불러오기
+//	<!-- =========================민형이 자료========================= -->
+	
+//	회원 이메일로 객체 가져오기
+//	public MemberDTO findByMember(String member_email) {
+//		return memberMapper.findByMember(member_email);
+//	}
+//	public Optional<MemberDTO> findByUser(String member_email){
+//		return memberMapper.findByUser(member_email);
+//	}
+	
+//	회원 이메일로 시퀀스 찾기
 	public Long findByMemberId(String member_email) {
 		return memberMapper.findByMemberId(member_email);
 	}
 	
 //	회원가입
-	public int memberInsert(MemberDTO memberDTO) {
-		memberDTO.setMember_password(passwordEncoder.encode(memberDTO.getMember_password()));
-		
-		return memberMapper.memberInsert(memberDTO);
-	}
+//	public int memberInsert(MemberDTO memberDTO) {
+//		memberDTO.setMember_password(passwordEncoder.encode(memberDTO.getMember_password()));
+//		
+//		return memberMapper.memberInsert(memberDTO);
+//	}
 	
 //	로그인
-	public int memberLogin(String member_email, String member_password) {
-		return memberMapper.memberLogin(member_email, member_password);
-	}
+//	public int memberLogin(String member_email, String member_password) {
+//		return memberMapper.memberLogin(member_email, member_password);
+//	}
 	
 //	전체 회원 수
-	public int memberCount(String keyword) {
-		return memberMapper.memberCount(keyword);
-	}
+//	public int memberCount(String keyword) {
+//		return memberMapper.memberCount(keyword);
+//	}
 	
 //	회원 검색
 	public List<MemberDTO> memberSearch(Principal principal, String keyword, int start, int end){
@@ -81,43 +184,4 @@ public class MemberService {
 		return memberMapper.memberInfo(member_email);
 	}
 	
-//	친구신청 받는 아이디로 친구신청 상태 찾기
-//	public String findByMemberFriendStatus(Long member_receive_id, Long member_id) {	// member_receive_id : 친구신청 받는 아이디
-//		return memberMapper.findByMemberFriendStatus(member_receive_id, member_id);		// member_id : 친구신청 보낸 (나의) 아이디
-//	}
-	
-//	친구신청 보낸 아이디 찾기
-//	public List<MemberDTO> findBySendId(Long member_id) {
-//		return memberMapper.findBySendId(member_id);
-//	}
-	
-//	친구신청 받은 아이디로 보낸 아이디 찾기 (친구신청 받았을 때)
-//	public List<FriendRequestDTO> findBySendIdList(Principal principal) {
-//		Long myId = memberMapper.findByMemberId(principal.getName());
-//		List<FriendRequestDTO> sendIdList = null;
-//		
-//		try {
-//			friendMapper.findBySendIdList(myId);		// 나의(신청 받은) 아이디로 보낸아이디(들) 검색한 리스트
-//			System.out.println("서비스 센드리스트"+sendIdList);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		return sendIdList;
-//	}
-	
-	
-//	public List<MemberDTO> memberList(Principal principal) {
-//		friendMapper.RequestStatus(null, null) 여기까지 하다 끔!
-		
-//		Long userid = memberMapper.findByMemberId(principal.getName());
-//		
-//		List<MemberDTO> list = memberMapper.memberList();
-//		
-//		for (MemberDTO memberDTO : list) {
-//			
-//			memberDTO.setMember_id(userid);
-//		}
-//		
-//		return list;
-//	}
 }

@@ -6,8 +6,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import com.planner.dto.FriendDTO;
-import com.planner.dto.FriendRequestDTO;
+import com.planner.dto.request.friend.FriendDTO;
+import com.planner.dto.request.friend.FriendRequestDTO;
 
 @Mapper
 @Repository

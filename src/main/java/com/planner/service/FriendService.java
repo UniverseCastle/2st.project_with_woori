@@ -6,9 +6,9 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
-import com.planner.dto.FriendDTO;
-import com.planner.dto.FriendRequestDTO;
-import com.planner.dto.MemberDTO;
+import com.planner.dto.request.friend.FriendDTO;
+import com.planner.dto.request.friend.FriendRequestDTO;
+import com.planner.dto.request.member.MemberDTO;
 import com.planner.mapper.FriendMapper;
 import com.planner.mapper.MemberMapper;
 
