@@ -1,6 +1,5 @@
 package com.planner.controller;
 
-import java.security.Principal;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -95,12 +94,12 @@ public class MemberController {
 	
 	/*내 정보*/
 	@PreAuthorize("isAuthenticated()")
-	@GetMapping("/auth/info")
-	public String memberInfo(Model model,@UserData ResMemberDetail detail) {
+	@GetMapping("/auth/myInfo")
+	public String myInfo(Model model,@UserData ResMemberDetail detail) {
 		String gender = Gender.findNameByCode(detail.getMember_gender());
 		model.addAttribute("detail", detail);
 		model.addAttribute("gender", gender);
-		return "/member/member_info"; 
+		return "/member/member_myInfo"; 
 	}
 	
 	/*비밀번호 확인 폼*/
@@ -205,7 +204,7 @@ public class MemberController {
 	@GetMapping("/memberSearch")
 	public String memberSearch(@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
 						   @RequestParam(name = "keyword", defaultValue = "!@#$%^&*()") String keyword,		// 키워드 기본값 특수문자로 초기 화면 없애기
-						   Model model, Principal principal) {
+						   @UserData ResMemberDetail detail, Model model) {
 //		TODO 페이징처리 유효성검사 하기
 //		페이징 처리
 		int pageSize = 10;
@@ -214,9 +213,9 @@ public class MemberController {
 		int end = currentPage * pageSize;
 		int count = 0;
 		
-		List<MemberDTO> list = memberService.memberSearch(principal, keyword, start, end);
+		List<MemberDTO> list = memberService.memberSearch(detail.getMember_email(), keyword, start, end);
 		if (list.size() > 0) {
-			memberService.findBySendId(principal, keyword);
+			memberService.findBySendId(detail.getMember_email(), keyword);
 			count = list.size();
 		}
 		
@@ -240,7 +239,7 @@ public class MemberController {
 		model.addAttribute("list", list);						// 친구신청 리스트 (친구신청 상태 담겨있음)
 		model.addAttribute("friendRoles", FriendRole.values());	// FriendRole 상태 권한설정
 		
-		int receive_count = friendService.receiveRequestCount(principal);	// 받은 친구신청 수
+		int receive_count = friendService.receiveRequestCount(detail.getMember_email());	// 받은 친구신청 수
 		model.addAttribute("receive_count", receive_count);
 		
 		return "member/member_memberSearch";
@@ -249,21 +248,20 @@ public class MemberController {
 //	회원정보(내정보) Get
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/memberInfo")
-	public String memberInfo(@ModelAttribute("member_email") String member_email, Principal principal,
-							  Model model) {
-		Long myId = memberService.findByMemberId(principal.getName());
+	public String memberInfo(@ModelAttribute(value = "member_email") String member_email,
+							 @UserData ResMemberDetail detail, Model model) {
+//		Long myId = memberService.findByMemberId(detail.getMember_email());
 		if (!member_email.isEmpty()) {		// 회원 정보인 경우
 			MemberDTO memberDTO = memberService.memberInfo(member_email);
 			model.addAttribute("memberDTO", memberDTO);
-		}else {								// 내 정보인 경우
-			MemberDTO memberDTO = memberService.memberInfo(principal.getName());
-			model.addAttribute("memberDTO", memberDTO);
-			model.addAttribute("myId", myId);	// 내 정보일 때 차별점을 주기 위해 시퀀스 넘김
 		}
-		int receive_count = friendService.receiveRequestCount(principal);	// 받은 친구신청 수
+//		else {								// 내 정보인 경우
+//			MemberDTO memberDTO = memberService.memberInfo(detail.getMember_email());
+//			model.addAttribute("memberDTO", memberDTO);
+//			model.addAttribute("myId", myId);	// 내 정보일 때 차별점을 주기 위해 시퀀스 넘김
+//		}
+		int receive_count = friendService.receiveRequestCount(detail.getMember_email());	// 받은 친구신청 수
 		model.addAttribute("receive_count", receive_count);
-		
-		
 		
 		return "member/member_memberInfo";
 	}
@@ -271,8 +269,8 @@ public class MemberController {
 //	회원정보 Post
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/memberInfo")
-	public String memberInfo(@RequestParam("member_email") String member_email,
-							 Principal principal, RedirectAttributes rttr) {
+	public String memberInfo(@RequestParam(value = "member_email") String member_email,
+							 RedirectAttributes rttr) {
 		rttr.addFlashAttribute("member_email", member_email);
 		
 		return "redirect:/member/memberInfo";

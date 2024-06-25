@@ -68,8 +68,8 @@ public interface MemberMapper {
 //	public int memberInsert(MemberDTO memberDTO);
 	
 //	로그인
-	public int memberLogin(@Param("member_email") String member_email,
-						   @Param("member_password") String member_password);
+//	public int memberLogin(@Param("member_email") String member_email,
+//						   @Param("member_password") String member_password);
 	
 //	전체 회원 수
 //	public int memberCount(String keyword);

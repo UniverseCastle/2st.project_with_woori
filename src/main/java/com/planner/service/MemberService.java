@@ -156,9 +156,9 @@ public class MemberService {
 //	}
 	
 //	회원 검색
-	public List<MemberDTO> memberSearch(Principal principal, String keyword, int start, int end){
+	public List<MemberDTO> memberSearch(String member_email, String keyword, int start, int end){
 //		int count = 0;
-		Long myId = memberMapper.findByMemberId(principal.getName());
+		Long myId = memberMapper.findByMemberId(member_email);
 		List<MemberDTO> list = memberMapper.memberSearch(myId, keyword, start, end);
 		List<MemberDTO> sendIdList = memberMapper.findBySendId(myId, keyword);
 		
@@ -174,8 +174,8 @@ public class MemberService {
 	}
 	
 //	친구신청 보낸 아이디 찾기
-	public List<MemberDTO> findBySendId(Principal principal, @Param("keyword") String keyword) {
-		Long member_id = memberMapper.findByMemberId(principal.getName());
+	public List<MemberDTO> findBySendId(String member_email, @Param("keyword") String keyword) {
+		Long member_id = memberMapper.findByMemberId(member_email);
 		return memberMapper.findBySendId(member_id, keyword);
 	}
 	

@@ -17,6 +17,7 @@
 					<form action="/member/memberInfo" method="post" th:attr="id='infoForm' + ${friendRequestDTO.friend_request_id}">
 						<a onclick="infoForm()" class="infoA" th:attr="data-info='infoForm' + ${friendRequestDTO.friend_request_id}" href="javascript:void(0);">
 							[[${friendRequestDTO.member_email}]]
+							<input type="hidden" th:name="_csrf" th:value="${_csrf.token}"/>
 						</a>
 						<input type="hidden" name="member_email" th:value="${friendRequestDTO.member_email}"			/>
 					</form>
@@ -26,6 +27,7 @@
 						<button type="submit">취소</button>
 						<input type="hidden" name="member_receive_id" th:value="${friendRequestDTO.member_receive_id}"	/>
 						<input type="hidden" name="delete_who" value="receive"	/>		<!-- 나에게 요청을 받은 삭제 대상을 구분짓는 숨김요소 -->
+						<input type="hidden" th:name="_csrf" th:value="${_csrf.token}"/>
 					</form>
 				</td>
 			</tr>

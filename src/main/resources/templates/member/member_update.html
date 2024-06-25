@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layout/layout}">
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
 <link rel="stylesheet" type="text/css" href="/css/header.css">
 </head>
 <body>
-	<header th:replace="~{header :: header}"></header>
+<!-- <header th:replace="~{header :: header}"></header> -->
+	<div layout:fragment="content">
 	<main class="updateMain">
 		<h2>회원정보수정</h2>
 		<form class="updateForm" action="/member/auth/update" th:method="put">
@@ -40,5 +42,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 			</div>
 		</form>
 	</main>
+	</div>
 </body>
 </html>

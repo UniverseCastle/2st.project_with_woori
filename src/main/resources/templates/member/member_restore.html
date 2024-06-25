@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layout/layout}">
 <head>
 <meta charset="UTF-8">
 <meta name="_csrf" th:content="${_csrf.token}"/>
@@ -11,6 +12,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <script	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
+	<div layout:fragment="content">
 	<main class="restoreMain">
 		<input type="email" id="currentEmail" name="currentEmail" placeholder="가입했던 이메일을 적어주세요">
 		<input type="password" id="currentPassword" name="currentPassword" placeholder="비밀번호 작성">
@@ -25,7 +27,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 		</div>
 		<button type="button" class="restoreBtn">신청</button>
 	</main>
-
+	</div>
 		<script>
 			$(function(){
 				// 소셜로그인 타입 박스 보여주기 안보여주기

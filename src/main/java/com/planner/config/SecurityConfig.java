@@ -58,11 +58,11 @@ public class SecurityConfig {
                   .failureHandler(oAuth2AuthenticationFailureHandler)
   )	
           .formLogin((formLogin) -> formLogin		// 사용자 정의
-					.loginPage("/member/login")		// 로그인페이지 설정과
+					.loginPage("/member/anon/login")		// 로그인페이지 설정과
 					.usernameParameter("member_email")
 					.passwordParameter("member_password") 		//default = password, username
-					.failureUrl("/member/fail")
-					.defaultSuccessUrl("/member",true))	// 리다이렉트 URL 설정	
+					.failureUrl("/member/anon/fail")
+					.defaultSuccessUrl("/member/anon",true))	// 리다이렉트 URL 설정	
           			
           
           .logout((logout)->logout							//사용자 정의

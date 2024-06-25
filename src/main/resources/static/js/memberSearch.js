@@ -2,10 +2,16 @@
 $(document).on("click", ".btn", function(){
 	let button = $(this);
 	let member_id = button.val();
+	let csrfToken = $("meta[name='_csrf']").attr("content");
+    let csrfHeader = $("meta[name='_csrf_header']").attr("content");
 	$.ajax({
 		url		: "/friend/friendRequest",
 		type	: "post",
 		data	: {member_id : member_id},
+		beforeSend: function(xhr) {
+            // CSRF 토큰을 요청 헤더에 포함
+            xhr.setRequestHeader(csrfHeader, csrfToken);
+        },
 		success	: function(status){
 			if (status != null) {
 				button.prop("disabled", true);

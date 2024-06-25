@@ -19,17 +19,20 @@
 							[[${friendRequestDTO.member_email}]]
 						</a>
 						<input type="hidden" name="member_email" th:value="${friendRequestDTO.member_email}"			/>
+						<input type="hidden" th:name="_csrf" th:value="${_csrf.token}"/>
 					</form>
 				</td>
 				<td>
 					<form action="/friend/friendAccept" method="post">
 						<button type="submit">수락</button>
 						<input type="hidden" name="member_send_id" th:value="${friendRequestDTO.member_send_id}"	/>
+						<input type="hidden" th:name="_csrf" th:value="${_csrf.token}"/>
 					</form>
 					<form action="/friend/requestDelete" method="post">
 						<button type="submit">거절</button>
 						<input type="hidden" name="member_send_id" th:value="${friendRequestDTO.member_send_id}"	/>
 						<input type="hidden" name="delete_who" value="send"	/>		<!-- 나에게 요청을 보낸 삭제 대상을 구분짓는 숨김요소 -->
+						<input type="hidden" th:name="_csrf" th:value="${_csrf.token}"/>
 					</form>
 				</td>
 			</tr>

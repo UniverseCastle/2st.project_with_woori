@@ -32,9 +32,9 @@ public class FriendService {
 	}
 	
 //	친구신청 (보냄)
-	public void friendRequest(Long member_id, Principal principal) {	// member_id : 친구(신청 받은) 시퀀스
+	public void friendRequest(Long member_id, String member_email) {	// member_id : 친구(신청 받은) 시퀀스
 		FriendRequestDTO friendRequestDTO = new FriendRequestDTO();
-		Long myId = memberMapper.findByMemberId(principal.getName());	// 나의(보낸) 시퀀스
+		Long myId = memberMapper.findByMemberId(member_email);	// 나의(보낸) 시퀀스
 		
 		friendRequestDTO.setMember_receive_id(member_id);				// 내가 친구신청 보낸 친구의 시퀀스
 		friendRequestDTO.setMember_send_id(myId);						// 나의 시퀀스
@@ -49,15 +49,15 @@ public class FriendService {
 	}
 	
 //	(받은)친구신청 갯수
-	public int receiveRequestCount(Principal principal) {
-		Long myId = memberMapper.findByMemberId(principal.getName());
+	public int receiveRequestCount(String member_email) {
+		Long myId = memberMapper.findByMemberId(member_email);
 		
 		return friendMapper.receiveRequestCount(myId);
 	}
 	
 //	(받은)친구신청 리스트
-	public List<FriendRequestDTO> receiveRequestList(Principal principal) {
-		Long myId = memberMapper.findByMemberId(principal.getName());
+	public List<FriendRequestDTO> receiveRequestList(String member_email) {
+		Long myId = memberMapper.findByMemberId(member_email);
 		List<FriendRequestDTO> list = friendMapper.receiveRequestList(myId);
 		
 //		for (FriendRequestDTO friendRequestDTO : list) {
@@ -70,8 +70,8 @@ public class FriendService {
 	}
 	
 //	(보낸)친구신청 리스트
-	public List<FriendRequestDTO> sendRequestList(Principal principal) {
-		Long myId = memberMapper.findByMemberId(principal.getName());
+	public List<FriendRequestDTO> sendRequestList(String member_email) {
+		Long myId = memberMapper.findByMemberId(member_email);
 		List<FriendRequestDTO> list = friendMapper.sendRequestList(myId);
 		
 		return list;
@@ -90,8 +90,8 @@ public class FriendService {
 //	}
 	
 //	친구수락 (+친구상태 업데이트)
-	public void friendAccept(Principal principal, Long member_send_id) {
-		Long myId = memberMapper.findByMemberId(principal.getName());				// 나의(받은) 시퀀스
+	public void friendAccept(String member_email, Long member_send_id) {
+		Long myId = memberMapper.findByMemberId(member_email);				// 나의(받은) 시퀀스
 		MemberDTO memberMyDTO = memberMapper.findByMemberSeq(myId);					// 나의 객체
 		MemberDTO memberFriendDTO = memberMapper.findByMemberSeq(member_send_id);	// 친구 객체
 		FriendDTO friendDTO = new FriendDTO();
@@ -106,8 +106,8 @@ public class FriendService {
 	}
 	
 //	친구목록 (myId != member_my_id : 'C' / 나, 친구 위치 바꿔서 set 해줌 / friend_status = 'C')
-	public List<FriendDTO> friendList(Principal principal) {
-		long myId = memberMapper.findByMemberId(principal.getName());
+	public List<FriendDTO> friendList(String member_email) {
+		long myId = memberMapper.findByMemberId(member_email);
 		
 		List<FriendDTO> list = friendMapper.friendList(myId);
 		
