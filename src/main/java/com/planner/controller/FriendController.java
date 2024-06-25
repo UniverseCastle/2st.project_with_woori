@@ -56,6 +56,8 @@ public class FriendController {
 	@GetMapping("receiveList")
 	public String receiveList(Principal principal, Model model) {
 		List<FriendRequestDTO> receiveList = friendService.receiveRequestList(principal);
+		int receive_count = friendService.receiveRequestCount(principal);	// 받은 친구신청 수
+		model.addAttribute("receive_count", receive_count);
 		model.addAttribute("receiveList", receiveList);
 		
 		return "friend/friend_receive";
@@ -66,10 +68,23 @@ public class FriendController {
 	@GetMapping("sendList")
 	public String sendList(Principal principal, Model model) {
 		List<FriendRequestDTO> sendList = friendService.sendRequestList(principal);
+		int receive_count = friendService.receiveRequestCount(principal);	// 받은 친구신청 수
+		model.addAttribute("receive_count", receive_count);
 		model.addAttribute("sendList", sendList);
 		
 		return "friend/friend_send";
 	}
+	
+//	친구 헤더 (받은 친구신청 수)
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("friendHeader")
+	public String friendHeader(Principal principal, Model model) {
+		int receive_count = friendService.receiveRequestCount(principal);	// 받은 친구신청 수
+		model.addAttribute("receive_count", receive_count);
+		
+		return "fragments/friend";
+	}
+	
 	
 //	친구수락 (친구상태 업데이트) Post
 	@PreAuthorize("isAuthenticated()")
@@ -118,6 +133,8 @@ public class FriendController {
 	@PreAuthorize("isAuthenticated()")
 	public String friendList(Principal principal, Model model) {
 		List<FriendDTO> friendList = friendService.friendList(principal);
+		int receive_count = friendService.receiveRequestCount(principal);	// 받은 친구신청 수
+		model.addAttribute("receive_count", receive_count);
 		model.addAttribute("friendList", friendList);
 		
 		return "friend/friend_friendList";
@@ -144,13 +161,16 @@ public class FriendController {
 //	친구정보 Post
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("friendInfo")
-	public String friendInfo(FriendDTO frndDTO, RedirectAttributes rttr,
+	public String friendInfo(FriendDTO frndDTO, RedirectAttributes rttr, Principal principal,
 							 @RequestParam(name = "friend_change", defaultValue = "none") String friend_change) {
 		if (friend_change.equals("nick")) {
 			friendService.friendNickName(frndDTO);
 		}else if (friend_change.equals("memo")) {
 			friendService.friendMemo(frndDTO);
 		}
+		
+		int receive_count = friendService.receiveRequestCount(principal);	// 받은 친구신청 수
+		rttr.addFlashAttribute("receive_count", receive_count);				// rttr 로 보냄
 		
 		FriendDTO friendDTO = friendService.friendInfo(frndDTO);
 		friendDTO.setFriend_status(frndDTO.getFriend_status());		// 정방향 / 역방향 여부를 알려주는 변수
@@ -162,8 +182,10 @@ public class FriendController {
 //	친구정보 Get
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("friendInfo")
-	public String friendInfo(@ModelAttribute("friendDTO")FriendDTO friendDTO, Model model) {
+	public String friendInfo(@ModelAttribute("friendDTO")FriendDTO friendDTO,
+							 @ModelAttribute("receive_count") int receive_count, Model model) {
 		model.addAttribute("friendDTO", friendDTO);
+		model.addAttribute("receive_count", receive_count);
 		
 		return "friend/friend_friendInfo";
 	}

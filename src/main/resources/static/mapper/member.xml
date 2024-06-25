@@ -89,7 +89,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<!-- 내 (회원)정보 -->
-	<select id="myInfo" resultType="MemberDTO">
+	<select id="memberInfo" resultType="MemberDTO">
 		select *
 		from member
 		where member_email = #{member_email}
@@ -108,7 +108,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	-->
 	<!-- 모든 회원 정보 / 페이징 처리 / 키워드 추가 / 이메일 '@' 앞 부분만 검색 가능 / 회원 목록 숨김 / 검색으로만 찾을 수 있음 -->
-	<select id="memberList" resultType="MemberDTO">
+	<select id="memberSearch" resultType="MemberDTO">
 		<![CDATA[
 			select *
 			from

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<!-- 라이브러리 참조 : ThymeLeaf & Spring-Security & ThymeLeaf Layout -->
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<!-- CSS -->
+<link th:href="@{/css/layout.css}" rel="stylesheet">
+
+<!-- Header 영역 -->
+<th:block th:replace="fragments/header :: headerLayout"></th:block>
+	
+<body>
+	<!-- Content 영역 -->
+	<th:block layout:fragment="content" align="center"></th:block>
+	
+	<!-- Footer 영역 -->
+	<th:block th:replace="fragments/footer :: footerLayout"></th:block>
+	
+	<!-- Script 영역 -->
+	<th:block layout:fragment="script"></th:block>
+</body>
+</html>

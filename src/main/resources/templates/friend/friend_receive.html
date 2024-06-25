@@ -1,24 +1,26 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-<meta charset="UTF-8">
-<title>받은 친구목록</title>
-</head>
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layout/layout}">
 <body>
-	<div align="center">
-		<div align="right" style="width: 800px;">
-			<a sec:authorize="isAuthenticated()" href="/friend/sendList">보낸신청</a>
-			<a sec:authorize="isAuthenticated()" href="/friend/friendList">친구목록</a>
-			<a sec:authorize="isAuthenticated()" href="/member/main">메인</a>
-		</div>
+	<div layout:fragment="content">
+		<th:block th:replace="~{fragments/friend :: friendLayout}"></th:block>
+		<h1>받은요청</h1>
 		<table style="border: 1px solid; width: 400px; text-align: center;">
 			<tr>
 				<th>보낸사람 이메일</th>
 				<th>수락/거절</th>
 			</tr>
 			<tr th:each="friendRequestDTO : ${receiveList}">
-				<td th:text="${friendRequestDTO.member_email}"></td>	<!-- a태그로 유저 정보보기 -->
+				<td>	<!-- 이메일 클릭 시 회원정보로 이동 -->
+					<form action="/member/memberInfo" method="post" th:attr="id='infoForm' + ${friendRequestDTO.friend_request_id}">
+						<a onclick="infoForm()" class="infoA" th:attr="data-info='infoForm' + ${friendRequestDTO.friend_request_id}" href="javascript:void(0);">
+							[[${friendRequestDTO.member_email}]]
+						</a>
+						<input type="hidden" name="member_email" th:value="${friendRequestDTO.member_email}"			/>
+					</form>
+				</td>
 				<td>
 					<form action="/friend/friendAccept" method="post">
 						<button type="submit">수락</button>
@@ -33,5 +35,6 @@
 			</tr>
 		</table>
 	</div>
+	<script layout:fragment="script" type="text/javascript" src="/js/friendRequest.js"></script>
 </body>
 </html>

@@ -1,3 +1,4 @@
+/* 반복문으로 꺼낸 숨김버튼에 속성을 부여함 */
 const hideBtns = document.querySelectorAll('.hideBtn');
 hideBtns.forEach(button => {
 	button.addEventListener('click', () => {
@@ -10,8 +11,9 @@ hideBtns.forEach(button => {
 		const nameI = document.getElementById(showId);
 		const submitBtn = document.getElementById(submitId);
 		const nameH = document.getElementById(hiddenId);
-		const nickF = document.getElementById(nickId);
+		const nickF = document.getElementById(nickId);button
 		
+		/* 클릭 시 다른 버튼 비활성화 */
 		hideBtns.forEach(btn => {
 			if (btn !== button) {
 				btn.disabled = true;
@@ -25,6 +27,8 @@ hideBtns.forEach(button => {
 			submitBtn.style.display = 'inline-block';
 			nameI.style.display = 'inline-block';
 		}
+		
+		/* 버튼타입을 직접 서밋 */
 		submitBtn.addEventListener('click', () => {
 			nameH.value = nameI.value;
 			nickF.submit();
@@ -33,6 +37,7 @@ hideBtns.forEach(button => {
 	});
 });
 
+/* 링크 클릭 시 직접 서밋 */
 const infoA = document.querySelectorAll('.infoA');
 infoA.forEach(button => {
 	button.addEventListener('click', () => {

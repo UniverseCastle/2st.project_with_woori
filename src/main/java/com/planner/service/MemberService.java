@@ -52,11 +52,11 @@ public class MemberService {
 		return memberMapper.memberCount(keyword);
 	}
 	
-//	모든유저 정보
-	public List<MemberDTO> memberList(Principal principal, String keyword, int start, int end){
+//	회원 검색
+	public List<MemberDTO> memberSearch(Principal principal, String keyword, int start, int end){
 //		int count = 0;
 		Long myId = memberMapper.findByMemberId(principal.getName());
-		List<MemberDTO> list = memberMapper.memberList(myId, keyword, start, end);
+		List<MemberDTO> list = memberMapper.memberSearch(myId, keyword, start, end);
 		List<MemberDTO> sendIdList = memberMapper.findBySendId(myId, keyword);
 		
 		if (!sendIdList.isEmpty()) {
@@ -76,9 +76,9 @@ public class MemberService {
 		return memberMapper.findBySendId(member_id, keyword);
 	}
 	
-//	내 (회원)정보
-	public MemberDTO myInfo(String member_email) {
-		return memberMapper.myInfo(member_email);
+//	회원정보
+	public MemberDTO memberInfo(String member_email) {
+		return memberMapper.memberInfo(member_email);
 	}
 	
 //	친구신청 받는 아이디로 친구신청 상태 찾기

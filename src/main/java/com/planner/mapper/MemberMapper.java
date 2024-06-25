@@ -39,8 +39,8 @@ public interface MemberMapper {
 //	전체 회원 수
 	public int memberCount(String keyword);
 	
-//	모든유저 정보
-	public List<MemberDTO> memberList(@Param("member_id") Long member_id, @Param("keyword") String keyword,
+//	회원 검색
+	public List<MemberDTO> memberSearch(@Param("member_id") Long member_id, @Param("keyword") String keyword,
 									  @Param("start") int start, @Param("end") int end);
 	
 //	친구신청 받는 아이디로 친구신청 상태 찾기
@@ -50,8 +50,8 @@ public interface MemberMapper {
 //	친구신청 보낸 아이디 찾기
 	public List<MemberDTO> findBySendId(@Param("member_id") Long member_id, @Param("keyword") String keyword);
 	
-//	내 (회원)정보
-	public MemberDTO myInfo(String member_email);
+//	회원정보
+	public MemberDTO memberInfo(String member_email);
 	
 //	친구목록
 //	public List<MemberDTO> friendList(Long member_id);
