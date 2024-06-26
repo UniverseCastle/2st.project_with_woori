@@ -7,17 +7,14 @@
 <!-- CSS -->
 <link th:href="@{/css/layout.css}" rel="stylesheet">
 
-<!-- Header 영역 -->
-<th:block th:replace="fragments/header :: headerLayout"></th:block>
-	
 <body>
+	<!-- Header 영역 -->
+	<th:block th:replace="~{/fragments/header :: headerLayout}"></th:block>
+	
 	<!-- Content 영역 -->
 	<th:block layout:fragment="content" align="center"></th:block>
 	
 	<!-- Footer 영역 -->
-	<th:block th:replace="fragments/footer :: footerLayout"></th:block>
-	
-	<!-- Script 영역 -->
-	<th:block layout:fragment="script"></th:block>
+	<th:block th:replace="~{/fragments/footer :: footerLayout}"></th:block>
 </body>
 </html>

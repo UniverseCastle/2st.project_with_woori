@@ -1,6 +1,5 @@
 package com.planner.service;
 
-import java.security.Principal;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -60,12 +59,6 @@ public class FriendService {
 		Long myId = memberMapper.findByMemberId(member_email);
 		List<FriendRequestDTO> list = friendMapper.receiveRequestList(myId);
 		
-//		for (FriendRequestDTO friendRequestDTO : list) {
-//			if (friendRequestDTO.getMember_send_id() != null) {
-//				String email = memberMapper.findByMemberEmail(friendRequestDTO.getMember_send_id());
-//				friendRequestDTO.setMember_email(email);
-//			}
-//		}
 		return list;
 	}
 	
@@ -81,13 +74,6 @@ public class FriendService {
 	public void requestDelete(Long member_receive_id, Long member_send_id) {
 		friendMapper.requestDelete(member_receive_id, member_send_id);
 	}
-	
-//	(보낸)친구신청 취소
-//	public void sendDelete(@Param("member_receive_id") Long member_receive_id,
-//			  			   Principal principal) {
-//		Long myId = memberMapper.findByMemberId(principal.getName());
-//		friendMapper.sendDelete(member_receive_id, myId);
-//	}
 	
 //	친구수락 (+친구상태 업데이트)
 	public void friendAccept(String member_email, Long member_send_id) {

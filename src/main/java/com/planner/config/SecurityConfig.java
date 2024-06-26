@@ -49,6 +49,7 @@ public class SecurityConfig {
                   .requestMatchers(new AntPathRequestMatcher("/member/anon/**")).permitAll()
                   .requestMatchers(new AntPathRequestMatcher("/oauth2/**")).permitAll()
                   .requestMatchers(new AntPathRequestMatcher("/member/auth/**")).hasRole("USER")
+                  .requestMatchers(new AntPathRequestMatcher("/friend/**")).hasRole("USER")
                   .anyRequest().authenticated()
           )
           .oauth2Login(configure ->

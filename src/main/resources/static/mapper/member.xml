@@ -48,6 +48,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 				member_reg,
 				member_status,
 				member_role,
+				oauth_type,
 				oauth_id
 				) values (
 				member_seq.nextval,
@@ -60,6 +61,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 				sysdate,
 				'B',
 				#{member_role},
+				'none',
 				'none'
 			)
 	</insert>
@@ -133,13 +135,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where member_email = #{member_email}
 	</select>
 	
-	<!-- 회원 시퀀스로 객체 가져오기 -->
-	<select id="findByMemberSeq" resultType="MemberDTO">
-		select *
-		from member
-		where member_id = #{member_id}
-	</select>
-
 	<!-- 회원 이메일로 시퀀스 찾기 -->
 	<select id="findByMemberId" resultType="Long">
 		select member_id
@@ -147,46 +142,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where member_email = #{member_email}
 	</select>
 	
-	<!-- 회원 시퀀스로 이메일 찾기 -->
+	<!-- 회원 시퀀스로 객체 가져오기 (친구 객체 찾을 때 사용) -->
+	<select id="findByMemberSeq" resultType="MemberDTO">
+		select *
+		from member
+		where member_id = #{member_id}
+	</select>
+	
+	<!-- 회원 시퀀스로 이메일 찾기 (친구 이메일 찾을 때 사용) -->
 	<select id="findByMemberEmail" resultType="String">
 		select member_email
 		from member
 		where member_id = #{member_id}
 	</select>
 	
-	<!-- 회원 시퀀스로 이름 찾기 -->
-	<select id="findByMemberName" resultType="String">
-		select member_name
-		from member
-		where member_id = #{member_id}
-	</select>
-	
-	<!-- 로그인 -->
-<!-- 	<select id="memberLogin" resultType="int"> -->
-<!-- 		select * -->
-<!-- 		from member -->
-<!-- 		where member_email=#{member_email} -->
-<!-- 		and member_password=#{member_password} -->
-<!-- 	</select> -->
-	
-	<!-- 전체 회원 수(키워드 적용 / 이메일 '@' 전까지만 검색한 결과값) -->
-	<!--  
-	<select id="memberCount" resultType="int">
-		select count(*)
-		from member
-		where substr (member_email, 1, instr(member_email, '@') - 1) like '%'||#{keyword}||'%'
-	</select>
-	-->
-	
-	<!-- 내 (회원)정보 -->
-	<select id="memberInfo" resultType="MemberDTO">
-		select *
-		from member
-		where member_email = #{member_email}
-	</select>
-	
 	<!-- 모든 회원 정보 / 페이징 처리 / 키워드 추가 / 이메일 '@' 앞 부분만 검색 가능 / 회원 목록 숨김 / 검색으로만 찾을 수 있음 -->
-	<select id="memberSearch" resultType="MemberDTO">
+	<select id="search" resultType="MemberDTO">
 		<![CDATA[
 			select *
 			from
@@ -207,7 +178,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		]]>
 	</select>
 	
-	
 	<!-- (나에게) 친구신청 보낸 아이디 찾기 -->
 	<select id="findBySendId" resultType="MemberDTO">
 		select m.*, fr.member_send_id, rownum r
@@ -215,6 +185,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		left outer join friend_request fr
 		on m.member_id = fr.member_send_id
 		where fr.member_receive_id=#{member_id}
+		and m.member_status='B'
 		and substr (member_email, 1, instr(member_email, '@') - 1) like '%' || #{keyword} || '%'
 	</select>
 

@@ -4,14 +4,9 @@
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{layout/layout}">
 <head>
-<meta charset="UTF-8">
-<title>로그인</title>
 <link rel="stylesheet" type="text/css" href="/css/login.css">
-<link rel="stylesheet" type="text/css" href="/css/header.css">
-<script	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-<!-- 	<header th:replace="~{header :: header}"></header> -->
 	<div layout:fragment="content">
 		<main class="loginMain">
 			<form class="loginForm" method="post">
@@ -30,6 +25,7 @@
 				<a class="kakaoBtn" href="/oauth2/authorization/kakao?mode=login"><img src="/images/kakao.webp" class="kakaoLogo"></a>
 			</div>
 		</main>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	</div>
 </body>
 </html>

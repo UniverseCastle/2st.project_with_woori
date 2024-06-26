@@ -1,6 +1,5 @@
 package com.planner.controller;
 
-import java.security.Principal;
 import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,23 +24,15 @@ import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/friend/*")
+@RequestMapping("/friend")
 public class FriendController {
 
 	private final FriendService friendService;
 	private final MemberService memberService;
 	
-//	친구찾기 리스트 Get
-//	@PreAuthorize("isAuthenticated()")
-//	@GetMapping("findFriend")
-//	public String findFriend() {
-//		
-//		return "friend_findFriend";
-//	}
-	
 //	친구추가 Post
 	@PreAuthorize("isAuthenticated()")
-	@PostMapping("friendRequest")
+	@PostMapping("/request")
 	@ResponseBody
 	public String friendRequest(@RequestParam("member_id") Long member_id,
 								@UserData ResMemberDetail dtail, Model model) {
@@ -55,7 +46,7 @@ public class FriendController {
 	
 //	(받은)친구신청 리스트 Get
 	@PreAuthorize("isAuthenticated()")
-	@GetMapping("receiveList")
+	@GetMapping("/receiveList")
 	public String receiveList(@UserData ResMemberDetail dtail, Model model) {
 		List<FriendRequestDTO> receiveList = friendService.receiveRequestList(dtail.getMember_email());
 		int receive_count = friendService.receiveRequestCount(dtail.getMember_email());	// 받은 친구신청 수
@@ -67,7 +58,7 @@ public class FriendController {
 	
 //	(보낸)친구신청 리스트 Get
 	@PreAuthorize("isAuthenticated()")
-	@GetMapping("sendList")
+	@GetMapping("/sendList")
 	public String sendList(@UserData ResMemberDetail dtail, Model model) {
 		List<FriendRequestDTO> sendList = friendService.sendRequestList(dtail.getMember_email());
 		int receive_count = friendService.receiveRequestCount(dtail.getMember_email());	// 받은 친구신청 수
@@ -78,34 +69,28 @@ public class FriendController {
 	}
 	
 //	친구 헤더 (받은 친구신청 수)
-	@PreAuthorize("isAuthenticated()")
-	@GetMapping("friendHeader")
-	public String friendHeader(@UserData ResMemberDetail dtail, Model model) {
-		int receive_count = friendService.receiveRequestCount(dtail.getMember_email());	// 받은 친구신청 수
-		model.addAttribute("receive_count", receive_count);
-		
-		return "fragments/friend";
-	}
-	
+//	@PreAuthorize("isAuthenticated()")
+//	@GetMapping("/friendHeader")
+//	public String friendHeader(@UserData ResMemberDetail dtail, Model model) {
+//		int receive_count = friendService.receiveRequestCount(dtail.getMember_email());	// 받은 친구신청 수
+//		model.addAttribute("receive_count", receive_count);
+//		
+//		return "fragments/friend";
+//	}
 	
 //	친구수락 (친구상태 업데이트) Post
 	@PreAuthorize("isAuthenticated()")
-	@PostMapping("friendAccept")
-//	@ResponseBody
+	@PostMapping("/accept")
 	public String friendAccept(@RequestParam("member_send_id") Long member_send_id,
 							   @UserData ResMemberDetail detail, Model model) {
 		friendService.friendAccept(detail.getMember_email(), member_send_id);			// 요청 상태 업데이트 메서드
-//		friendService.friendAdd(principal, member_send_id);				// 친구 테이블에 추가 메서드
-		
-//		Long myid = memberService.findByMemberId(principal.getName());
-//		String friendStatus = memberService.findByMemberFriendStatus(member_id, myid);
 		
 		return "redirect:/friend/receiveList";
 	}
 	
 //	친구신청 취소/거절 Post
-	@PostMapping("requestDelete")
 	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/requestDelete")
 	public String requestDelete(@RequestParam(name = "delete_who", defaultValue = "none") String delete_who,
 								FriendRequestDTO friendRequestDTO, @UserData ResMemberDetail detail) {
 		Long myId = memberService.findByMemberId(detail.getMember_email());
@@ -116,53 +101,33 @@ public class FriendController {
 			
 			return "redirect:/friend/sendList";
 		}
-		
 		return "redirect:/friend/receiveList";
 	}
 	
-//	(보낸)친구신청 취소 Post
-//	@PostMapping("receiveDelete")
-//	@PreAuthorize("isAuthenticated()")
-//	public String sendDelete(@RequestParam("member_receive_id") Long member_receive_id,
-//			Principal principal) {
-//		friendService.sendDelete(member_receive_id, principal);
-//		
-//		return "redirect:/friend/receiveList";
-//	}
-	
 //	친구목록 Get
-	@GetMapping("friendList")
 	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/list")
 	public String friendList(@UserData ResMemberDetail detail, Model model) {
 		List<FriendDTO> friendList = friendService.friendList(detail.getMember_email());
 		int receive_count = friendService.receiveRequestCount(detail.getMember_email());	// 받은 친구신청 수
 		model.addAttribute("receive_count", receive_count);
 		model.addAttribute("friendList", friendList);
 		
-		return "friend/friend_friendList";
+		return "friend/friend_list";
 	}
 	
 //	친구 닉네임 변경 Post
-	@PostMapping("friendName")
 	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/nickname")
 	public String friendName(FriendDTO friendDTO) {
 		friendService.friendNickName(friendDTO);
 		
-		return "redirect:/friend/friendList";
+		return "redirect:/friend/list";
 	}
-	
-//	친구 메모 변경 Post
-//	@PreAuthorize("isAuthenticated()")
-//	@PostMapping("friendMemo")
-//	public String friendMemo(FriendDTO friendDTO) {
-//		friendService.friendMemo(friendDTO);
-//		
-//		return "redirect:/friend/friendList";
-//	}
 	
 //	친구정보 Post
 	@PreAuthorize("isAuthenticated()")
-	@PostMapping("friendInfo")
+	@PostMapping("/info")
 	public String friendInfo(FriendDTO frndDTO, RedirectAttributes rttr, @UserData ResMemberDetail detail,
 							 @RequestParam(name = "friend_change", defaultValue = "none") String friend_change) {
 		if (friend_change.equals("nick")) {
@@ -178,42 +143,30 @@ public class FriendController {
 		friendDTO.setFriend_status(frndDTO.getFriend_status());		// 정방향 / 역방향 여부를 알려주는 변수
 		rttr.addFlashAttribute("friendDTO", friendDTO);
 		
-		return "redirect:/friend/friendInfo";
+		return "redirect:/friend/info";
 	}
 
 //	친구정보 Get
 	@PreAuthorize("isAuthenticated()")
-	@GetMapping("friendInfo")
+	@GetMapping("/info")
 	public String friendInfo(@ModelAttribute("friendDTO")FriendDTO friendDTO,
 							 @ModelAttribute("receive_count") int receive_count, Model model) {
 		model.addAttribute("friendDTO", friendDTO);
 		model.addAttribute("receive_count", receive_count);
 		
-		return "friend/friend_friendInfo";
+		return "friend/friend_info";
 	}
 	
 //	친구삭제 Post
 	@PreAuthorize("isAuthenticated()")
-	@PostMapping("friendDelete")
+	@PostMapping("/delete")
 	public String friendDelete(@RequestParam("friend_id") Long friend_id,
 							   @RequestParam("member_my_id") Long member_my_id,
 							   @RequestParam("member_friend_id") Long member_friend_id) {
 		// 친구테이블(member_my_id) == 친구요청테이블(member_receive_id)
 		friendService.friendDelete(friend_id, member_my_id, member_friend_id);	// 친구, 친구요청 삭제 메서드
 		
-		return "redirect:/friend/friendList";
+		return "redirect:/friend/list";
 	}
 	
-	
-//	친구정보 수정 Post
-//	@PreAuthorize("isAuthenticated()")
-//	@PostMapping("friendInfo")
-//	public String friendInfo(FriendDTO friendDTO) {
-//		if (friend_change.equals("nick")) {
-//			System.out.println("========================");
-//			System.out.println(friendDTO.getFriend_status());
-//		}
-//		friendService.friendNickName(friendDTO);
-//		return "redirect:/friend/friendInfo";
-//	}
 }

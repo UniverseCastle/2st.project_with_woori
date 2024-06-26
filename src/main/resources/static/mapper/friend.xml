@@ -11,11 +11,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where member_send_id=#{member_send_id}
 	</select>
 	
-	<!-- 친구찾기 리스트 -->
-	<select id="findFriend" resultType="FriendDTO">
-		
-	</select>
-	
 	<!-- 친구신청 (보낼 때) -->
 	<insert id="friendRequest" parameterType="FriendRequestDTO">
 		insert into friend_request values(
@@ -74,14 +69,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where member_receive_id = #{member_receive_id}
 		and member_send_id = #{member_send_id}
 	</delete>
-	
-	<!-- (보낸)친구신청 취소 -->
-<!-- 	<delete id="sendDelete"> -->
-<!-- 		delete -->
-<!-- 		from friend_request -->
-<!-- 		where member_receive_id = #{member_receive_id} -->
-<!-- 		and member_send_id = #{member_send_id} -->
-<!-- 	</delete> -->
 	
 	<!-- 친구수락 -->
 	<update id="friendAccept" parameterType="Long">
@@ -162,7 +149,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</resultMap>
 	
 	<resultMap id="selectMemberInfo" type="MemberDTO">
-		<result column="member_id" property="member_id"	/>
+		<id column="member_id" property="member_id"	/>
 		<result column="member_email" property="member_email"	/>
 		<result column="member_password" property="member_password"	/>
 		<result column="member_name" property="member_name"	/>

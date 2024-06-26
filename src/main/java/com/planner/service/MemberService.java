@@ -1,6 +1,5 @@
 package com.planner.service;
 
-import java.security.Principal;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -124,42 +123,16 @@ public class MemberService {
 		}
 	
 //	<!-- =========================민형이 자료========================= -->
-	
-//	회원 이메일로 객체 가져오기
-//	public MemberDTO findByMember(String member_email) {
-//		return memberMapper.findByMember(member_email);
-//	}
-//	public Optional<MemberDTO> findByUser(String member_email){
-//		return memberMapper.findByUser(member_email);
-//	}
-	
 //	회원 이메일로 시퀀스 찾기
 	public Long findByMemberId(String member_email) {
 		return memberMapper.findByMemberId(member_email);
 	}
 	
-//	회원가입
-//	public int memberInsert(MemberDTO memberDTO) {
-//		memberDTO.setMember_password(passwordEncoder.encode(memberDTO.getMember_password()));
-//		
-//		return memberMapper.memberInsert(memberDTO);
-//	}
-	
-//	로그인
-//	public int memberLogin(String member_email, String member_password) {
-//		return memberMapper.memberLogin(member_email, member_password);
-//	}
-	
-//	전체 회원 수
-//	public int memberCount(String keyword) {
-//		return memberMapper.memberCount(keyword);
-//	}
-	
 //	회원 검색
-	public List<MemberDTO> memberSearch(String member_email, String keyword, int start, int end){
+	public List<MemberDTO> search(String member_email, String keyword, int start, int end){
 //		int count = 0;
 		Long myId = memberMapper.findByMemberId(member_email);
-		List<MemberDTO> list = memberMapper.memberSearch(myId, keyword, start, end);
+		List<MemberDTO> list = memberMapper.search(myId, keyword, start, end);
 		List<MemberDTO> sendIdList = memberMapper.findBySendId(myId, keyword);
 		
 		if (!sendIdList.isEmpty()) {
@@ -168,7 +141,6 @@ public class MemberService {
 		for (MemberDTO memberDTO : list) {		// 리스트에서 신청상태를 표시하기 위해 set
 			String status = friendMapper.friendRequestStatus(memberDTO.getMember_id(), myId);
 			memberDTO.setFriend_request_status(status);
-//			memberDTO.setMember_count(count);	// 중복되어 나오는 데이터를 삭제하고 난 후 회원 수를 리턴
 		}
 		return list;
 	}
@@ -178,10 +150,4 @@ public class MemberService {
 		Long member_id = memberMapper.findByMemberId(member_email);
 		return memberMapper.findBySendId(member_id, keyword);
 	}
-	
-//	회원정보
-	public MemberDTO memberInfo(String member_email) {
-		return memberMapper.memberInfo(member_email);
-	}
-	
 }

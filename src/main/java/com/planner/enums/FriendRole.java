@@ -6,8 +6,6 @@ import lombok.Getter;
 public enum FriendRole {
 
 	REQUEST("R", "요청중"),
-//	SEND("S", "요청보냄"),
-//	RECEIVE("R", "요청받음"),
 	SUCCESS("F", "친구");
 	
 	private String code;
@@ -27,23 +25,3 @@ public enum FriendRole {
 		return null;
 	}
 }
-
-//public static String fromString(UserRole userRole) {
-//for (UserRole role : UserRole.values()) {
-//	if (role.equals(userRole)) {
-//		return role.getName();
-//	}
-//}
-//throw new IllegalArgumentException();
-//}
-
-
-//REQUEST("R", "요청중"),
-//SUCCESS("S", "친구");
-//
-//private String code;
-//private String name;
-
-//for(UserRole userRole : UserRole.values()) {
-//
-//}

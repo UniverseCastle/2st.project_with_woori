@@ -16,16 +16,15 @@
 		<a href="/planner/main">Planner</a>
 	</div>
   	<ul class="nav_menu">
-  		<li>
-  			<a sec:authorize="isAuthenticated()" href="/member/memberSearch">친구</a>
+  		<li sec:authorize="isAuthenticated()">
+  			<a href="/member/auth/search">친구</a>
   		</li>
   	</ul>
   	
   	<ul class="nav_icon">
   		<li class="myPage">
   			<!-- 아이콘 이미지 -->
-<!-- 	  		<a sec:authorize="isAnonymous()" href="/member/insert">회원가입</a> -->
-  			<a sec:authorize="isAuthenticated()"  href="/member/auth/myInfo">내 정보</a>
+  			<a sec:authorize="isAuthenticated()"  href="/member/auth/info">내 정보</a>
   			<a sec:authorize="isAuthenticated()"  href="/member/anon/signout">로그아웃</a>
   			<a sec:authorize="isAnonymous()"  href="/member/anon/login">로그인</a>
   		</li>

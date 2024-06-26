@@ -1,19 +1,18 @@
-<!DOCTYPE html>
+     <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{layout/layout}">
 <head>
   <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-  <meta name="_csrf" th:content="${_csrf.token}"/>
-  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 	<div layout:fragment="content">
 		<th:block th:replace="~{fragments/friend :: friendLayout}"></th:block>
+		<input type="hidden" id="status" th:value="${status}"	/>
 		<div>
 			<h1>Friend Search</h1>
-			<form action="/member/memberSearch" method="get" id="keywordForm" onsubmit="return false">	<!-- Enter Key 로 서밋 방지 -->
+			<form action="/member/auth/search" method="get" id="keywordForm" onsubmit="return false">	<!-- Enter Key 로 서밋 방지 -->
 				<input type="text" name="keyword" id="keywordInput"	/>
 				<button type="button" id="keywordBtn">검색</button>
 			</form>
@@ -31,7 +30,7 @@
 				</tr>
 				<tr th:each="memberDTO : ${list}">
 					<td>
-						<form action="/member/memberInfo" method="post" th:attr="id='infoForm' + ${memberDTO.member_id}">
+						<form action="/member/auth/info" method="post" th:attr="id='infoForm' + ${memberDTO.member_id}">
 							<a onclick="infoForm()" class="infoA" th:attr="data-info='infoForm' + ${memberDTO.member_id}" href="javascript:void(0);">
 								[[${memberDTO.member_email}]]
 							</a>
@@ -58,21 +57,21 @@
 			<!-- 페이징 처리 시작 -->
 			<div th:if="${count > 0}">
 				<span th:if="${startPage > 10}">
-					<a th:href="@{|/member/memberSearch?keyword=${keyword}&pageNum=${startPage - 10}|}" th:text="'[이전]'"></a>
+					<a th:href="@{|/member/search?keyword=${keyword}&pageNum=${startPage - 10}|}" th:text="'[이전]'"></a>
 				</span>
 				<span th:each="i : ${#numbers.sequence(startPage, endPage)}">
-					<a th:if="${pageNum != i}" th:href="@{|/member/memberSearch?keyword=${keyword}&pageNum=${i}|}" th:text="'['+${i}+']'"></a>
+					<a th:if="${pageNum != i}" th:href="@{|/member/search?keyword=${keyword}&pageNum=${i}|}" th:text="'['+${i}+']'"></a>
 					<span th:if="${pageNum == i}">
 						[<b th:text="${i}"></b>]
 					</span>
 				</span>
 				<span th:if="${endPage} < ${pageCount}">
-					<a th:href="@{|/member/memberSearch?keyword=${keyword}&pageNum=${startPage + 10}|}" th:text="'[다음]'"></a>
+					<a th:href="@{|/member/search?keyword=${keyword}&pageNum=${startPage + 10}|}" th:text="'[다음]'"></a>
 				</span>
 			</div>
 			<!-- 페이징 처리 끝 -->
 		</div>
+		<script type="text/javascript" src="/js/member/memberSearch.js"></script>
 	</div>
-	<script layout:fragment="script" type="text/javascript" src="/js/memberSearch.js"></script>
 </body>
 </html>
