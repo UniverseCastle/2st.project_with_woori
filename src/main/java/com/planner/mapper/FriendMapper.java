@@ -13,11 +13,11 @@ import com.planner.dto.request.friend.FriendRequestDTO;
 @Repository
 public interface FriendMapper {
 	
+//	친구 시퀀스로 객체 찾기
+	public FriendDTO findByFriendId(Long friend_id);
+	
 //	아이디 받아서 객체 찾기
 	public FriendRequestDTO findByFriendRequest(Long member_id);
-	
-//	친구찾기 리스트
-	public List<FriendDTO> findFriend(@Param("member_my_id") Long member_my_id);
 	
 //	친구신청 (보냄)
 	public void friendRequest(FriendRequestDTO friendRequestDTO);

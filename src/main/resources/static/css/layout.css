@@ -4,7 +4,7 @@
     align-items: center; 
     background-color: lightgray;
 	padding: 8px 12px;
-	
+	height: 70px;
 }
 
 .logo {			/* 왼쪽 위 로고 */
@@ -69,13 +69,10 @@ body {
     min-height: 100%;
 }
 
-header {
-    width: 100;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
+/* header { */
+/*     width: 100%; */
+/*     height: 40px; */
+/* } */
 
 footer {
     position: absolute;
@@ -86,11 +83,8 @@ footer {
     padding: 15px 0;
     text-align: center;
 }
-content{
-    margin-bottom:100px;
-    margin-top: 50px;
-    margin-left: 200px;
-    margin-right: 200px;
+.content{
+    margin : 50px 200px 100px;
 }
 
 ul {

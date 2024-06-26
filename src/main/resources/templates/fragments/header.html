@@ -1,16 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<th:block th:fragment="headerLayout">
-  <head>
-    <title>Planner</title>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1"/>
-	<meta name="_csrf" th:content="${_csrf.token}"/>
-	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-  </head>
-  
-  <nav class="navbar">
+<th:block>
+  <header class="navbar" th:fragment="headerLayout">
 	<div class="logo">
 		<i class="navImg"></i>	<!-- 로고 이미지 -->
 		<a href="/planner/main">Planner</a>
@@ -29,7 +21,6 @@
   			<a sec:authorize="isAnonymous()"  href="/member/anon/login">로그인</a>
   		</li>
   	</ul>
-  </nav>
-	
+  </header>
 </th:block>
 </html>

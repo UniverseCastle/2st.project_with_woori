@@ -3,7 +3,13 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.planner.mapper.FriendMapper">
-
+	<!-- 친구 시퀀스로 객체 찾기 -->
+	<select id="findByFriendId" resultType="FriendDTO">
+		select *
+		from friend
+		where friend_id = #{friend_id}
+	</select>
+	
 	<!-- 친구요청 객체 찾기 -->
 	<select id="findByFriendRequest" resultType="FriendRequestDTO">
 		select *

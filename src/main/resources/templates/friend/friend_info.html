@@ -10,6 +10,12 @@
 		<table style="border: 1px solid; width: 800px; text-align: center;">
 			<tbody th:each="memberDTO : ${friendDTO.memberInfo}">
 				<tr>
+					<td colspan="4">
+						[[${friendDTO.friend_id}]]
+						[[${friendDTO.friend_status}]]
+					</td>
+				</tr>
+				<tr>
 					<td>이메일</td>
 					<td th:text="${memberDTO.member_email}" colspan="3"></td>
 				</tr>

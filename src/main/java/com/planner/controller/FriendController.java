@@ -6,7 +6,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,12 +35,32 @@ public class FriendController {
 	@ResponseBody
 	public String friendRequest(@RequestParam("member_id") Long member_id,
 								@UserData ResMemberDetail dtail, Model model) {
-		friendService.friendRequest(member_id, dtail.getMember_email());			// 친구신청 void 메서드
+		friendService.friendRequest(member_id, dtail.getMember_email());				// 친구신청 void 메서드
 		
 		Long myid = memberService.findByMemberId(dtail.getMember_email());
-		String friendStatus = friendService.friendRequestStatus(member_id, myid);	// 친구신청 상태 찾는 메서드 / (받는 아이디, 보낸 아이디)
+		String friendStatus = friendService.friendRequestStatus(member_id, myid);		// 친구신청 상태 찾는 메서드 / (받는 아이디, 보낸 아이디)
 		
 		return friendStatus;
+	}
+	
+//	친구추가 Post / 회원정보 에서 submit 한 경우
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/requestByInfo")
+	public String friendRequest(@RequestParam(value = "member_id") Long member_id,
+								@RequestParam(value = "member_email") String member_email,	// 내정보 로 이동되는것을 막기 위해 값 같이 넘겨줌
+								@RequestParam(value = "infoRoot") String infoRoot,			// 회원정보 에서 submit 한 경우
+								@UserData ResMemberDetail dtail, Model model,
+								RedirectAttributes rttr) {
+		if (!infoRoot.equals("none") || !infoRoot.equals("") || infoRoot != null) {
+			friendService.friendRequest(member_id, dtail.getMember_email());			// 친구신청 void 메서드
+			rttr.addFlashAttribute("infoRoot", infoRoot);								// infoRoot = "search" 인 상태 유지
+			rttr.addFlashAttribute("member_email", member_email);
+		}
+//		Long myid = memberService.findByMemberId(dtail.getMember_email());
+//		String friendStatus = friendService.friendRequestStatus(member_id, myid);		// 친구신청 상태 찾는 메서드 / (받는 아이디, 보낸 아이디)
+//		rttr.addFlashAttribute("friendStatus", friendStatus);							// 회원정보에서 버튼이 보여질 조건을 주기위한 변수
+		
+		return "redirect:/member/auth/info";
 	}
 	
 //	(받은)친구신청 리스트 Get
@@ -67,16 +86,6 @@ public class FriendController {
 		
 		return "friend/friend_send";
 	}
-	
-//	친구 헤더 (받은 친구신청 수)
-//	@PreAuthorize("isAuthenticated()")
-//	@GetMapping("/friendHeader")
-//	public String friendHeader(@UserData ResMemberDetail dtail, Model model) {
-//		int receive_count = friendService.receiveRequestCount(dtail.getMember_email());	// 받은 친구신청 수
-//		model.addAttribute("receive_count", receive_count);
-//		
-//		return "fragments/friend";
-//	}
 	
 //	친구수락 (친구상태 업데이트) Post
 	@PreAuthorize("isAuthenticated()")
@@ -128,29 +137,35 @@ public class FriendController {
 //	친구정보 Post
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/info")
-	public String friendInfo(FriendDTO frndDTO, RedirectAttributes rttr, @UserData ResMemberDetail detail,
+	public String friendInfo(FriendDTO friendDTO, @UserData ResMemberDetail detail, Model model,
 							 @RequestParam(name = "friend_change", defaultValue = "none") String friend_change) {
 		if (friend_change.equals("nick")) {
-			friendService.friendNickName(frndDTO);
+			friendService.friendNickName(friendDTO);
 		}else if (friend_change.equals("memo")) {
-			friendService.friendMemo(frndDTO);
+			friendService.friendMemo(friendDTO);
 		}
 		
+		
+//		FriendDTO friendDTO = friendService.friendInfo(frndDTO);
+//		friendDTO.setFriend_status(frndDTO.getFriend_status());		// 정방향 / 역방향 여부를 알려주는 변수
+//		rttr.addFlashAttribute("friendDTO", friendDTO);
+		
 		int receive_count = friendService.receiveRequestCount(detail.getMember_email());	// 받은 친구신청 수
-		rttr.addFlashAttribute("receive_count", receive_count);				// rttr 로 보냄
+		model.addAttribute("receive_count", receive_count);
 		
-		FriendDTO friendDTO = friendService.friendInfo(frndDTO);
-		friendDTO.setFriend_status(frndDTO.getFriend_status());		// 정방향 / 역방향 여부를 알려주는 변수
-		rttr.addFlashAttribute("friendDTO", friendDTO);
-		
-		return "redirect:/friend/info";
+//		return "redirect:/friend/info";
+	    return String.format("redirect:/friend/info?friend_id=%d&friend_status=%s", friendDTO.getFriend_id(), friendDTO.getFriend_status());
+
 	}
 
 //	친구정보 Get
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/info")
-	public String friendInfo(@ModelAttribute("friendDTO")FriendDTO friendDTO,
-							 @ModelAttribute("receive_count") int receive_count, Model model) {
+	public String friendInfo(@RequestParam("friend_id") Long friend_id, @UserData ResMemberDetail detail,
+							 @RequestParam("friend_status") String friend_status, Model model) {
+		FriendDTO friendDTO = friendService.friendInfo(friend_id, friend_status);
+		int receive_count = friendService.receiveRequestCount(detail.getMember_email());	// 받은 친구신청 수
+		
 		model.addAttribute("friendDTO", friendDTO);
 		model.addAttribute("receive_count", receive_count);
 		
