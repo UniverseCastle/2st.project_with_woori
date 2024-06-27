@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.planner.dto.request.friend.FriendDTO;
 import com.planner.dto.request.friend.FriendRequestDTO;
@@ -29,13 +28,13 @@ public class FriendController {
 	private final FriendService friendService;
 	private final MemberService memberService;
 	
-//	친구추가 Post
+//	친구추가 Post / 친구목록 에서 ajax 서밋한 경우
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/request")
 	@ResponseBody
 	public String friendRequest(@RequestParam("member_id") Long member_id,
 								@UserData ResMemberDetail dtail, Model model) {
-		friendService.friendRequest(member_id, dtail.getMember_email());				// 친구신청 void 메서드
+		friendService.friendRequest(member_id, dtail);									// 친구신청 void 메서드
 		
 		Long myid = memberService.findByMemberId(dtail.getMember_email());
 		String friendStatus = friendService.friendRequestStatus(member_id, myid);		// 친구신청 상태 찾는 메서드 / (받는 아이디, 보낸 아이디)
@@ -46,21 +45,34 @@ public class FriendController {
 //	친구추가 Post / 회원정보 에서 submit 한 경우
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/requestByInfo")
-	public String friendRequest(@RequestParam(value = "member_id") Long member_id,
-								@RequestParam(value = "member_email") String member_email,	// 내정보 로 이동되는것을 막기 위해 값 같이 넘겨줌
-								@RequestParam(value = "infoRoot") String infoRoot,			// 회원정보 에서 submit 한 경우
-								@UserData ResMemberDetail dtail, Model model,
-								RedirectAttributes rttr) {
-		if (!infoRoot.equals("none") || !infoRoot.equals("") || infoRoot != null) {
-			friendService.friendRequest(member_id, dtail.getMember_email());			// 친구신청 void 메서드
-			rttr.addFlashAttribute("infoRoot", infoRoot);								// infoRoot = "search" 인 상태 유지
-			rttr.addFlashAttribute("member_email", member_email);
+	public String friendRequest(@RequestParam(value = "member_id") Long member_id, 
+								@RequestParam(name = "delete_who", defaultValue = "none") String delete_who, 
+								@RequestParam(value = "friend_request_status") String friend_request_status,
+								@UserData ResMemberDetail detail, Model model) {
+		if (friend_request_status.equals("search")) {
+			friendService.friendRequest(member_id, detail);		// 친구신청 void 메서드
+		}else if (friend_request_status.equals("receive")) {
+			if (delete_who.equals("send")) {					// 받은 신청목록에서 온 경우
+				friendService.requestDelete(detail.getMember_id(), member_id);	// 거절 메서드
+				
+				return String.format("redirect:/member/auth/info/%d", member_id);
+			}
+			friendService.friendAccept(detail, member_id);		// 수락 메서드
+			
+		}else if (friend_request_status.equals("send")) {
+			if (delete_who.equals("receive")) {					// 보낸 신청목록에서 온 경우
+				friendService.requestDelete(member_id, detail.getMember_id());
+				
+				return String.format("redirect:/member/auth/info/%d", member_id);
+			}
 		}
+		
+		
 //		Long myid = memberService.findByMemberId(dtail.getMember_email());
 //		String friendStatus = friendService.friendRequestStatus(member_id, myid);		// 친구신청 상태 찾는 메서드 / (받는 아이디, 보낸 아이디)
 //		rttr.addFlashAttribute("friendStatus", friendStatus);							// 회원정보에서 버튼이 보여질 조건을 주기위한 변수
 		
-		return "redirect:/member/auth/info";
+		return String.format("redirect:/member/auth/info/%d", member_id);
 	}
 	
 //	(받은)친구신청 리스트 Get
@@ -87,26 +99,25 @@ public class FriendController {
 		return "friend/friend_send";
 	}
 	
-//	친구수락 (친구상태 업데이트) Post
+//	친구수락 (친구상태 업데이트) Post / 받은요청 목록에서 수락 할 경우
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/accept")
 	public String friendAccept(@RequestParam("member_send_id") Long member_send_id,
 							   @UserData ResMemberDetail detail, Model model) {
-		friendService.friendAccept(detail.getMember_email(), member_send_id);			// 요청 상태 업데이트 메서드
+		friendService.friendAccept(detail, member_send_id);			// 요청 상태 업데이트 메서드
 		
 		return "redirect:/friend/receiveList";
 	}
 	
-//	친구신청 취소/거절 Post
+//	친구신청 취소/거절 Post / 보낸요청 목록에서 취소/거절 한 경우
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/requestDelete")
 	public String requestDelete(@RequestParam(name = "delete_who", defaultValue = "none") String delete_who,
 								FriendRequestDTO friendRequestDTO, @UserData ResMemberDetail detail) {
-		Long myId = memberService.findByMemberId(detail.getMember_email());
-		if (delete_who.equals("send")) {
-			friendService.requestDelete(myId, friendRequestDTO.getMember_send_id());
-		}else if (delete_who.equals("receive")) {
-			friendService.requestDelete(friendRequestDTO.getMember_receive_id(), myId);
+		if (delete_who.equals("send")) {			// 받은 신청목록에서 온 경우
+			friendService.requestDelete(detail.getMember_id(), friendRequestDTO.getMember_send_id());
+		}else if (delete_who.equals("receive")) {	// 보낸 신청목록에서 온 경우
+			friendService.requestDelete(friendRequestDTO.getMember_receive_id(), detail.getMember_id());
 			
 			return "redirect:/friend/sendList";
 		}

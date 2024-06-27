@@ -30,17 +30,17 @@
 				</tr>
 				<tr th:each="memberDTO : ${list}">
 					<td>
-						<form action="/member/auth/info" method="post" th:attr="id='infoForm' + ${memberDTO.member_id}">
-							<a onclick="infoForm()" class="infoA" th:attr="data-info='infoForm' + ${memberDTO.member_id}" href="javascript:void(0);">
-								[[${memberDTO.member_email}]]
-							</a>
-							<input type="hidden" name="member_email" th:value="${memberDTO.member_email}"	/>
-							<input type="hidden" name="infoRoot" value="search"	/>			<!-- 회원정보 / 어디에서 왔는지 표시 -->
-							<input type="hidden" th:name="_csrf" th:value="${_csrf.token}"/>
-						</form>
-						<script>
-							
-						</script>
+<!-- 						<form action="/member/auth/info" method="get" th:attr="id='infoForm' + ${memberDTO.member_id}"> -->
+<!-- 							<a onclick="infoForm()" class="infoA" th:attr="data-info='infoForm' + ${memberDTO.member_id}" href="javascript:void(0);"> -->
+						<a th:href="@{|/member/auth/info/${memberDTO.member_id}|}">
+							[[${memberDTO.member_email}]]
+						</a>
+<!-- 							</a> -->
+<!-- 							<input type="hidden" name="member_email" th:value="${memberDTO.member_email}"	/> -->
+<!-- 							<input type="hidden" name="member_id" th:value="${memberDTO.member_id}"	/> -->
+<!-- 							<input type="hidden" name="infoRoot" value="search"	/>			회원정보 / 어디에서 왔는지 표시 -->
+<!-- 							<input type="hidden" th:name="_csrf" th:value="${_csrf.token}"/> -->
+<!-- 						</form> -->
 					</td>
 					<td th:text="${memberDTO.member_birth}"></td>
 					<td th:text="${memberDTO.member_gender}"></td>

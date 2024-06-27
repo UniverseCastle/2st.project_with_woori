@@ -9,7 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -92,54 +92,52 @@ public class MemberController {
 		throw new CustomException(ErrorCode.NO_ACCOUNT);
 	}
 	
-	/*내(회원) 정보*/
+//	내정보
 	@PreAuthorize("isAuthenticated()")
-	@GetMapping("/auth/info")
-	public String info(@ModelAttribute(value = "member_email") String member_email,
-					   @ModelAttribute(value = "infoRoot") String infoRoot,
-					   @UserData ResMemberDetail detail, Model model) {
-		Long myId = detail.getMember_id();
+	@GetMapping("/auth/myInfo")
+	public String myInfo(@UserData ResMemberDetail detail, Model model) {
 		ResMemberDetail memberDTO;
-		String gender = "";
-		int receive_count = 0;
+		String gender;
 		
-		if (!member_email.isEmpty()) {	// 회원 정보인 경우
-			memberDTO = memberService.memberDetail(member_email);				// 회원 객체
-			gender = Gender.findNameByCode(memberDTO.getMember_gender());
-			
-			if (!infoRoot.equals("none")|| !infoRoot.equals("") || infoRoot != null) {
-				model.addAttribute("infoRoot", infoRoot);						// search, receive, send / 경로에서 온 값 리턴
-				
-				// 내가 신청 보낼 때
-				String friendStatus = friendService.friendRequestStatus(memberDTO.getMember_id(), myId);	// 친구신청 상태 찾는 메서드 / (받는 아이디, 보낸 아이디)
-				model.addAttribute("friendStatus", friendStatus);
-			}
-		}else {							// 내 정보인 경우
-			memberDTO = memberService.memberDetail(detail.getMember_email());	// 나의 객체
-			gender = Gender.findNameByCode(detail.getMember_gender());
-		}
-		receive_count = friendService.receiveRequestCount(detail.getMember_email());	// 받은 친구신청 수
+		memberDTO = memberService.memberDetail(detail.getMember_email());	// 나의 객체
+		gender = Gender.findNameByCode(detail.getMember_gender());
+		
 		model.addAttribute("memberDTO", memberDTO);
 		model.addAttribute("gender", gender);
-		model.addAttribute("myId", myId);
-		model.addAttribute("receive_count", receive_count);
 		
-		model.addAttribute("infoRoot", infoRoot);
+		return "/member/member_myInfo";
+	}
+	
+//	회원정보
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/auth/info/{member_id}")
+	public String memberInfo(@PathVariable(value = "member_id") Long member_id,
+					   		 @UserData ResMemberDetail detail, Model model) {
+		String gender;
+		int receive_count = 0;
+		
+		MemberDTO memberDTO = memberService.info(member_id, detail);
+		gender = Gender.findNameByCode(memberDTO.getMember_gender());
+		receive_count = friendService.receiveRequestCount(detail.getMember_email());	// 받은 친구신청 수
+		
+		model.addAttribute("receive_count", receive_count);
+		model.addAttribute("memberDTO", memberDTO);
+		model.addAttribute("gender", gender);
 		
 		return "/member/member_info"; 
 	}
 	
 //	내(회원) 정보 Post
-	@PreAuthorize("isAuthenticated()")
-	@PostMapping("/auth/info")
-	public String memberInfo(@RequestParam(value = "member_email", defaultValue = "none") String member_email,
-							 @RequestParam(value = "infoRoot", defaultValue = "none") String infoRoot,	// 어디에서 왔는지 표시 (search, receive, send)
-							 RedirectAttributes rttr) {
-		rttr.addFlashAttribute("member_email", member_email);
-		rttr.addFlashAttribute("infoRoot", infoRoot);
-		
-		return "redirect:/member/auth/info";
-	}
+//	@PreAuthorize("isAuthenticated()")
+//	@PostMapping("/auth/info")
+//	public String memberInfo(@RequestParam(value = "member_email", defaultValue = "none") String member_email,
+//							 @RequestParam(value = "infoRoot", defaultValue = "none") String infoRoot,	// 어디에서 왔는지 표시 (search, receive, send)
+//							 RedirectAttributes rttr) {
+//		rttr.addFlashAttribute("member_email", member_email);
+//		rttr.addFlashAttribute("infoRoot", infoRoot);
+//		
+//		return "redirect:/member/auth/info";
+//	}
 	
 	/*비밀번호 확인 폼*/
 	@PreAuthorize("isAuthenticated()")

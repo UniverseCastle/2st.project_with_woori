@@ -17,6 +17,37 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where member_send_id=#{member_send_id}
 	</select>
 	
+		
+	<!-- 친구요청 상태 찾기 -->
+	<select id="findRequestListById" resultType="FriendRequestDTO">
+		select m.member_id, fr.*
+		from member m
+		left outer join friend_request fr
+		on m.member_id = fr.member_receive_id
+		where fr.member_receive_id = #{member_id}
+		or fr.member_send_id = #{member_id}
+	</select>
+	
+	<!-- 받은 친구요청 / 상대 찾기 -->
+	<select id="findReceiveListById" resultType="FriendRequestDTO">
+		select m.member_id, fr.*
+		from member m
+		left outer join friend_request fr
+		on m.member_id = fr.member_receive_id
+		where fr.member_receive_id = #{member_id}
+		and fr.friend_request_status != 'F'
+	</select>
+	
+	<!-- 보낸 친구요청 / 상대 찾기 -->
+	<select id="findSendListById" resultType="FriendRequestDTO">
+		select m.member_id, fr.*
+		from member m
+		left outer join friend_request fr
+		on m.member_id = fr.member_send_id
+		where fr.member_send_id = #{member_id}
+		and fr.friend_request_status != 'F'
+	</select>
+	
 	<!-- 친구신청 (보낼 때) -->
 	<insert id="friendRequest" parameterType="FriendRequestDTO">
 		insert into friend_request values(
@@ -170,6 +201,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		from friend
 		where friend_id = #{friend_id}
 	</delete>
+
 	
 	<!-- 친구요청 삭제 / 친구요청 테이블에 status = 'F' 상태인것 같이 삭제 / 기존 요청삭제 메서드 써도될듯?????????????? -->
 <!-- 	<delete id="friendRequestDelete"> -->

@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import com.planner.dto.request.friend.FriendDTO;
 import com.planner.dto.request.friend.FriendRequestDTO;
 import com.planner.dto.request.member.MemberDTO;
+import com.planner.dto.response.member.ResMemberDetail;
 import com.planner.mapper.FriendMapper;
 import com.planner.mapper.MemberMapper;
+import com.planner.util.UserData;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,12 +28,11 @@ public class FriendService {
 	}
 	
 //	친구신청 (보냄)
-	public void friendRequest(Long member_id, String member_email) {	// member_id : 친구(신청 받은) 시퀀스
+	public void friendRequest(Long member_id, @UserData ResMemberDetail detail) {	// member_id : 친구(신청 받은) 시퀀스
 		FriendRequestDTO friendRequestDTO = new FriendRequestDTO();
-		Long myId = memberMapper.findByMemberId(member_email);			// 나의(보낸) 시퀀스
 		
 		friendRequestDTO.setMember_receive_id(member_id);				// 내가 친구신청 보낸 친구의 시퀀스
-		friendRequestDTO.setMember_send_id(myId);						// 나의 시퀀스
+		friendRequestDTO.setMember_send_id(detail.getMember_id());		// 나의 시퀀스
 		
 		friendMapper.friendRequest(friendRequestDTO);					// 친구신청 void 메서드
 	}
@@ -71,19 +72,18 @@ public class FriendService {
 	}
 	
 //	친구수락 (+친구상태 업데이트)
-	public void friendAccept(String member_email, Long member_send_id) {
-		Long myId = memberMapper.findByMemberId(member_email);				// 나의(받은) 시퀀스
-		MemberDTO memberMyDTO = memberMapper.findByMemberSeq(myId);					// 나의 객체
+	public void friendAccept(@UserData ResMemberDetail detail, Long member_send_id) {
+		MemberDTO memberMyDTO = memberMapper.findByMemberSeq(detail.getMember_id());// 나의 객체
 		MemberDTO memberFriendDTO = memberMapper.findByMemberSeq(member_send_id);	// 친구 객체
 		FriendDTO friendDTO = new FriendDTO();
 		
-		friendDTO.setMember_my_id(myId);
+		friendDTO.setMember_my_id(detail.getMember_id());
 		friendDTO.setMember_friend_id(member_send_id);
 		friendDTO.setFriend_my_nickname(memberMyDTO.getMember_name());				// 나의 이름
 		friendDTO.setFriend_nickname(memberFriendDTO.getMember_name());				// 친구 이름
 		
-		friendMapper.friendAccept(myId, member_send_id);				// 친구 상태 업데이트 메서드
-		friendMapper.friendAdd(friendDTO);								// 친구 테이블에 추가 메서드
+		friendMapper.friendAccept(detail.getMember_id(), member_send_id);			// 친구 상태 업데이트 메서드
+		friendMapper.friendAdd(friendDTO);											// 친구 테이블에 추가 메서드
 	}
 	
 //	친구목록 (myId != member_my_id : 'C' / 나, 친구 위치 바꿔서 set 해줌 / friend_status = 'C')

@@ -19,6 +19,9 @@ public interface FriendMapper {
 //	아이디 받아서 객체 찾기
 	public FriendRequestDTO findByFriendRequest(Long member_id);
 	
+//	친구요청 상태 찾기
+	public List<FriendRequestDTO> findRequestListById(@Param("member_id") Long member_id);
+	
 //	친구신청 (보냄)
 	public void friendRequest(FriendRequestDTO friendRequestDTO);
 	
