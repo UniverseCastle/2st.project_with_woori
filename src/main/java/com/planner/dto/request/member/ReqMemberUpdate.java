@@ -9,7 +9,7 @@ public class ReqMemberUpdate {
 	
 	private Long member_id;				// 유저 시퀀스
 
-	private String member_name;			// 회원명	
+	private String member_name;		// 회원명	
 	
 	private String member_birth;		// 회원생일
 	

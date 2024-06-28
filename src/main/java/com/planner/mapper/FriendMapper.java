@@ -16,6 +16,10 @@ public interface FriendMapper {
 //	친구 시퀀스로 객체 찾기
 	public FriendDTO findByFriendId(Long friend_id);
 	
+//	회원 시퀀스로 친구 시퀀스 찾기
+	public Long findByFriendSeq(@Param(value = "member_my_id") Long member_my_id,
+								@Param(value = "member_friend_id") Long member_friend_id);
+	
 //	아이디 받아서 객체 찾기
 	public FriendRequestDTO findByFriendRequest(Long member_id);
 	
@@ -47,17 +51,10 @@ public interface FriendMapper {
 	
 //	친구 테이블에 추가 (friend)
 	public void friendAdd(FriendDTO friendDTO);
-	
-//	친구 정보 테이블에 추가 (friend_info)
-//	public void friendInfoAdd(FriendInfoDTO friendInfoDTO);
 
 //	친구신청 취소/거절
 	public void requestDelete(@Param("member_receive_id") Long member_receive_id,
 							  @Param("member_send_id") Long member_send_id);
-	
-//	(보낸)친구신청 취소
-//	public void sendDelete(@Param("member_receive_id") Long member_receive_id,
-//			  			   @Param("member_send_id") Long member_send_id);
 	
 //	친구목록
 	public List<FriendDTO> friendList(@Param("member_my_id") Long member_my_id);

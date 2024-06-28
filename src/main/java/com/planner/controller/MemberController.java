@@ -26,6 +26,7 @@ import com.planner.enums.Gender;
 import com.planner.enums.MemberStatus;
 import com.planner.exception.CustomException;
 import com.planner.exception.ErrorCode;
+import com.planner.service.EmailService;
 import com.planner.service.FriendService;
 import com.planner.service.MemberService;
 import com.planner.util.CommonUtils;
@@ -42,6 +43,7 @@ public class MemberController {
 	
 	private final MemberService memberService;
 	private final FriendService friendService;
+	private final EmailService emailService;
 	
 //	<!-- =========================민형이 자료========================= -->
 	/*소셜로그인에서 생긴 쿠키 제거 후 로그아웃*/
@@ -56,6 +58,12 @@ public class MemberController {
 	@GetMapping("/anon/insert")
 	public String memberInsert() {
 		return "/member/member_insert";
+	}
+	
+	/* 이메일 인증*/
+	@PostMapping("/anon/email/chk")
+	public String emailChk(@RequestParam(value = "toEmail")String toEmail) {
+		return null;
 	}
 	
 	//	회원가입 Post
@@ -127,18 +135,6 @@ public class MemberController {
 		return "/member/member_info"; 
 	}
 	
-//	내(회원) 정보 Post
-//	@PreAuthorize("isAuthenticated()")
-//	@PostMapping("/auth/info")
-//	public String memberInfo(@RequestParam(value = "member_email", defaultValue = "none") String member_email,
-//							 @RequestParam(value = "infoRoot", defaultValue = "none") String infoRoot,	// 어디에서 왔는지 표시 (search, receive, send)
-//							 RedirectAttributes rttr) {
-//		rttr.addFlashAttribute("member_email", member_email);
-//		rttr.addFlashAttribute("infoRoot", infoRoot);
-//		
-//		return "redirect:/member/auth/info";
-//	}
-	
 	/*비밀번호 확인 폼*/
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/auth/chk")
@@ -173,7 +169,7 @@ public class MemberController {
 	public String memberUpdate(ReqMemberUpdate req) {
 		memberService.memberUpdate(req);
 		//TODO - 회원 정보 이메일 수정시에 이메일 인증 추가
-		return "redirect:/member/auth/info";
+		return "redirect:/member/auth/myInfo";
 	}
 	
 	/*회원 탈퇴*/

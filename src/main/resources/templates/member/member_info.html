@@ -12,7 +12,7 @@
 			<th:block th:replace="~{fragments/friend :: friendLayout}"></th:block>
 		</div>
 	  	<main class="infoMain">
-		<h2>회원정보 [[${memberDTO.friend_request_status}]]</h2>
+		<h2>회원정보</h2>
 			<input type="hidden" id="status" th:value="${memberDTO.member_status}">
 			<table class="infoTable">
 				<tr class="i_tr1">
@@ -50,21 +50,25 @@
 					</td>
 				</tr>
 			</table>
-			<form action="/friend/requestByInfo" method="post">
-				<div th:if="${memberDTO.friend_request_status.equals('search')}">
+			<form action="/friend/requestByInfo" method="post" id="requestForm">
+				<div th:if="${memberDTO.friend_request_status.equals('search')}">	<!-- 회원검색 에서 회원정보 진입 -->
 					<button type="submit">친구추가</button>
 					<input type="hidden" name="member_id" th:value="${memberDTO.member_id}"	/>
 					<input type="hidden" name="friend_request_status" th:value="${memberDTO.friend_request_status}"	/>
 					<input type="hidden" th:name="_csrf" th:value="${_csrf.token}"/>
 				</div>
-				<div th:if="${memberDTO.friend_request_status.equals('send')}">
+				<div th:if="${memberDTO.friend_request_status.equals('send')}">		<!-- 받은목록 에서 회원정보 진입 -->
+					<input type="hidden" name="member_id" th:value="${memberDTO.member_id}"	/>
+					<input type="hidden" name="friend_request_status" th:value="${memberDTO.friend_request_status}"	/>
 					<input type="hidden" name="delete_who" id="sendDelete"	/>
 					<input type="hidden" th:name="_csrf" th:value="${_csrf.token}"/>
 					<button type="submit">수락</button>
 					<button id="sendDeleteBtn" type="button">거절</button>
 				</div>
-				<div th:if="${memberDTO.friend_request_status.equals('receive')}">
+				<div th:if="${memberDTO.friend_request_status.equals('receive')}">	<!-- 보낸목록 에서 회원정보 진입 -->
+					<input type="hidden" name="friend_request_status" th:value="${memberDTO.friend_request_status}"	/>
 					<input type="hidden" name="member_id" th:value="${memberDTO.member_id}"	/>
+					<input type="hidden" name="delete_who" value="receive"	/>
 					<input type="hidden" th:name="_csrf" th:value="${_csrf.token}"/>
 					<button>취소</button>
 				</div>
@@ -72,14 +76,6 @@
 			<input type="hidden" id="sendDeleteH" value="send"	/>
 		</main>
 		<script type="text/javascript" src="/js/member/memberInfo.js"></script>
-		<script>
-			const sendDeleteBtn = document.getElementById('sendDeleteBtn');
-			const sendDelete = document.getElementById('sendDelete');
-			const sendDeleteH = document.getElementById('sendDeleteH');
-			sendDeleteBtn.addEventListener('click', () => {
-				sendDelete.val = sendDeleteH.val;
-			});
-		</script>
 	</div>
 </body>
 </html>

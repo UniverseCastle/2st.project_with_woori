@@ -27,6 +27,13 @@ public class FriendService {
 		return friendMapper.findByFriendRequest(member_id);
 	}
 	
+//	회원 시퀀스로 친구 시퀀스 찾기
+	public Long findByFriendSeq(Long member_my_id , Long member_friend_id) {
+		Long friend_id = friendMapper.findByFriendSeq(member_my_id, member_friend_id);
+		
+		return friend_id;
+	}
+	
 //	친구신청 (보냄)
 	public void friendRequest(Long member_id, @UserData ResMemberDetail detail) {	// member_id : 친구(신청 받은) 시퀀스
 		FriendRequestDTO friendRequestDTO = new FriendRequestDTO();

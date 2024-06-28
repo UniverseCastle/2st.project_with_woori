@@ -34,7 +34,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService{
 		// resistrationId 가져오기
 		String registrationId = oAuth2UserRequest.getClientRegistration().getRegistrationId();
 
-		
 		// accessToken 가져오기
 		String accessToken = oAuth2UserRequest.getAccessToken().getTokenValue();
 		
@@ -45,6 +44,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService{
 		
 		 Authentication authentication = new UsernamePasswordAuthenticationToken(oAuth2UserPrincipal, null, oAuth2UserPrincipal.getAuthorities());
 	     SecurityContextHolder.getContext().setAuthentication(authentication);
+	    
 	     
 		// OAuth2User 인터페이스의 사용자 정의 구현체 클래스 리턴.
 		return oAuth2UserPrincipal;
