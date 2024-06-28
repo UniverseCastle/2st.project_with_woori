@@ -31,6 +31,9 @@ public class FriendService {
 	public Long findByFriendSeq(Long member_my_id , Long member_friend_id) {
 		Long friend_id = friendMapper.findByFriendSeq(member_my_id, member_friend_id);
 		
+		System.out.println(member_friend_id);
+		System.out.println(friend_id);
+		
 		return friend_id;
 	}
 	

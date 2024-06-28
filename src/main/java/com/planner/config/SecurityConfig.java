@@ -50,6 +50,9 @@ public class SecurityConfig {
                   .requestMatchers(new AntPathRequestMatcher("/oauth2/**")).permitAll()						// "/oauth2/**" 은 모든 권한의 접속을 허용함
                   .requestMatchers(new AntPathRequestMatcher("/friend/**")).hasRole("USER")				// "/oauth2/**" 은 모든 권한의 접속을 허용함
                   .requestMatchers(new AntPathRequestMatcher("/member/auth/**")).hasRole("USER")	// "/member/auth/**" 은 USER 권한을 가진 사용자만 접속을 허용함
+                  .requestMatchers(new AntPathRequestMatcher("/team/**")).hasRole("USER")	
+                  .requestMatchers(new AntPathRequestMatcher("/vote/**")).hasRole("USER")	
+                  .requestMatchers(new AntPathRequestMatcher("/reply/**")).hasRole("USER")	
                   .anyRequest().authenticated()
           )
           .oauth2Login(configure ->															// OAuth2 인증 로그인( 소셜 ) 정의

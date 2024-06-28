@@ -78,6 +78,7 @@ public class FriendController {
 	public String receiveList(@UserData ResMemberDetail dtail, Model model) {
 		List<FriendRequestDTO> receiveList = friendService.receiveRequestList(dtail.getMember_email());
 		int receive_count = friendService.receiveRequestCount(dtail.getMember_email());	// 받은 친구신청 수
+		System.out.println(receive_count);
 		model.addAttribute("receive_count", receive_count);
 		model.addAttribute("receiveList", receiveList);
 		

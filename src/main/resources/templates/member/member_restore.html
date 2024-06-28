@@ -9,20 +9,21 @@
 </head>
 <body>
 	<div layout:fragment="content">
-		<main class="restoreMain">
-			<input type="email" id="currentEmail" name="currentEmail" placeholder="가입했던 이메일을 적어주세요">
-			<input type="password" id="currentPassword" name="currentPassword" placeholder="비밀번호 작성">
-			<input type="checkbox" class="isOAuth">소셜로그인으로 가입했나요?
-			
-			<!-- display default none -->
-			<div id="oauthTypeBox">
-				<select name="oauth_type">
-					<option value="google">구글</option>
-					<option value="kakao">카카오</option>
-				</select>
-			</div>
-			<button type="button" class="restoreBtn">신청</button>
-		</main>
+	<main class="restoreMain">
+		<input type="email" id="currentEmail" name="currentEmail" placeholder="가입했던 이메일을 적어주세요">
+		<input type="password" id="currentPassword" name="currentPassword" placeholder="비밀번호 작성">
+		<input type="checkbox" id="isOAuth">소셜로그인으로 가입했나요?
+		
+		<!-- display default none -->
+		<div id="oauthTypeBox">
+			<select name="oauth_type" id="oauth_type">
+				<option value="">==선택==</option>
+				<option value="google">구글</option>
+				<option value="kakao">카카오</option>
+			</select>
+		</div>
+		<button type="button" class="restoreBtn">신청</button>
+	</main>
 		<script type="text/javascript" src="/js/member/memberRestore.js"></script>
 	</div>
 </body>

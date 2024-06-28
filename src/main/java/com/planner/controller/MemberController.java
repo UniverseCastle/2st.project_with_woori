@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -37,15 +38,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequiredArgsConstructor
 @RequestMapping("/member")
+@RequiredArgsConstructor
 public class MemberController {
-	
+
 	private final MemberService memberService;
 	private final FriendService friendService;
 	private final EmailService emailService;
 	
-//	<!-- =========================민형이 자료========================= -->
 	/*소셜로그인에서 생긴 쿠키 제거 후 로그아웃*/
 	@GetMapping("/anon/signout")
 	public String signout(HttpServletRequest request, HttpServletResponse response) {
@@ -85,7 +85,7 @@ public class MemberController {
 	}
 
 	/*로그인시에 회원탈퇴여부 검사*/
-	@GetMapping("/anon")
+	@GetMapping("/auth")
 	public String memberChk(@UserData ResMemberDetail detail, HttpServletRequest request,HttpServletResponse response) {
 		if(detail.getMember_status().equals(MemberStatus.DELETE.getCode())) {
 			CommonUtils.removeCookiesAndSession(request, response);
@@ -195,8 +195,7 @@ public class MemberController {
 		return result;
 	}
 	
-//	<!-- =========================민형이 자료========================= -->
-	
+	/*쭈썽이햄--------------------------------------------------------------------------------------------------------------------------------------->*/
 //	회원찾기
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/auth/search")
@@ -244,4 +243,5 @@ public class MemberController {
 		
 		return "member/member_search";
 	}
+	
 }
