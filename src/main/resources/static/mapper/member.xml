@@ -20,7 +20,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			member_role,
 			member_reg
 		)	VALUES	(
-			member_seq.nextval,
+			member_seq.NEXTVAL,
 			'2020-02-01',
 			'none',
 			'none',
@@ -34,7 +34,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			sysdate
 		)
 	</insert>
-		<!--member_seq.NEXTVAL , sysdate -->
+		<!--member_seq.NEXTVAL ,nextval('member_seq'),now(), sysdate -->
 	<!-- 회원가입 -->
 	<insert id="memberInsert" parameterType="MemberDTO">
 			INSERT INTO member(
@@ -122,8 +122,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		SELECT *
 		FROM member
 		WHERE
-			member_email = #{member_email},
-			oauth_tpye = #{oauth_tpye}
+			member_email = #{member_email} 
+		AND
+			oauth_type = #{oauth_type}
 	</select>
 	
 	<!-- =========================민형이 자료========================= -->
@@ -188,5 +189,4 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		and m.member_status='B'
 		and substr (member_email, 1, instr(member_email, '@') - 1) like '%' || #{keyword} || '%'
 	</select>
-
 </mapper>

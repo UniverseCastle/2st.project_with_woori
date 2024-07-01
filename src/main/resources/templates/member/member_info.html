@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-	  layout:decorate="~{layout/layout}">
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
+<link rel="stylesheet" href="/css/header.css" type="text/css"	/>
 <script	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-	<div layout:fragment="content">
+	<header th:replace="~{/fragments/header :: header}"></header>
+	<div>
 		<div th:if="${memberDTO.member_id != myId}">
 			<th:block th:replace="~{fragments/friend :: friendLayout}"></th:block>
 		</div>
@@ -50,35 +51,30 @@
 					</td>
 				</tr>
 			</table>
-			<div class="userDeleteBtnBox" th:if="${memberDTO.member_id == myId}">
-				<!-- 일반 로그인 -->
-				<a th:if="${memberDTO.oauth_id =='none'}" href="/member/auth/chk?url=delete">회원탈퇴</a>
-				<!-- 소셜 로그인 -->
-				<button th:if="${memberDTO.oauth_id !='none'}" type="button" class="userDeleteBtn">회원탈퇴</button>
-			</div>
-			<div th:if="${memberDTO.member_id != myId}">
-				<div th:if="${infoRoot == 'search'}">
-					<form action="/friend/requestByInfo" method="post">
-						<input type="hidden" name="infoRoot" th:value="${infoRoot}"	/>		<!-- 회원정보에서 submit 한 것을 알려주는 숨김 요소 -->
-						<input type="hidden" name="member_id" th:value="${memberDTO.member_id}"	/>
-						<input type="hidden" name="member_email" th:value="${memberDTO.member_email}"	/>
-						<input type="hidden" th:name="_csrf" th:value="${_csrf.token}"/>
-						<div th:if="${friendStatus != 'R' && friendStatus != 'F'}">
-							<button>친구추가</button>
-						</div>
-						<div th:if="${friendStatus == 'R' || friendStatus == 'F'}">
-							<span th:text="${@friendRoleUtils.getFriendRoleName(friendStatus)}"></span>
-						</div>
-					</form>
+			<form action="/friend/requestByInfo" method="post" id="requestForm">
+				<div th:if="${memberDTO.friend_request_status.equals('search')}">	<!-- 회원검색 에서 회원정보 진입 -->
+					<button type="submit">친구추가</button>
+					<input type="hidden" name="member_id" th:value="${memberDTO.member_id}"	/>
+					<input type="hidden" name="friend_request_status" th:value="${memberDTO.friend_request_status}"	/>
+					<input type="hidden" th:name="_csrf" th:value="${_csrf.token}"/>
 				</div>
-				<div th:if="${infoRoot == 'receive'}">
-					<button>수락</button>
-					<button>거절</button>
+				<div th:if="${memberDTO.friend_request_status.equals('send')}">		<!-- 받은목록 에서 회원정보 진입 -->
+					<input type="hidden" name="member_id" th:value="${memberDTO.member_id}"	/>
+					<input type="hidden" name="friend_request_status" th:value="${memberDTO.friend_request_status}"	/>
+					<input type="hidden" name="delete_who" id="sendDelete"	/>
+					<input type="hidden" th:name="_csrf" th:value="${_csrf.token}"/>
+					<button type="submit">수락</button>
+					<button id="sendDeleteBtn" type="button">거절</button>
 				</div>
-				<div th:if="${infoRoot == 'send'}">
+				<div th:if="${memberDTO.friend_request_status.equals('receive')}">	<!-- 보낸목록 에서 회원정보 진입 -->
+					<input type="hidden" name="friend_request_status" th:value="${memberDTO.friend_request_status}"	/>
+					<input type="hidden" name="member_id" th:value="${memberDTO.member_id}"	/>
+					<input type="hidden" name="delete_who" value="receive"	/>
+					<input type="hidden" th:name="_csrf" th:value="${_csrf.token}"/>
 					<button>취소</button>
 				</div>
-			</div>
+			</form>
+			<input type="hidden" id="sendDeleteH" value="send"	/>
 		</main>
 		<script type="text/javascript" src="/js/member/memberInfo.js"></script>
 	</div>

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +26,7 @@ import com.planner.enums.Gender;
 import com.planner.enums.MemberStatus;
 import com.planner.exception.CustomException;
 import com.planner.exception.ErrorCode;
+import com.planner.service.EmailService;
 import com.planner.service.FriendService;
 import com.planner.service.MemberService;
 import com.planner.util.CommonUtils;
@@ -36,14 +37,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequiredArgsConstructor
 @RequestMapping("/member")
+@RequiredArgsConstructor
 public class MemberController {
-	
+
 	private final MemberService memberService;
 	private final FriendService friendService;
+	private final EmailService emailService;
 	
-//	<!-- =========================민형이 자료========================= -->
 	/*소셜로그인에서 생긴 쿠키 제거 후 로그아웃*/
 	@GetMapping("/anon/signout")
 	public String signout(HttpServletRequest request, HttpServletResponse response) {
@@ -56,6 +57,12 @@ public class MemberController {
 	@GetMapping("/anon/insert")
 	public String memberInsert() {
 		return "/member/member_insert";
+	}
+	
+	/* 이메일 인증*/
+	@PostMapping("/anon/email/chk")
+	public String emailChk(@RequestParam(value = "toEmail")String toEmail) {
+		return null;
 	}
 	
 	//	회원가입 Post
@@ -77,7 +84,7 @@ public class MemberController {
 	}
 
 	/*로그인시에 회원탈퇴여부 검사*/
-	@GetMapping("/anon")
+	@GetMapping("/auth")
 	public String memberChk(@UserData ResMemberDetail detail, HttpServletRequest request,HttpServletResponse response) {
 		if(detail.getMember_status().equals(MemberStatus.DELETE.getCode())) {
 			CommonUtils.removeCookiesAndSession(request, response);
@@ -92,53 +99,39 @@ public class MemberController {
 		throw new CustomException(ErrorCode.NO_ACCOUNT);
 	}
 	
-	/*내(회원) 정보*/
+//	내정보
 	@PreAuthorize("isAuthenticated()")
-	@GetMapping("/auth/info")
-	public String info(@ModelAttribute(value = "member_email") String member_email,
-					   @ModelAttribute(value = "infoRoot") String infoRoot,
-					   @UserData ResMemberDetail detail, Model model) {
-		Long myId = detail.getMember_id();
+	@GetMapping("/auth/myInfo")
+	public String myInfo(@UserData ResMemberDetail detail, Model model) {
 		ResMemberDetail memberDTO;
-		String gender = "";
-		int receive_count = 0;
+		String gender;
 		
-		if (!member_email.isEmpty()) {	// 회원 정보인 경우
-			memberDTO = memberService.memberDetail(member_email);				// 회원 객체
-			gender = Gender.findNameByCode(memberDTO.getMember_gender());
-			
-			if (!infoRoot.equals("none")|| !infoRoot.equals("") || infoRoot != null) {
-				model.addAttribute("infoRoot", infoRoot);						// search, receive, send / 경로에서 온 값 리턴
-				
-				// 내가 신청 보낼 때
-				String friendStatus = friendService.friendRequestStatus(memberDTO.getMember_id(), myId);	// 친구신청 상태 찾는 메서드 / (받는 아이디, 보낸 아이디)
-				model.addAttribute("friendStatus", friendStatus);
-			}
-		}else {							// 내 정보인 경우
-			memberDTO = memberService.memberDetail(detail.getMember_email());	// 나의 객체
-			gender = Gender.findNameByCode(detail.getMember_gender());
-		}
-		receive_count = friendService.receiveRequestCount(detail.getMember_email());	// 받은 친구신청 수
+		memberDTO = memberService.memberDetail(detail.getMember_email());	// 나의 객체
+		gender = Gender.findNameByCode(detail.getMember_gender());
+		
 		model.addAttribute("memberDTO", memberDTO);
 		model.addAttribute("gender", gender);
-		model.addAttribute("myId", myId);
-		model.addAttribute("receive_count", receive_count);
 		
-		model.addAttribute("infoRoot", infoRoot);
-		
-		return "/member/member_info"; 
+		return "/member/member_myInfo";
 	}
 	
-//	내(회원) 정보 Post
+//	회원정보
 	@PreAuthorize("isAuthenticated()")
-	@PostMapping("/auth/info")
-	public String memberInfo(@RequestParam(value = "member_email", defaultValue = "none") String member_email,
-							 @RequestParam(value = "infoRoot", defaultValue = "none") String infoRoot,	// 어디에서 왔는지 표시 (search, receive, send)
-							 RedirectAttributes rttr) {
-		rttr.addFlashAttribute("member_email", member_email);
-		rttr.addFlashAttribute("infoRoot", infoRoot);
+	@GetMapping("/auth/info/{member_id}")
+	public String memberInfo(@PathVariable(value = "member_id") Long member_id,
+					   		 @UserData ResMemberDetail detail, Model model) {
+		String gender;
+		int receive_count = 0;
 		
-		return "redirect:/member/auth/info";
+		MemberDTO memberDTO = memberService.info(member_id, detail);
+		gender = Gender.findNameByCode(memberDTO.getMember_gender());
+		receive_count = friendService.receiveRequestCount(detail.getMember_email());	// 받은 친구신청 수
+		
+		model.addAttribute("receive_count", receive_count);
+		model.addAttribute("memberDTO", memberDTO);
+		model.addAttribute("gender", gender);
+		
+		return "/member/member_info"; 
 	}
 	
 	/*비밀번호 확인 폼*/
@@ -175,7 +168,7 @@ public class MemberController {
 	public String memberUpdate(ReqMemberUpdate req) {
 		memberService.memberUpdate(req);
 		//TODO - 회원 정보 이메일 수정시에 이메일 인증 추가
-		return "redirect:/member/auth/info";
+		return "redirect:/member/auth/myInfo";
 	}
 	
 	/*회원 탈퇴*/
@@ -201,15 +194,13 @@ public class MemberController {
 		return result;
 	}
 	
-//	<!-- =========================민형이 자료========================= -->
-	
+	/*쭈썽이햄--------------------------------------------------------------------------------------------------------------------------------------->*/
 //	회원찾기
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/auth/search")
 	public String search(@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
-						   	   @RequestParam(name = "keyword", defaultValue = "!@#$%^&*()") String keyword,		// 키워드 기본값 특수문자로 초기 화면 없애기
-						   	   @UserData ResMemberDetail detail, Model model) {
-//		TODO 페이징처리 유효성검사 하기
+				   	     @RequestParam(name = "keyword", defaultValue = "!@#$%^&*()") String keyword,		// 키워드 기본값 특수문자로 초기 화면 없애기
+				   	     @UserData ResMemberDetail detail, Model model) {
 //		페이징 처리
 		int pageSize = 10;
 		int currentPage = pageNum;
@@ -219,7 +210,6 @@ public class MemberController {
 		
 		List<MemberDTO> list = memberService.search(detail.getMember_email(), keyword, start, end);
 		if (list.size() > 0) {
-			memberService.findBySendId(detail.getMember_email(), keyword);
 			count = list.size();
 		}
 		
@@ -238,7 +228,7 @@ public class MemberController {
 		model.addAttribute("endPage", endPage);
 		model.addAttribute("pageNum", pageNum);
 		
-		model.addAttribute("keyword", keyword);
+		model.addAttribute("keyword", keyword);					// 키워드
 		
 		model.addAttribute("list", list);						// 친구신청 리스트 (친구신청 상태 담겨있음)
 		model.addAttribute("friendRoles", FriendRole.values());	// FriendRole 상태 권한설정
@@ -250,4 +240,5 @@ public class MemberController {
 		
 		return "member/member_search";
 	}
+	
 }

@@ -12,7 +12,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.planner.dto.response.member.ResMemberDetail;
 import com.planner.oauth.CookieUtils;
-import com.planner.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.planner.oauth.TokenRedirect;
 import com.planner.oauth.service.OAuth2Service;
 import com.planner.oauth.service.OAuth2UserPrincipal;
@@ -31,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-	private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 	private final OAuth2UserUnlinkManager oAuth2UserUnlinkManager;
 	private final OAuth2Service oAuth2Service;
 
@@ -62,8 +60,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                     .build().toUriString();
         }
 		if ("login".equalsIgnoreCase(mode)) {
+			
 			ResMemberDetail member  = oAuth2Service.findByOAuthId(principal.getOAuthId());
-
 			if (member == null) {
 				oAuth2Service.createMember(principal);
 				member = oAuth2Service.findByOAuthId(principal.getOAuthId());
@@ -71,6 +69,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 			
 			return UriComponentsBuilder.fromUriString(TokenRedirect.LOGIN_SUCCESS_URL.getUrlText()).build()
 					.toUriString();
+			
 		} else if ("unlink".equalsIgnoreCase(mode)) {
 
 			String accessToken = principal.userInfo().getAccessToken();
@@ -85,6 +84,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 		return UriComponentsBuilder.fromUriString(TokenRedirect.LOGIN_FAILED_URL.getUrlText())
 				.queryParam("error","role").build().toUriString();
 	}
+	
+	
 	
 	private OAuth2UserPrincipal getOAuth2UserPrincipal(Authentication authentication) {
 		Object principal = authentication.getPrincipal();

@@ -17,8 +17,13 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 *.properties
+<<<<<<< HEAD
 *.yml
 
+=======
+*yml
+src/main/resources/static/upload/**
+>>>>>>> b89d054ef35cf294e1b326cb249b854c7e56e1d0
 ### IntelliJ IDEA ###
 .idea
 *.iws
