@@ -2,7 +2,6 @@ package com.planner.service;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -207,6 +206,10 @@ public class MemberService {
 	
 //	회원 검색
 	public List<MemberDTO> search(String member_email, String keyword, int start, int end){
+		if (CommonUtils.isEmpty(member_email)) {
+			throw new CustomException(ErrorCode.NO_ACCOUNT);
+		}
+		
 		Long myId = memberMapper.findByMemberId(member_email);
 		List<MemberDTO> list = memberMapper.search(myId, keyword, start, end);
 		List<MemberDTO> sendIdList = memberMapper.findBySendId(myId, keyword);
@@ -221,9 +224,10 @@ public class MemberService {
 		return list;
 	}
 	
-//	친구신청 보낸 아이디 찾기
-	public List<MemberDTO> findBySendId(String member_email, @Param("keyword") String keyword) {
-		Long member_id = memberMapper.findByMemberId(member_email);
-		return memberMapper.findBySendId(member_id, keyword);
+//	전체회원 수
+	public int searchCount(Long member_id, String keyword) {
+		int count = memberMapper.searchCount(member_id, keyword);
+		
+		return count;
 	}
 }

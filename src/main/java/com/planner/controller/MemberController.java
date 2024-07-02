@@ -9,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -200,20 +199,26 @@ public class MemberController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/auth/search")
 	public String search(@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
-						   	   @RequestParam(name = "keyword", defaultValue = "!@#$%^&*()") String keyword,		// 키워드 기본값 특수문자로 초기 화면 없애기
-						   	   @UserData ResMemberDetail detail, Model model) {
-//		TODO 페이징처리 유효성검사 하기
+				   	     @RequestParam(name = "keyword", defaultValue = "!@#$%^&*()") String keyword,		// 키워드 기본값 특수문자로 초기 화면 없애기
+				   	     @UserData ResMemberDetail detail, Model model) {
 //		페이징 처리
 		int pageSize = 10;
 		int currentPage = pageNum;
 		int start = (currentPage - 1) * pageSize + 1;
 		int end = currentPage * pageSize;
 		int count = 0;
+		String gender;
 		
 		List<MemberDTO> list = memberService.search(detail.getMember_email(), keyword, start, end);
+		for (MemberDTO memberDTO : list) {
+			gender = Gender.findNameByCode(memberDTO.getMember_gender());
+			
+			model.addAttribute("gender", gender);
+		}
+
+		
 		if (list.size() > 0) {
-			memberService.findBySendId(detail.getMember_email(), keyword);
-			count = list.size();
+			count = memberService.searchCount(detail.getMember_id(), keyword);
 		}
 		
 		int pageCount = count / pageSize + (count % pageSize == 0 ? 0 : 1);
@@ -231,7 +236,7 @@ public class MemberController {
 		model.addAttribute("endPage", endPage);
 		model.addAttribute("pageNum", pageNum);
 		
-		model.addAttribute("keyword", keyword);
+		model.addAttribute("keyword", keyword);					// 키워드
 		
 		model.addAttribute("list", list);						// 친구신청 리스트 (친구신청 상태 담겨있음)
 		model.addAttribute("friendRoles", FriendRole.values());	// FriendRole 상태 권한설정

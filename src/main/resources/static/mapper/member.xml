@@ -51,14 +51,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 				oauth_type,
 				oauth_id
 				) values (
-				member_seq.NEXTVAL,
+				member_seq.nextval,
 				#{member_password},
 				#{member_name},
 				#{member_birth},
 				#{member_email},
 				#{member_phone},
 				#{member_gender},
-				now(),
+				sysdate,
 				'B',
 				#{member_role},
 				'none',
@@ -176,6 +176,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			where fr.friend_request_status != 'F'
 			or fr.member_receive_id is null)
 			where r between #{start} and #{end}
+		]]>
+	</select>
+	
+	<!-- 모든 회원 수 -->
+	<select id="searchCount" resultType="int">
+		<![CDATA[
+			select count(*)
+			from (
+				select *
+				from member
+				where member_id != #{member_id}
+				and substr (member_email, 1, instr(member_email, '@') - 1) like '%' || #{keyword} || '%'
+				and member_status = 'B'
+			)m
+			left outer join friend_request fr
+			on m.member_id = fr.member_send_id
+			and m.member_id = fr.member_receive_id
+			where fr.friend_request_status != 'F'
+			or fr.member_receive_id is null
 		]]>
 	</select>
 	
