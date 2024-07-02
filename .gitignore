@@ -17,7 +17,7 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 *.properties
-*yml
+*.yml
 src/main/resources/static/upload/**
 ### IntelliJ IDEA ###
 .idea
