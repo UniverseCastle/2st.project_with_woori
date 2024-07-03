@@ -6,7 +6,7 @@
 }
 
 .list_table {
-	width: 500px;
+	width: 600px;
 	border: 2px solid #ddd;
 	border-radius: 20px;
 	padding: 20px;
@@ -34,24 +34,39 @@
 }
 
 .infoA {
-	font-size: 16px;
 	color: purple;
 }
 
-.list_td2 {
-	margin-right: 20px;
+.list_th1 {
+	padding: 0 0 10px;
+	text-align: center;
+	width: 40%;
+}
+
+.list_th2, .list_th3 {
+	padding: 0 0 10px;
+	text-align: center;
+	width: 30%;
+}
+
+.nameT {
 	width: 120px;
-	line-height: 1.2;
-	text-align: center;
+	white-space: nowrap;
 	overflow: hidden;
-	word-wrap: break-word;
-	display: -webkit-box;
-	-webkit-line-clamp: 1;
-	-webkit-box-orient: vertical;
+	text-overflow: ellipsis;
 }
 
-.list_td1, .list_td3, .list_td4 {
-	padding: 0 10px 3px;
+.list_td {
 	text-align: center;
 }
+/* 메모 길이 1줄로 조정 / 뒷부분 .. 표시 */
+.memoT {
+	width: 180px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 
+.list_tdBtn {
+	width: 80px;
+}

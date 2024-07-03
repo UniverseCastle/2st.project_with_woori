@@ -17,13 +17,13 @@
 				</th>
 			</tr>
 			<tr class="receive_sub_tr">
-				<th class="list_td1" colspan="2">친구이메일</th>
-				<th class="list_td2" colspan="2">친구별명</th>
-				<th class="list_td4" colspan="2">친구메모</th>
+				<th class="list_th1" colspan="2">친구이메일</th>
+				<th class="list_th2" colspan="2">친구별명</th>
+				<th class="list_th3" colspan="2">친구메모</th>
 			</tr>
 			<tr th:each="friendDTO : ${friendList}" class="list_tr">
 				<!-- 이메일 -->
-				<td class="list_td1" colspan="2">
+				<td class="list_td" colspan="2">
 					<form action="/friend/info" method="get" th:attr="id='infoForm' + ${friendDTO.friend_id}">
 						<a onclick="infoForm()" class="infoA" th:attr="data-info='infoForm' + ${friendDTO.friend_id}" href="javascript:void(0);">
 							[[${friendDTO.member_email}]]
@@ -33,10 +33,10 @@
 					</form>
 				</td>
 				<!-- 별명 -->
-				<td class="list_td2">
+				<td class="list_td">
 					<!-- 나타나 있음 -->
 					<div th:attr="id='nameT' + ${friendDTO.friend_id}"
-					 th:text="${friendDTO.friend_nickname}">
+					 th:text="${friendDTO.friend_nickname}" class="nameT">
 					</div>
 					<!-- 숨겨져 있음 -->
 					<div>
@@ -45,7 +45,7 @@
 						 th:value="${friendDTO.friend_nickname}"	/>
 					</div>
 				</td>
-				<td class="list_td2">
+				<td class="list_tdBtn">
 					<form action="/friend/nickname" method="post" th:attr="id='nickForm' + ${friendDTO.friend_id}">
 						<input type="hidden" name="friend_id" th:value="${friendDTO.friend_id}"	/>
 						<input type="hidden" name="friend_status" th:value="${friendDTO.friend_status}"	/>
@@ -73,9 +73,9 @@
 					</button>
 				</td>
 				<!-- 메모 -->
-				<td colspan="2" class="list_td4">
+				<td colspan="2" class="list_td">
 					<div th:attr="id='memoT' + ${friendDTO.friend_id}"
-					 th:text="${friendDTO.friend_memo}">
+					 th:text="${friendDTO.friend_memo}" class="memoT">
 					</div>
 					<div>
 						<input type="text" style="display: none; width: 60px;"

@@ -98,3 +98,18 @@
 	transition: 1.2s;
 	cursor: not-allowed;
 }
+
+/* 목록/삭제 버튼 */
+.listBtn, #deleteBtn {
+	font-size: 16px;
+	font-weight: bold;
+	color: gray;
+	height: 35px;
+	border: 2px solid gray;
+	border-radius: 10px;
+	background-color: white;
+}
+/* 마우스 올렸을 때 */
+.listBtn:hover, #deleteBtn:hover {
+	cursor: pointer;
+}

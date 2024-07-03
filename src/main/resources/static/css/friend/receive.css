@@ -36,19 +36,16 @@
 .receive_td1 {
 	margin-right: 10px;
 	width: 160px;
-	line-height: 1.2;
-	text-align: center;
+	white-space: nowrap;
 	overflow: hidden;
-	word-wrap: break-word;
-	display: -webkit-box;
-	-webkit-line-clamp: 1;
-	-webkit-box-orient: vertical;
+	text-overflow: ellipsis;
+	text-align: center;
 }
 .receive_td2 {
 	width: 20px;
 /* 	text-align: center; */
-/* 	display: flex; */
-/* 	align-items: center; */
+	display: flex;
+	align-items: center;
 /* 	justify-content: center; */
 }
 
