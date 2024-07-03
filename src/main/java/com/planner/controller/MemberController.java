@@ -23,6 +23,7 @@ import com.planner.dto.request.member.ReqMemberUpdate;
 import com.planner.dto.response.member.ResMemberDetail;
 import com.planner.enums.FriendRole;
 import com.planner.enums.Gender;
+import com.planner.enums.Masking;
 import com.planner.enums.MemberStatus;
 import com.planner.exception.CustomException;
 import com.planner.exception.ErrorCode;
@@ -121,11 +122,15 @@ public class MemberController {
 	public String memberInfo(@PathVariable(value = "member_id") Long member_id,
 					   		 @UserData ResMemberDetail detail, Model model) {
 		String gender;
+		String name;
 		int receive_count = 0;
 		
 		MemberDTO memberDTO = memberService.info(member_id, detail);
 		gender = Gender.findNameByCode(memberDTO.getMember_gender());
 		receive_count = friendService.receiveRequestCount(detail.getMember_email());	// 받은 친구신청 수
+		
+		name = Masking.maskAs(memberDTO.getMember_name(), Masking.NAME);
+		model.addAttribute("name", name);		// 마스킹 처리
 		
 		model.addAttribute("receive_count", receive_count);
 		model.addAttribute("memberDTO", memberDTO);
@@ -215,7 +220,6 @@ public class MemberController {
 			
 			model.addAttribute("gender", gender);
 		}
-
 		
 		if (list.size() > 0) {
 			count = memberService.searchCount(detail.getMember_id(), keyword);
@@ -245,6 +249,8 @@ public class MemberController {
 		
 		int receive_count = friendService.receiveRequestCount(detail.getMember_email());	// 받은 친구신청 수
 		model.addAttribute("receive_count", receive_count);
+		
+		model.addAttribute("NAME", Masking.NAME);		// 타임리프로 마스킹 처리를 하기위해 넘겨줌
 		
 		return "member/member_search";
 	}

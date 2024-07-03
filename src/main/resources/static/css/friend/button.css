@@ -58,9 +58,9 @@
 }
 /* 비활성화된 버튼 */
 .addBtn:disabled {
-	background-color: gray;
+	pointer-events: none;
+	opacity: 0;
 	transition: 1.2s;
-	cursor: not-allowed;
 }
 
 /* ----------------------------------------------------- */

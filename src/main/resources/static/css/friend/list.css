@@ -10,9 +10,6 @@
 	border: 2px solid #ddd;
 	border-radius: 20px;
 	padding: 20px;
-	display: flex;
-	align-items: center;
-	flex-direction: column;
 	box-shadow: 0px 0px 10px 1px lightgray;
 }
 
@@ -31,6 +28,7 @@
 .list_tr {
 	font-size: 16px;
 	color: gray;
+	height: 1.8em;
 }
 
 .infoA {

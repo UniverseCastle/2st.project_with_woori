@@ -27,17 +27,12 @@
 .i_tr {
 	font-size: 15px;
 	color: gray;
+	height: 2em;
+	text-align: left;
 }
 
 .i_th {
-	margin-top: 10px;
-	display: flex;
-	justify-content: left;
 	padding: 0 20px;
-}
-
-.i_td {
-	text-align: center;
 }
 
 .modifyBtn {
@@ -81,7 +76,7 @@
 	font-size: 15px;
 	font-weight: bold;
 	color: gray;
-	margin-top: 50px;
+	margin-top: 20px;
 	height: 35px;
 	border: 2px solid gray;
 	border-radius: 10px;
@@ -94,9 +89,13 @@
 	font-size: 15px;
 	font-weight: bold;
 	color: gray;
-	margin-top: 50px;
+	margin-top: 20px;
 	height: 35px;
 	border: 2px solid gray;
 	border-radius: 10px;
 	background-color: white;
+}
+
+.addOrCancelBtn:hover, .acceptBtn:hover {
+	cursor: pointer;
 }
