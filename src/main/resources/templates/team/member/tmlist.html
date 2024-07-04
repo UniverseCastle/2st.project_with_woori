@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="team_id" th:content="${tmlist[0].team_id}">
+	<meta name="_csrf_header" th:content="${_csrf.headerName}">
+	<meta name="_csrf_token" th:content="${_csrf.token}">
+	<title>그룹 회원 목록</title>
+	<link rel="stylesheet" type="text/css" href="/css/team/teamCommon.css">
+	<script type="text/javascript" src="/js/team/member/tmlist.js" defer></script>
+</head>
+<body>
+<div id="main-container"> <!-- main-container 시작 -->
+<p>
+	그룹 회원 : <span th:text="${#lists.size(tmlist)} - ${wait_count}" id="member_count"></span>명 <br>
+	가입 대기 : <span th:text="${wait_count}" id="wait_count"></span>명
+</p>
+<div class="nodrag" id="grades">
+	<label for="TEAM_MASTER">그룹장</label>
+	<input type="checkbox" id="TEAM_MASTER" checked>
+	<label for="TEAM_SUB_MASTER">부그룹장</label>
+	<input type="checkbox" id="TEAM_SUB_MASTER" checked>
+	<label for="TEAM_USER">그룹원</label>
+	<input type="checkbox" id="TEAM_USER" checked>
+	<label for="WAIT">가입대기</label>
+	<input type="checkbox" id="WAIT" checked>
+</div>
+<table>
+	<tr>
+		<th>회원번호</th>
+		<th>별명</th>
+		<th>등급</th>
+		<th>가입일자</th>
+		<th></th>
+	</tr>
+	<tr th:each="dto : ${tmlist}" th:id="${dto.member_id}" th:class="${dto.tm_grade}">
+		<td th:text="${dto.member_id}"></td>
+		<td><span th:text="${dto.tm_nickname}" class="tmlink pointer font-lsblue"></span></td>
+		<td>
+			<span th:text="${dto.tm_grade}" class="grade_span"></span>
+			<select th:if="${tm_grade} == 'TEAM_MASTER' and ${dto.tm_grade} != 'TEAM_MASTER' and ${dto.tm_grade} != 'WAIT'"
+				class="grade_select" style="display:none;">
+				<option value="TEAM_MASTER">TEAM_MASTER
+				<option value="TEAM_SUB_MASTER" th:selected="${dto.tm_grade} == 'TEAM_SUB_MASTER'">TEAM_SUB_MASTER
+				<option value="TEAM_USER" th:selected="${dto.tm_grade} == 'TEAM_USER'">TEAM_USER
+			</select>
+		</td>
+		<td th:text="${#temporals.format(dto.tm_reg, 'yyyy-MM-dd')}"></td>
+		<td th:if="${tm_grade} == 'TEAM_MASTER' and ${dto.tm_grade} != 'TEAM_MASTER' and ${dto.tm_grade} != 'WAIT'">
+			<div class="btn_basic">
+				<button type="button" class="modify">수정</button>
+				<button type="button" class="kick">추방</button>
+			</div>
+			<div class="btn_grade" style="display:none;">
+				<button type="button" class="modify_grade">수정</button>
+				<button type="button" class="modify_cancel">취소</button>
+			</div>
+		</td>
+		<td th:if="${#strings.contains(tm_grade, 'MASTER')} and ${dto.tm_grade} == 'WAIT'">
+			<button type="button" class="accept">가입승인</button>
+			<button type="button" class="kick wait">가입거절</button>
+		</td>
+	</tr>
+</table>
+</div> <!-- main-container 끝 -->
+</body>
+</html>

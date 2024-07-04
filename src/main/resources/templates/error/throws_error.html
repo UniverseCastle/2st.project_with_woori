@@ -1,0 +1,26 @@
+ <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<input type="hidden" id="errorMsg" th:value="${errorMessage}">
+<input type="hidden" id="deleteMember" th:value="${deleteMember}">
+ <script>
+	const errorMsg = document.getElementById("errorMsg").value;
+	const deleteMember = document.getElementById("deleteMember").value;
+		console.log(errorMsg);
+	if(errorMsg != null && errorMsg != ""){
+	
+		alert(errorMsg);
+		if(errorMsg === deleteMember){
+			location.href="/member/anon/login";
+		}else{
+			history.go(-1);
+		}
+	}
+</script>
+
+</body>
+</html> 	
