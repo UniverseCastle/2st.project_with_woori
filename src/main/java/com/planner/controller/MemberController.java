@@ -186,11 +186,9 @@ public class MemberController {
 		String gender;
 
 		if (detail.getOauth_id().equals("none")) {
-			System.out.println("===================="+detail.getMember_email()+"첫번째=======================");
 			memberDTO = memberService.memberDetail(detail.getMember_email()); // 나의 객체
 		}
 		if (!detail.getOauth_id().equals("none")) {
-			System.out.println("===================="+detail.getMember_email()+"두번=======================");
 			memberDTO = memberService.memberDetailForSocial(detail.getMember_email(), detail.getOauth_type());
 		}
 		gender = Gender.findNameByCode(detail.getMember_gender());
@@ -280,13 +278,52 @@ public class MemberController {
 		int start = (currentPage - 1) * pageSize + 1;
 		int end = currentPage * pageSize;
 		int count = 0;
-		String gender;
 		
 		List<MemberDTO> list = memberService.search(detail.getMember_email(), keyword, start, end);
 		for (MemberDTO memberDTO : list) {
-			gender = Gender.findNameByCode(memberDTO.getMember_gender());
+			String statusB = "";
+			String statusC = "";
 			
-			model.addAttribute("gender", gender);
+			/* 친구 신청 상태 */
+			if (friendService.friendRequestStatus(memberDTO.getMember_id(), detail.getMember_id()) != null) {
+				statusB = friendService.friendRequestStatus(memberDTO.getMember_id(), detail.getMember_id());
+			}else if (friendService.friendRequestStatus(detail.getMember_id(), memberDTO.getMember_id()) != null) {
+				statusC = friendService.friendRequestStatus(detail.getMember_id(), memberDTO.getMember_id());
+			}
+			if (statusB.equals("S") && statusC.equals("S")) {
+				memberDTO.setFriend_request_status("");
+			}else if (statusB.equals("S")) {
+				memberDTO.setFriend_request_status("S");
+			}else if (statusC.equals("S")){
+				memberDTO.setFriend_request_status("R");
+			}
+			System.out.println("이거ㅓㅓㅓㅓㅓㅓ?????????????"+friendService.friendStatus(detail.getMember_id(), memberDTO.getMember_id()));
+			System.out.println("아님이거ㅓㅓㅓㅓㅓㅓ?????????????"+friendService.friendStatus(memberDTO.getMember_id(), detail.getMember_id()));
+			
+			String friendB = "";
+			String friendC = "";
+			/* 친구 상태 */
+			System.out.println("프랜드비"+friendB);
+			System.out.println("프랜드씨"+friendC);
+			
+			if (friendService.friendStatus(detail.getMember_id(), memberDTO.getMember_id()) != null &&
+				friendService.friendStatus(detail.getMember_id(), memberDTO.getMember_id()).equals("F")) {			// 내가 보낸 경우
+				System.out.println("여기는?ㅋㅋㅋㅋㅋㅋㅋ11111111111111111111");
+				memberDTO.setFriend_request_status("F");
+			}else if (friendService.friendStatus(memberDTO.getMember_id(), detail.getMember_id()) != null &&
+					  friendService.friendStatus(memberDTO.getMember_id(), detail.getMember_id()).equals("F")) {	// 내가 받은 경우
+				memberDTO.setFriend_request_status("F");
+				System.out.println("여기는?ㅋㅋㅋㅋㅋㅋㅋ2222222222222222222222222");
+			}
+//			
+//			if (friendService.friendStatus(detail.getMember_id(), memberDTO.getMember_id()).equals("F")) {
+//				System.out.println("여기??????????????????");
+//				memberDTO.setFriend_request_status("F");
+//			}else if (friendService.friendStatus(memberDTO.getMember_id(), detail.getMember_id()).equals("F")) {
+//				memberDTO.setFriend_request_status("F");
+//			}
+			
+			System.out.println("상태ㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐ"+memberDTO.getFriend_request_status());
 		}
 		
 		if (list.size() > 0) {
@@ -300,6 +337,10 @@ public class MemberController {
 		
 		if (endPage >= pageCount) {
 			endPage = pageCount;
+		}
+		
+		if (keyword.length() < 3) {
+			return "redirect:/member/auth/search";
 		}
 		
 		model.addAttribute("count", count);
@@ -320,8 +361,9 @@ public class MemberController {
 		
 		model.addAttribute("NAME", Masking.NAME);		// 타임리프로 마스킹 처리를 하기위해 넘겨줌
 		
+		model.addAttribute("detail", detail);
+		
 		return "member/member_search";
 	}
-	
 
 }

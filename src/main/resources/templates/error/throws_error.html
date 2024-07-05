@@ -1,8 +1,10 @@
  <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.12.1/dist/sweetalert2.all.min.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.12.1/dist/sweetalert2.min.css" rel="stylesheet">
 </head>
 <body>
 <input type="hidden" id="errorMsg" th:value="${errorMessage}">
@@ -12,12 +14,14 @@
 	const deleteMember = document.getElementById("deleteMember").value;
 		console.log(errorMsg);
 	if(errorMsg != null && errorMsg != ""){
-	
-		alert(errorMsg);
+		Swal.fire({
+			  icon: "error",
+			  title: "Oops...",
+			  text: "Something went wrong!",
+			  footer: '<a href="#">Why do I have this issue?</a>'
+			});
 		if(errorMsg === deleteMember){
 			location.href="/member/anon/login";
-		}else{
-			history.go(-1);
 		}
 	}
 </script>

@@ -269,15 +269,31 @@ public class MemberService {
 		
 		Long myId = memberMapper.findByMemberId(member_email);
 		List<MemberDTO> list = memberMapper.search(myId, keyword, start, end);
-		List<MemberDTO> sendIdList = memberMapper.findBySendId(myId, keyword);
+//		List<MemberDTO> sendIdList = memberMapper.findBySendId(myId, keyword);
 		
-		if (!sendIdList.isEmpty()) {
-			list.removeAll(sendIdList);			// 보낸사람 기준 여러명에게 보낸 만큼 중복되어 나오는 데이터 삭제
-		}
-		for (MemberDTO memberDTO : list) {		// 리스트에서 신청상태를 표시하기 위해 set
-			String status = friendMapper.friendRequestStatus(memberDTO.getMember_id(), myId);
-			memberDTO.setFriend_request_status(status);
-		}
+//		if (!sendIdList.isEmpty()) {
+//			list.removeAll(sendIdList);			// 보낸사람 기준 여러명에게 보낸 만큼 중복되어 나오는 데이터 삭제
+//		}
+//		String statusB = "";
+//		String statusC = "";
+//		for (MemberDTO memberDTO : list) {		// 리스트에서 신청상태를 표시하기 위해 set
+//			if (friendMapper.friendRequestStatus(memberDTO.getMember_id(), myId) != null) {
+//				statusB = friendMapper.friendRequestStatus(memberDTO.getMember_id(), myId);
+//			}else if (friendMapper.friendRequestStatus(myId, memberDTO.getMember_id()) != null) {
+//				statusC = friendMapper.friendRequestStatus(myId, memberDTO.getMember_id());
+//			}
+//			
+//			if (statusB.equals("S") && statusC.equals("S")) {
+//				memberDTO.setFriend_request_status("");
+//			}else if (statusB.equals("S")) {
+//				memberDTO.setFriend_request_status("S");
+//			}else if (statusC.equals("S")){
+//				memberDTO.setFriend_request_status("R");
+//			}
+//		}
+//		if (CommonUtils.isEmpty(status)) {
+//			throw new CustomException(ErrorCode.NO_ACCOUNT);
+//		}
 		return list;
 	}
 	

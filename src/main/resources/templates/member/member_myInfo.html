@@ -23,7 +23,7 @@
 					<span th:text="${memberDTO.member_email}"></span>
 				</td>
 				<td class="i_td1-1">
-					<a th:if="${memberDTO.oauth_id =='none'}" class="modifyBtn" href="/member/auth/chk?url=update">수정 ></a>
+					<a th:if="${memberDTO.oauth_id =='none'}" class="modifyBtn" href="/member/auth/pw/chk?url=update">수정 ></a>
 					<a th:if="${memberDTO.oauth_id !='none'}" href="/member/auth/update">수정 ></a>
 				</td>
 			</tr>

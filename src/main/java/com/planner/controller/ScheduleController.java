@@ -51,10 +51,7 @@ public class ScheduleController {
 	      ArrayList<MapLikeDTO> mapLikeList = mapLikeService.MapLikeSelect(id);
 	      model.addAttribute("mapLikeList", mapLikeList);
 	      model.addAttribute("date", date);
-	      // @RequestParam("date") String date
 	      model.addAttribute("list", list);
-	      for (MapLikeDTO MapLikedto1 : mapLikeList) {
-	      }
 	      return "schedule";
 	   }
 	
