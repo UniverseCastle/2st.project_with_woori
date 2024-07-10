@@ -5,6 +5,7 @@
 	<link rel="stylesheet" type="text/css" href="/css/friend/button.css"	/>
 	<link rel="stylesheet" type="text/css" href="/css/member/search.css"	/>
 	<link rel="stylesheet" type="text/css" href="/css/header.css"	/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
 	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
 	<meta name="_csrf" th:content="${_csrf.token}"/>
 	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
@@ -24,10 +25,10 @@
 			<div th:if="${#lists.isEmpty(list) && keyword != '!@#$%^&*()'}" align="center">
 				<h2>검색 결과가 없습니다.</h2>
 			</div>
-		<div th:if="${count != 0}">
-			<table class="searchTable">
+		<div th:if="${count != 0}" class="searchTable">
+			<table>
 				<tr class="search_sub_tr">
-					<th class="search_td1">이메일</th>
+					<th class="search_tr1">이메일</th>
 					<th class="search_td2">이름</th>
 					<th class="search_td3">성별</th>
 				</tr>
@@ -49,16 +50,16 @@
 					<td class="search_td2" th:text="${@friendRoleUtils.getMemberMaskingName(memberDTO.member_name, NAME)}"></td>
 					<td class="search_td3" th:text="${@friendRoleUtils.getMemberGender(memberDTO.member_gender)}"></td>
 					<td class="search_td4">
-						<div th:if="${friendB == null && friendC == null && memberDTO.friend_request_status == null && memberDTO.friend_request_status != 'F'}">	<!-- 친구 요청상태 이거나 친구 이거나 -->
+						<div th:if="${friendB == null && friendC == null && memberDTO.friend_request_status == null && memberDTO.friend_request_status != 'F'}" class="status_box">	<!-- 친구 요청상태 이거나 친구 이거나 -->
 							<button type="button" th:value="${memberDTO.member_id}" class="custom-btn btn-add"><span>친구추가</span></button>
 						</div>
-						<div th:if="${memberDTO.friend_request_status == 'R' and memberDTO.friend_request_status != 'F'}">
+						<div th:if="${memberDTO.friend_request_status == 'R' and memberDTO.friend_request_status != 'F'}" class="status_box">
 							<button type="button" th:value="${memberDTO.member_id}" class="custom-btn btn-access"><span>요청수락</span></button>
 						</div>
-						<div th:if="${memberDTO.friend_request_status == 'S' and memberDTO.friend_request_status != 'F'}">
+						<div th:if="${memberDTO.friend_request_status == 'S' and memberDTO.friend_request_status != 'F'}" class="status_box">
 							<span class="fr-status" th:text="${@friendRoleUtils.getFriendRoleName(memberDTO.friend_request_status)}"></span>
 						</div>
-						<div th:if="${memberDTO.friend_request_status == 'F'}">
+						<div th:if="${memberDTO.friend_request_status == 'F'}" class="status_box">
 							<span class="fr-status" th:text="${@friendRoleUtils.getFriendRoleName(memberDTO.friend_request_status)}"></span>
 						</div>
 <!-- 					</td> -->
@@ -89,5 +90,6 @@
 		<input type="hidden" th:value="${receive_count}" id="re_count"	/>
 	</main>
 	<script type="text/javascript" src="/js/member/memberSearch.js"></script>
+	<script type="text/javascript" src="/js/header.js"></script>
 </body>
 </html>

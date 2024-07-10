@@ -99,3 +99,10 @@
 .addOrCancelBtn:hover, .acceptBtn:hover {
 	cursor: pointer;
 }
+
+.i-div {
+	margin-top: 30px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}

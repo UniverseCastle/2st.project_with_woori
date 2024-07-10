@@ -297,33 +297,15 @@ public class MemberController {
 			}else if (statusC.equals("S")){
 				memberDTO.setFriend_request_status("R");
 			}
-			System.out.println("이거ㅓㅓㅓㅓㅓㅓ?????????????"+friendService.friendStatus(detail.getMember_id(), memberDTO.getMember_id()));
-			System.out.println("아님이거ㅓㅓㅓㅓㅓㅓ?????????????"+friendService.friendStatus(memberDTO.getMember_id(), detail.getMember_id()));
 			
-			String friendB = "";
-			String friendC = "";
 			/* 친구 상태 */
-			System.out.println("프랜드비"+friendB);
-			System.out.println("프랜드씨"+friendC);
-			
 			if (friendService.friendStatus(detail.getMember_id(), memberDTO.getMember_id()) != null &&
 				friendService.friendStatus(detail.getMember_id(), memberDTO.getMember_id()).equals("F")) {			// 내가 보낸 경우
-				System.out.println("여기는?ㅋㅋㅋㅋㅋㅋㅋ11111111111111111111");
 				memberDTO.setFriend_request_status("F");
 			}else if (friendService.friendStatus(memberDTO.getMember_id(), detail.getMember_id()) != null &&
 					  friendService.friendStatus(memberDTO.getMember_id(), detail.getMember_id()).equals("F")) {	// 내가 받은 경우
 				memberDTO.setFriend_request_status("F");
-				System.out.println("여기는?ㅋㅋㅋㅋㅋㅋㅋ2222222222222222222222222");
 			}
-//			
-//			if (friendService.friendStatus(detail.getMember_id(), memberDTO.getMember_id()).equals("F")) {
-//				System.out.println("여기??????????????????");
-//				memberDTO.setFriend_request_status("F");
-//			}else if (friendService.friendStatus(memberDTO.getMember_id(), detail.getMember_id()).equals("F")) {
-//				memberDTO.setFriend_request_status("F");
-//			}
-			
-			System.out.println("상태ㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐㅐ"+memberDTO.getFriend_request_status());
 		}
 		
 		if (list.size() > 0) {
