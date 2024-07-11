@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-  <header id="header" th:fragment="header">
+  <header id="header" class="nodrag" th:fragment="header">
 	<div class="container">
-		<h1 class="logo">Planner</h1>
+		<i class="logo" onclick="location.href='/planner/main'">
+			<img src="/images/pencil-solid.svg" width="30px" height="30px" />
+			<span>planner</span>
+		</i>
 <!-- 		<a href="/planner/main" class="menu_btn"> -->
 		<a href="#" class="menu_btn">
 			<div></div>
@@ -11,35 +14,46 @@
 			<div></div>
 		</a>
 		<nav class="nav">
-		  	<ul class="gnb" sec:authorize="isAuthenticated()">
-		  		<li><a href="javascript:void(0);">일정</a>
+		  	<ul class="gnb">
+		  		<li sec:authorize="isAuthenticated()"><a href="javascript:void(0);">일정</a>
 		  			<ul class="sub">
 		  				<li><a href="#">메뉴1</a></li>
 		  				<li><a href="#">메뉴2</a></li>
 		  				<li><a href="#">메뉴3</a></li>
 		  			</ul>
 		  		</li>
-		  		<li><a href="javascript:void(0);">그룹</a>
+		  		<li sec:authorize="isAuthenticated()"><a href="javascript:void(0);">그룹</a>
 		  			<ul class="sub">
 		  				<li><a href="#">메뉴1</a></li>
 		  				<li><a href="#">메뉴2</a></li>
 		  				<li><a href="#">메뉴3</a></li>
 		  			</ul>
 		  		</li>
-		  		<li><a href="javascript:void(0);">일정</a>
+		  		<li sec:authorize="isAuthenticated()"><a href="javascript:void(0);">일정</a>
 		  			<ul class="sub">
 		  				<li><a href="#">메뉴1</a></li>
 		  				<li><a href="#">메뉴2</a></li>
 		  				<li><a href="#">메뉴3</a></li>
 		  			</ul>
 		  		</li>
-		  		<li><a href="javascript:void(0);">friend</a>
+		  		<li sec:authorize="isAuthenticated()"><a href="javascript:void(0);">friend</a>
 		  			<ul class="sub">
 		  				<li><a href="/member/auth/search">회원검색</a></li>
 		  				<li><a href="/friend/list">친구목록</a></li>
 		  				<li><a href="/friend/receiveList">받은신청</a></li>
 		  				<li><a href="/friend/sendList">보낸신청</a></li>
 		  			</ul>
+		  		</li>
+		  		<li class="li_imgs">
+		  			<i sec:authorize="isAuthenticated()" onclick="location.href='/member/auth/myInfo'">
+		  				<img src="/images/myinfo.svg" width="20px" height="20px" class="mypage"	/>
+		  			</i> &nbsp;&nbsp;
+		  			<i sec:authorize="isAuthenticated()" onclick="location.href='/member/anon/signout'">
+		  				<img src="/images/logout.svg" width="20px" height="20px" class="mypage"	/>
+		  			</i>
+		  			<i sec:authorize="isAnonymous()" onclick="location.href='/member/anon/login'">
+		  				<img src="/images/login.svg" width="20px" height="20px" class="mypage"	/>
+		  			</i>
 		  		</li>
 		  	</ul>
 	  	</nav>

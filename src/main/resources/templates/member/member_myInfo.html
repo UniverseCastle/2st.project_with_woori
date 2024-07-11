@@ -10,6 +10,7 @@
 <body>
 	<header th:replace="~{/fragments/header :: header}"></header>
   	<main class="infoMain">
+  	<div id="con">
 		<input type="hidden" id="status" th:value="${memberDTO.member_status}">
 		<table class="infoTable">
 			<tr>
@@ -62,8 +63,10 @@
 				</td>
 			</tr>
 		</table>
+  	</div>
 	</main>
 	<script src="/js/common.js"></script>
 	<script type="text/javascript" src="/js/member/memberInfo.js"></script>
+	<script type="text/javascript" src="/js/header.js"></script>
 </body>
 </html>
