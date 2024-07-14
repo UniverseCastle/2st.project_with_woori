@@ -1,8 +1,9 @@
 package com.planner.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -18,11 +19,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.planner.dto.request.member.MemberDTO;
+import com.planner.dto.request.member.ReqChangePassword;
 import com.planner.dto.request.member.ReqMemberRestore;
 import com.planner.dto.request.member.ReqMemberUpdate;
 import com.planner.dto.response.member.ResMemberDetail;
 import com.planner.enums.FriendRole;
 import com.planner.enums.Gender;
+import com.planner.enums.Masking;
+import com.planner.enums.MemberRole;
 import com.planner.enums.MemberStatus;
 import com.planner.exception.CustomException;
 import com.planner.exception.ErrorCode;
@@ -32,169 +36,222 @@ import com.planner.service.MemberService;
 import com.planner.util.CommonUtils;
 import com.planner.util.UserData;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 @RequestMapping("/member")
 @RequiredArgsConstructor
 public class MemberController {
-
+//TODO - 이메일 체크 JS 까지 서윗알러트 바꿈
 	private final MemberService memberService;
 	private final FriendService friendService;
 	private final EmailService emailService;
-	
-	/*소셜로그인에서 생긴 쿠키 제거 후 로그아웃*/
-	@GetMapping("/anon/signout")
-	public String signout(HttpServletRequest request, HttpServletResponse response) {
-		CommonUtils.removeCookiesAndSession(request, response);
-		return "redirect:/member/logout";
-	}
 
-
-	//	회원가입 Get
+	// 회원가입 Get
 	@GetMapping("/anon/insert")
 	public String memberInsert() {
 		return "/member/member_insert";
 	}
-	
-	/* 이메일 인증*/
-	@PostMapping("/anon/email/chk")
-	public String emailChk(@RequestParam(value = "toEmail")String toEmail) {
-		return null;
-	}
-	
-	//	회원가입 Post
+
+	// 회원가입 Post
 	@PostMapping("/anon/insert")
-	public String memberInsert(MemberDTO memberDTO, RedirectAttributes rttr) {
+	public String memberInsert(@Valid MemberDTO memberDTO, RedirectAttributes rttr) {
 		int result = memberService.memberInsert(memberDTO);
 		rttr.addFlashAttribute("result", result);
 		return "redirect:/planner/main";
 	}
 
-	//	로그인
+	/* 사용자 이메일로 인증코드 보내기 */
+	@PostMapping("/anon/email/send")
+	@ResponseBody
+	public ResponseEntity<String> emailChk(@RequestParam(value = "toEmail") String toEmail,
+			@RequestParam(value = "type") String type) throws MessagingException, UnsupportedEncodingException {
+		memberService.memberChk(toEmail, type);
+		emailService.sendAuthCode(toEmail);
+		return ResponseEntity.ok("ok");
+	}
+
+	/* 인증코드 검증 */
+	@PostMapping("/anon/code/chk")
+	@ResponseBody
+	public ResponseEntity<Long> authCodeChk(@RequestParam(value = "toEmail") String toEmail,
+			@RequestParam(value = "authCode") String authCode) {
+		ResMemberDetail member = memberService.formMember(toEmail);
+		emailService.authCodeChk(toEmail, authCode);
+		if (!CommonUtils.isEmpty(member)) {
+			return ResponseEntity.ok(member.getMember_id());
+		}
+		return ResponseEntity.ok(1L); // 성공체크용으로 의미없는 값
+	}
+
+	/* 비밀번호 확인 폼 */
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/auth/pw/chk")
+	public String passwordChkForm(@RequestParam(value = "url") String url, Model model) {
+		model.addAttribute("url", url);
+		return "/member/passwordChk";
+	}
+
+	/* 비밀번호 확인 */
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/auth/pw/chk")
+	@ResponseBody
+	public ResponseEntity<String> passwordChk(@RequestParam(value = "currentPw") String currentPw,
+			@UserData ResMemberDetail member) {
+		memberService.isPasswordValid(currentPw, member);
+		return ResponseEntity.ok("성공");
+	}
+
+	/* 비밀번호 찾기 */
+	@GetMapping("/anon/find/pw")
+	public String findPwForm(@UserData ResMemberDetail detail, Model model) {
+		if (!CommonUtils.isEmpty(detail)) {
+			model.addAttribute("member_email", detail.getMember_email());
+		}
+		return "/member/member_find_pw";
+	}
+
+	/* 비밀번호 변경 폼 */
+	@GetMapping("/anon/pw/change/{member_id}")
+	public String pwChangeForm(@PathVariable(value = "member_id") Long member_id, Model model) {
+		model.addAttribute("member_id", member_id);
+		return "/member/member_change_pw";
+	}
+
+	/* 비밀번호 변경 */
+	@PostMapping("/anon/pw/change")
+	@ResponseBody
+	public ResponseEntity<String> pwChange(@Valid ReqChangePassword req) {
+		if (req.getNewPassword().equals(req.getNewPassword2())) {
+			memberService.changePassword(req);
+		}
+		return ResponseEntity.ok("ok");
+	}
+	
+	// 로그인
 	@GetMapping("/anon/login")
-	public String memberLogin(@UserData ResMemberDetail detail,HttpServletRequest request,HttpServletResponse response) {
-			if(detail != null &&detail.getMember_status().equals(MemberStatus.NOT_DONE.getCode())) {
-				CommonUtils.removeCookiesAndSession(request, response);
-				return"redirect:/member/anon/login";
-			}
+	public String memberLogin(@UserData ResMemberDetail detail, HttpServletRequest request,
+			HttpServletResponse response) {
+		if (detail != null && detail.getMember_status().equals(MemberStatus.NOT_DONE.getCode())) {
+			CommonUtils.removeCookiesAndSession(request, response);
+			return "redirect:/member/anon/login";
+		}
 		return "/member/member_login";
 	}
 
-	/*로그인시에 회원탈퇴여부 검사*/
+	/* 로그인시에 상태코드 검사 */
 	@GetMapping("/auth")
-	public String memberChk(@UserData ResMemberDetail detail, HttpServletRequest request,HttpServletResponse response) {
-		if(detail.getMember_status().equals(MemberStatus.DELETE.getCode())) {
-			CommonUtils.removeCookiesAndSession(request, response);
-			throw new CustomException(ErrorCode.WITHDRAWN_MEMBER);
+	public String memberStatusChk(@UserData ResMemberDetail detail, HttpServletRequest request,
+			HttpServletResponse response) {
+		if (MemberRole.SUPER_ADMIN.getType().equals(detail.getMember_role())) {
+			return "redirect:/admin/main";
 		}
+		memberService.memberStatusChk(detail.getMember_status(), request, response);
 		return "redirect:/planner/main";
 	}
-	
-	/*로그인 실패시 매핑*/
+
+	/* 로그인 실패시 매핑 */
 	@GetMapping("/anon/fail")
 	public void loginFail() {
 		throw new CustomException(ErrorCode.NO_ACCOUNT);
 	}
-	
-//	내정보
+
+	/* 소셜로그인에서 생긴 쿠키 제거 후 로그아웃 */
+	@GetMapping("/auth/signout")
+	public String signout(HttpServletRequest request, HttpServletResponse response) {
+		CommonUtils.removeCookiesAndSession(request, response);
+		return "redirect:/member/logout";
+	}
+
+	// 내정보
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/auth/myInfo")
 	public String myInfo(@UserData ResMemberDetail detail, Model model) {
-		ResMemberDetail memberDTO;
+		ResMemberDetail memberDTO = memberService.findMemberByLoginType(detail.getOauth_type(),
+				detail.getMember_email());
 		String gender;
-		
-		memberDTO = memberService.memberDetail(detail.getMember_email());	// 나의 객체
+
 		gender = Gender.findNameByCode(detail.getMember_gender());
-		
+
 		model.addAttribute("memberDTO", memberDTO);
 		model.addAttribute("gender", gender);
-		
+
 		return "/member/member_myInfo";
 	}
-	
+
 //	회원정보
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/auth/info/{member_id}")
-	public String memberInfo(@PathVariable(value = "member_id") Long member_id,
-					   		 @UserData ResMemberDetail detail, Model model) {
+	public String memberInfo(@PathVariable(value = "member_id") Long member_id, @UserData ResMemberDetail detail,
+			Model model) {
 		String gender;
+		String name;
 		int receive_count = 0;
-		
+
 		MemberDTO memberDTO = memberService.info(member_id, detail);
 		gender = Gender.findNameByCode(memberDTO.getMember_gender());
-		receive_count = friendService.receiveRequestCount(detail.getMember_email());	// 받은 친구신청 수
-		
+		receive_count = friendService.receiveRequestCount(detail.getMember_email()); // 받은 친구신청 수
+
+		name = Masking.maskAs(memberDTO.getMember_name(), Masking.NAME);
+		model.addAttribute("name", name); // 마스킹 처리
+
 		model.addAttribute("receive_count", receive_count);
 		model.addAttribute("memberDTO", memberDTO);
 		model.addAttribute("gender", gender);
-		
-		return "/member/member_info"; 
+
+		return "/member/member_info";
 	}
-	
-	/*비밀번호 확인 폼*/
-	@PreAuthorize("isAuthenticated()")
-	@GetMapping("/auth/chk")
-	public String passwordChkForm(@RequestParam(value = "url")String url, Model model) {
-		model.addAttribute("url", url);
-		return"/member/passwordChk";
-	}
-	
-	/*비밀번호 확인*/
-	@PreAuthorize("isAuthenticated()")
-	@PostMapping("/auth/chk")
-	@ResponseBody
-	public ResponseEntity<String> passwordChk(@RequestParam(value = "currentPw")String currentPw,@UserData ResMemberDetail member) {
-		int result = memberService.passwordChk(currentPw,member);
-		if(result ==1) {
-			return ResponseEntity.ok("성공");
-		}
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("실패");
-	}
-	
-	/*회원정보 수정 폼*/
+
+	/* 회원정보 수정 폼 */
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/auth/update")
-	public String memberUpdateForm(Model model,@UserData ResMemberDetail detail) {
+	public String memberUpdateForm(Model model, @UserData ResMemberDetail detail) {
 		model.addAttribute("detail", detail);
 		return "/member/member_update";
 	}
 
-	/*회원정보 수정*/
+	/* 회원정보 수정 */
 	@PreAuthorize("isAuthenticated()")
 	@PutMapping("/auth/update")
-	public String memberUpdate(ReqMemberUpdate req) {
+	public String memberUpdate(@Valid ReqMemberUpdate req) {
 		memberService.memberUpdate(req);
-		//TODO - 회원 정보 이메일 수정시에 이메일 인증 추가
 		return "redirect:/member/auth/myInfo";
 	}
-	
-	/*회원 탈퇴*/
+
+	/* 회원 탈퇴 */
 	@PreAuthorize("isAuthenticated()")
 	@DeleteMapping("/auth/delete")
 	@ResponseBody
-	public void memberDelete(@UserData ResMemberDetail detail,HttpServletRequest request,HttpServletResponse response) {
+	public void memberDelete(@UserData ResMemberDetail detail, HttpServletRequest request,
+			HttpServletResponse response) {
 		CommonUtils.removeCookiesAndSession(request, response);
 		memberService.memberDelete(detail.getMember_id());
 	}
-	
-	/*회원복구 폼*/
+
+	/* 회원복구 폼 */
 	@GetMapping("/anon/restore")
 	public String memberRestoreForm() {
 		return "/member/member_restore";
 	}
-	
-	/*회원 복구*/
+
+	/* 회원 복구 */
 	@PostMapping("/anon/restore")
 	@ResponseBody
-	public int memberRestore(ReqMemberRestore req) {
+	public ResponseEntity<Integer> memberRestore(@Valid ReqMemberRestore req) {
 		int result = memberService.memberRestore(req);
-		return result;
+		return ResponseEntity.ok(result);
 	}
-	
-	/*쭈썽이햄--------------------------------------------------------------------------------------------------------------------------------------->*/
+
+	/*
+	 * 쭈썽이햄-------------------------------------------------------------------------
+	 * -------------------------------------------------------------->
+	 */
 //	회원찾기
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/auth/search")
@@ -209,8 +266,36 @@ public class MemberController {
 		int count = 0;
 		
 		List<MemberDTO> list = memberService.search(detail.getMember_email(), keyword, start, end);
+		for (MemberDTO memberDTO : list) {
+			String statusB = "";
+			String statusC = "";
+			
+			/* 친구 신청 상태 */
+			if (friendService.friendRequestStatus(memberDTO.getMember_id(), detail.getMember_id()) != null) {
+				statusB = friendService.friendRequestStatus(memberDTO.getMember_id(), detail.getMember_id());
+			}else if (friendService.friendRequestStatus(detail.getMember_id(), memberDTO.getMember_id()) != null) {
+				statusC = friendService.friendRequestStatus(detail.getMember_id(), memberDTO.getMember_id());
+			}
+			if (statusB.equals("S") && statusC.equals("S")) {
+				memberDTO.setFriend_request_status("");
+			}else if (statusB.equals("S")) {
+				memberDTO.setFriend_request_status("S");
+			}else if (statusC.equals("S")){
+				memberDTO.setFriend_request_status("R");
+			}
+			
+			/* 친구 상태 */
+			if (friendService.friendStatus(detail.getMember_id(), memberDTO.getMember_id()) != null &&
+				friendService.friendStatus(detail.getMember_id(), memberDTO.getMember_id()).equals("F")) {			// 내가 보낸 경우
+				memberDTO.setFriend_request_status("F");
+			}else if (friendService.friendStatus(memberDTO.getMember_id(), detail.getMember_id()) != null &&
+					  friendService.friendStatus(memberDTO.getMember_id(), detail.getMember_id()).equals("F")) {	// 내가 받은 경우
+				memberDTO.setFriend_request_status("F");
+			}
+		}
+		
 		if (list.size() > 0) {
-			count = list.size();
+			count = memberService.searchCount(detail.getMember_id(), keyword);
 		}
 		
 		int pageCount = count / pageSize + (count % pageSize == 0 ? 0 : 1);
@@ -220,6 +305,10 @@ public class MemberController {
 		
 		if (endPage >= pageCount) {
 			endPage = pageCount;
+		}
+		
+		if (keyword.length() < 3) {
+			return "redirect:/member/auth/search";
 		}
 		
 		model.addAttribute("count", count);
@@ -238,7 +327,11 @@ public class MemberController {
 		int receive_count = friendService.receiveRequestCount(detail.getMember_email());	// 받은 친구신청 수
 		model.addAttribute("receive_count", receive_count);
 		
+		model.addAttribute("NAME", Masking.NAME);		// 타임리프로 마스킹 처리를 하기위해 넘겨줌
+		
+		model.addAttribute("detail", detail);
+		
 		return "member/member_search";
 	}
-	
+
 }

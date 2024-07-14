@@ -1,13 +1,16 @@
 	 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-	<link rel="stylesheet" href="/css/header.css" type="text/css"	/>
-	<link rel="stylesheet" type="text/css" href="/css/login.css">
+<link rel="stylesheet" type="text/css" href="/css/member/login.css">
+<link rel="stylesheet" type="text/css" href="/css/header.css"/>
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
-	<header th:replace="~{/fragments/header :: header}"></header>
-	<main class="loginMain">
+<header th:replace="~{/fragments/header :: header}"></header>
+		<main class="loginMain">
 		<form class="loginForm" method="post">
 		<h1>Planner</h1>
 			<input type="hidden" th:name="_csrf" th:value="${_csrf.token}"/>
@@ -16,7 +19,7 @@
 			<input type="submit" value="로그인" class="loginBtn"	/>
 		</form>
 		<div class="joinBtn">
-			<p class="join_a"><a class="join_a" sec:authorize="isAnonymous()" href="#">ID/PW 찾기</a>
+			<p class="join_a"><a class="join_a" sec:authorize="isAnonymous()" href="/member/anon/find/pw">PW 찾기</a>
 			| <a class="join_a" sec:authorize="isAnonymous()" href="/member/anon/insert">회원가입</a> | <a class="join_a" sec:authorize="isAnonymous()" href="/member/anon/restore">회원복구</a></p>
 		</div>
 		<div class="btnBox">
@@ -24,6 +27,7 @@
 			<a class="kakaoBtn" href="/oauth2/authorization/kakao?mode=login"><img src="/images/kakao.webp" class="kakaoLogo"></a>
 		</div>
 	</main>
+	<script type="text/javascript" src="/js/header.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </body>
 </html>

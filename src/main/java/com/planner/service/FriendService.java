@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.planner.dto.request.friend.FriendDTO;
 import com.planner.dto.request.friend.FriendRequestDTO;
@@ -26,11 +27,13 @@ public class FriendService {
 	private final MemberMapper memberMapper;
 	
 //	시퀀스 받아서 객체 찾기
+	@Transactional(readOnly = true)
 	public FriendRequestDTO findByFriendRequest(Long member_id) {
 		return friendMapper.findByFriendRequest(member_id);
 	}
 	
 //	회원 시퀀스로 친구 시퀀스 찾기
+	@Transactional(readOnly = true)
 	public Long findByFriendSeq(Long member_my_id , Long member_friend_id) {
 		Long friend_id = friendMapper.findByFriendSeq(member_my_id, member_friend_id);
 		
@@ -38,6 +41,7 @@ public class FriendService {
 	}
 	
 //	친구신청 (보냄)
+	@Transactional
 	public void friendRequest(Long member_id, Long myId) {	// member_id : 친구(신청 받은) 시퀀스
 		FriendRequestDTO friendRequestDTO = new FriendRequestDTO();
 		if (CommonUtils.isEmpty(member_id)) {
@@ -51,12 +55,14 @@ public class FriendService {
 	}
 	
 //	친구신청 상태 찾기
+	@Transactional(readOnly = true)
 	public String friendRequestStatus(@Param("member_receive_id") Long member_receive_id,
 							   		  @Param("member_send_id") Long member_send_id) {
 		return friendMapper.friendRequestStatus(member_receive_id, member_send_id);
 	}
 	
 //	(받은)친구신청 갯수
+	@Transactional(readOnly = true)
 	public int receiveRequestCount(String member_email) {
 		if (CommonUtils.isEmpty(member_email)) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
@@ -67,6 +73,7 @@ public class FriendService {
 	}
 	
 //	(받은)친구신청 리스트
+	@Transactional(readOnly = true)
 	public List<FriendRequestDTO> receiveRequestList(String member_email) {
 		if (CommonUtils.isEmpty(member_email)) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
@@ -78,6 +85,7 @@ public class FriendService {
 	}
 	
 //	(보낸)친구신청 리스트
+	@Transactional(readOnly = true)
 	public List<FriendRequestDTO> sendRequestList(String member_email) {
 		if (CommonUtils.isEmpty(member_email)) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
@@ -89,6 +97,7 @@ public class FriendService {
 	}
 	
 //	친구신청 취소/거절
+	@Transactional
 	public void requestDelete(Long member_receive_id, Long member_send_id) {
 		if (CommonUtils.isEmpty(member_receive_id) || CommonUtils.isEmpty(member_send_id)) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
@@ -97,24 +106,26 @@ public class FriendService {
 	}
 	
 //	친구수락 (+친구상태 업데이트)
-	public void friendAccept(@UserData ResMemberDetail detail, Long member_send_id) {
+	@Transactional
+	public void friendAccept(Long member_receive_id, Long member_send_id) {
 		if (CommonUtils.isEmpty(member_send_id)) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
 		}
-		MemberDTO memberMyDTO = memberMapper.findByMemberSeq(detail.getMember_id());// 나의 객체
+		MemberDTO memberMyDTO = memberMapper.findByMemberSeq(member_receive_id);	// 나의 객체
 		MemberDTO memberFriendDTO = memberMapper.findByMemberSeq(member_send_id);	// 친구 객체
 		FriendDTO friendDTO = new FriendDTO();
 		
-		friendDTO.setMember_my_id(detail.getMember_id());
+		friendDTO.setMember_my_id(member_receive_id);
 		friendDTO.setMember_friend_id(member_send_id);
 		friendDTO.setFriend_my_nickname(memberMyDTO.getMember_name());				// 나의 이름
 		friendDTO.setFriend_nickname(memberFriendDTO.getMember_name());				// 친구 이름
 		
-		friendMapper.friendAccept(detail.getMember_id(), member_send_id);			// 친구 상태 업데이트 메서드
+		friendMapper.friendAccept(member_receive_id, member_send_id);			// 친구 상태 업데이트 메서드
 		friendMapper.friendAdd(friendDTO);											// 친구 테이블에 추가 메서드
 	}
 	
 //	친구목록 (myId != member_my_id : 'C' / 나, 친구 위치 바꿔서 set 해줌 / friend_status = 'C')
+	@Transactional(readOnly = true)
 	public List<FriendDTO> friendList(String member_email) {
 		if (CommonUtils.isEmpty(member_email)) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
@@ -125,7 +136,8 @@ public class FriendService {
 		for (FriendDTO friendDTO : list) {
 			if (!friendDTO.getMember_my_id().equals(myId)) {		// 'C' 역방향 상태 / 나의 정보와 친구 정보의 위치가 바뀜
 				// 값의 위치를 바꿔주기 위해 변수에 대입
-				String friendEmail = memberMapper.findByMemberEmail(friendDTO.getMember_my_id());	// my_id = 친구 시퀀스
+				String friendEmail = memberMapper.findEmailBySeq(friendDTO.getMember_my_id());	// my_id = 친구 시퀀스
+				String friendName = memberMapper.findNameBySeq(friendDTO.getMember_my_id());
 				Long member_my_id = friendDTO.getMember_my_id();
 				Long member_friend_id = friendDTO.getMember_friend_id();
 				String friend_my_nickname = friendDTO.getFriend_my_nickname();
@@ -140,11 +152,14 @@ public class FriendService {
 				friendDTO.setFriend_nickname(friend_my_nickname);
 				friendDTO.setFriend_my_memo(friend_memo);
 				friendDTO.setFriend_memo(friend_my_memo);
-				friendDTO.setFriend_status("C");			// 바뀐 정보임을 알려주는 변수 	/ DB에 없음
+				friendDTO.setFriend_status("C");			// 바뀐 정보임을 알려주는 변수	/ DB에 없음
 				friendDTO.setMember_email(friendEmail);		// 친구 이메일 				/ DB에 없음
+				friendDTO.setMember_name(friendName);		// 친구 이름 				/ DB에 없음
 			}else {											// 'B' 정방향 상태
-				String friendEmail = memberMapper.findByMemberEmail(friendDTO.getMember_friend_id());
+				String friendEmail = memberMapper.findEmailBySeq(friendDTO.getMember_friend_id());
+				String friendName = memberMapper.findNameBySeq(friendDTO.getMember_friend_id());
 				friendDTO.setMember_email(friendEmail);		// 친구 이메일 				/ DB에 없음
+				friendDTO.setMember_name(friendName);		// 친구 이름					/ DB에 없음
 				friendDTO.setFriend_status("B"); 			// 정방향으로 저장된 정보		/ DB에 없음
 			}
 		}
@@ -152,6 +167,7 @@ public class FriendService {
 	}
 	
 //	친구 닉네임 변경
+	@Transactional
 	public void friendNickName(FriendDTO frndDTO) {
 		if (CommonUtils.isEmpty(frndDTO)) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
@@ -175,6 +191,7 @@ public class FriendService {
 	}
 	
 //	친구 매모 변경
+	@Transactional
 	public void friendMemo(FriendDTO frndDTO) {
 		if (CommonUtils.isEmpty(frndDTO)) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
@@ -198,6 +215,7 @@ public class FriendService {
 	}
 
 //	친구정보
+	@Transactional(readOnly = true)
 	public FriendDTO friendInfo(Long friend_id, String friend_status) {
 		if (CommonUtils.isEmpty(friend_id)) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
@@ -234,6 +252,7 @@ public class FriendService {
 	}
 	
 //	친구삭제
+	@Transactional
 	public void friendDelete(Long friend_id, Long member_my_id, Long member_friend_id) {
 		if (CommonUtils.isEmpty(member_my_id) || CommonUtils.isEmpty(member_friend_id)) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
@@ -243,5 +262,11 @@ public class FriendService {
 		Long member_send_id = member_friend_id;
 		friendMapper.friendDelete(friend_id);
 		friendMapper.requestDelete(member_receive_id, member_send_id);
+	}
+	
+//	친구상태 찾기
+	@Transactional(readOnly = true)
+	public String friendStatus(Long member_receive_id, Long member_send_id) {
+		return friendMapper.friendStatus(member_receive_id, member_send_id);
 	}
 }

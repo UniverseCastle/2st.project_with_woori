@@ -25,9 +25,9 @@ hideBtns.forEach(button => {
 		}
 		if (nameI && submitBtn) {
 			submitBtn.style.display = 'inline-block';
-			nameI.style.display = 'inline-block';
+			nameI.disabled = false;
 		}
-		
+      		
 		/* 버튼타입을 직접 서밋 */
 		submitBtn.addEventListener('click', () => {
 			nameH.value = nameI.value;

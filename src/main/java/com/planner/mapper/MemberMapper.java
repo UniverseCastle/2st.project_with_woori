@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.planner.dto.request.member.MemberDTO;
+import com.planner.dto.request.member.ReqChangePassword;
 import com.planner.dto.request.member.ReqMemberUpdate;
 import com.planner.dto.request.member.ReqOAuth2MemberAdd;
 import com.planner.dto.request.member.ReqOAuth2Signup;
@@ -33,17 +34,21 @@ public interface MemberMapper {
 	// 회원 이메일로 객체 가져오기
 	MemberDTO findByUser(@Param(value = "member_email") String member_email);
 
-	/* 내 정보 */
-	ResMemberDetail findByEmail(@Param(value = "member_email") String member_email);
-
 	/* 회원 수정 */
 	void memberUpdate(ReqMemberUpdate req);
 
 	/* 회원 상태변경 */
 	int changeMemberStatus(@Param(value = "member_id") Long member_id,
 			@Param(value = "member_status") String member_status);
-
-	/* 주썽이햄 */
+	/*회원 비밀번호 변경*/
+	int changePassword(ReqChangePassword req);
+	
+	/*일반로그인회원*/
+	ResMemberDetail formMember(@Param(value = "member_email")String member_email);
+	
+	/*소셜 로그인회원*/
+	ResMemberDetail socialMember(@Param(value = "member_email")String member_email);
+	/* 주썽이햄=======================================================>*/
 //	회원 시퀀스로 객체 가져오기
 	public MemberDTO findByMemberSeq(Long member_id);	// 친구 객체 찾을 때 사용
 	
@@ -51,11 +56,18 @@ public interface MemberMapper {
 	public Long findByMemberId(String member_email);
 	
 //	회원 시퀀스로 이메일 찾기
-	public String findByMemberEmail(Long member_id);	// 친구 이메일 찾을 때 사용
+	public String findEmailBySeq(Long member_id);	// 친구 이메일 찾을 때 사용
+	
+//	회원 시퀀스로 이름 찾기
+	public String findNameBySeq(Long member_id);	// 친구 이름 찾을 때 사용
 	
 //	회원 검색
 	public List<MemberDTO> search(@Param("member_id") Long member_id, @Param("keyword") String keyword,
 								  @Param("start") int start, @Param("end") int end);
+	
+//	전체회원 수
+	public int searchCount(@Param("member_id") Long member_id,
+						   @Param("keyword") String keyword);
 	
 //	친구신청 보낸 아이디 찾기
 	public List<MemberDTO> findBySendId(@Param("member_id") Long member_id, @Param("keyword") String keyword);
