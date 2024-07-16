@@ -22,7 +22,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<if test="team_id != -1">
 			S.team_id = #{team_id}
 		</if>
-		and to_char(schedule_start, 'yyyyMMdd') = #{date}
+		and #{date} between to_char(schedule_start, 'yyyyMMdd') and to_char(schedule_end, 'yyyyMMdd')
         ORDER BY S.schedule_start ASC, S.schedule_end ASC, S.schedule_id ASC
 	</select>
 	
@@ -44,11 +44,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<if test='so eq "T"'>
 			schedule_title like '%'||#{cal_title}||'%'
 		</if>
-		<if test='so eq "S"'>
-			to_char(schedule_start, 'yyyyMMdd') = #{cal_date}
-		</if>
-		<if test='so eq "E"'>
-			to_char(schedule_end, 'yyyyMMdd') = #{cal_date}
+		<if test='so eq "D"'>
+			(#{cal_date} between schedule_start and schedule_end
+			or #{cal_date} = to_char(schedule_start, 'yyyy-MM-dd')
+			or #{cal_date} = to_char(schedule_end, 'yyyy-MM-dd'))
 		</if>
 		and team_id = #{team_id}
 	</select>
@@ -60,5 +59,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		on m.schedule_id = s.schedule_id
 		where s.schedule_id = #{schedule_id}
 	</select>
-	
+
+	<select id="calendarPrint" parameterType="CalendarDTO" resultType="CalendarPrintDTO">
+		select schedule_id,
+			schedule_title,
+		    to_char(schedule_start, 'mmdd') as schedule_start,
+		    to_char(schedule_end, 'mmdd') as schedule_end
+		from schedule
+		where
+		<if test='team_id eq null'>
+			member_id = #{member_id}
+			and team_id is null
+		</if>
+		<if test='team_id neq null'>
+			team_id = #{team_id}
+		</if>
+		    and (schedule_start between #{start_date} and #{end_date}+1
+		        or schedule_end between #{start_date} and #{end_date}+1)
+		order by schedule_start asc, schedule_end asc, schedule_id asc
+	</select>
+
 </mapper>

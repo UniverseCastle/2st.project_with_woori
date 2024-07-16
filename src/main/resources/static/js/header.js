@@ -11,7 +11,7 @@ $('.header > .header-inner > .top-menu-bar > ul > li').mouseleave(function(){
 
 // 상단 2차 메뉴 배경
 $('.header > .header-inner > .top-menu-bar > ul > .menu-1').mouseenter(function(){
-    $('.sub-menu-bg').css('height','128px');
+    $('.sub-menu-bg').css('height','62px');
 });
 $('.header > .header-inner > .top-menu-bar > ul > .menu-1').mouseleave(function(){
     $('.sub-menu-bg').css('height','');

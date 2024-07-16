@@ -88,7 +88,23 @@
 		WHERE
 			member_id = #{member_id}
 	</update>
+		
+	<!-- 회원탈퇴시 친구삭제 -->
+<!-- 	<delete id="" > -->
+<!-- 		DELETE  -->
+<!-- 		FROM 	friend -->
+<!-- 		WHERE 	 -->
+<!-- 	</delete> -->
 	
+	<select id="isTeamMaster" resultType="int">
+		select count(*)
+		from team
+		where team_id in 
+    	(select team_id
+    	from team_member
+   	 	where member_id = #{member_id}
+    	and tm_grade='TEAM_MASTER')
+	</select>
 	<!-- 회원 상태변경 -->
 	<update id="changeMemberStatus">
 		UPDATE member
@@ -134,6 +150,7 @@
 			oauth_type = #{oauth_type}
 	</select>
 	
+	<!-- 계정 갯수 -->
 	<select id="accountCount">
 		SELECT 	count(*)
 		FROM	member
@@ -141,6 +158,7 @@
 			member_email = #{toEmail}
 	</select>
 	
+	<!-- 비번변경 -->
 	<update id="changePassword" parameterType="ReqChangePassword">
 		UPDATE 	member 
 		SET		member_password = #{newPassword}
@@ -149,8 +167,7 @@
 	</update>
 	
 	<!-- ================== 주성이햄========================= -->
-	
-	<!-- 회원 이메일로 객체 가져오기 -->
+<!-- 회원 이메일로 객체 가져오기 -->
 	<select id="findByUser" resultType="MemberDTO">
 		select *
 		from member
@@ -197,6 +214,7 @@
 				where member_id != #{member_id}
 				and substr (member_email, 1, instr(member_email, '@') - 1) like '%' || #{keyword} || '%'
 				and member_status = 'B'
+				and member_role = 'ROLE_USER'
 			)m
 			left outer join friend_request fr
 			on m.member_id = fr.member_send_id

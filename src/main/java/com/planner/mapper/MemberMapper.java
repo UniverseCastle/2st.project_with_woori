@@ -40,6 +40,10 @@ public interface MemberMapper {
 	/* 회원 상태변경 */
 	int changeMemberStatus(@Param(value = "member_id") Long member_id,
 			@Param(value = "member_status") String member_status);
+	
+	/*탈퇴시 그룹장인지 체크*/
+	int isTeamMaster(@Param(value = "member_id")Long Member_id);
+	
 	/*회원 비밀번호 변경*/
 	int changePassword(ReqChangePassword req);
 	
@@ -53,7 +57,7 @@ public interface MemberMapper {
 	public MemberDTO findByMemberSeq(Long member_id);	// 친구 객체 찾을 때 사용
 	
 //	회원 이메일로 시퀀스 가져오기
-	public Long findByMemberId(String member_email);
+	public Long findByMemberId(Long member_email);
 	
 //	회원 시퀀스로 이메일 찾기
 	public String findEmailBySeq(Long member_id);	// 친구 이메일 찾을 때 사용

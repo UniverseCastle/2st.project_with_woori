@@ -63,35 +63,32 @@ public class FriendService {
 	
 //	(받은)친구신청 갯수
 	@Transactional(readOnly = true)
-	public int receiveRequestCount(String member_email) {
-		if (CommonUtils.isEmpty(member_email)) {
+	public int receiveRequestCount(Long member_id) {
+		if (CommonUtils.isEmpty(member_id)) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
 		}
-		Long myId = memberMapper.findByMemberId(member_email);
 		
-		return friendMapper.receiveRequestCount(myId);
+		return friendMapper.receiveRequestCount(member_id);
 	}
 	
 //	(받은)친구신청 리스트
 	@Transactional(readOnly = true)
-	public List<FriendRequestDTO> receiveRequestList(String member_email) {
-		if (CommonUtils.isEmpty(member_email)) {
+	public List<FriendRequestDTO> receiveRequestList(Long member_id) {
+		if (CommonUtils.isEmpty(member_id)) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
 		}
-		Long myId = memberMapper.findByMemberId(member_email);
-		List<FriendRequestDTO> list = friendMapper.receiveRequestList(myId);
+		List<FriendRequestDTO> list = friendMapper.receiveRequestList(member_id);
 		
 		return list;
 	}
 	
 //	(보낸)친구신청 리스트
 	@Transactional(readOnly = true)
-	public List<FriendRequestDTO> sendRequestList(String member_email) {
-		if (CommonUtils.isEmpty(member_email)) {
+	public List<FriendRequestDTO> sendRequestList(Long member_id) {
+		if (CommonUtils.isEmpty(member_id)) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
 		}
-		Long myId = memberMapper.findByMemberId(member_email);
-		List<FriendRequestDTO> list = friendMapper.sendRequestList(myId);
+		List<FriendRequestDTO> list = friendMapper.sendRequestList(member_id);
 		
 		return list;
 	}
@@ -130,11 +127,10 @@ public class FriendService {
 		if (CommonUtils.isEmpty(detail.getMember_email())) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
 		}
-		long myId = memberMapper.findByMemberId(detail.getMember_email());
-		List<FriendDTO> list = friendMapper.friendList(myId);
+		List<FriendDTO> list = friendMapper.friendList(detail.getMember_id());
 		
 		for (FriendDTO friendDTO : list) {
-			if (!friendDTO.getMember_my_id().equals(myId)) {		// 'C' 역방향 상태 / 나의 정보와 친구 정보의 위치가 바뀜
+			if (!friendDTO.getMember_my_id().equals(detail.getMember_id())) {		// 'C' 역방향 상태 / 나의 정보와 친구 정보의 위치가 바뀜
 				// 값의 위치를 바꿔주기 위해 변수에 대입
 				String friendEmail = memberMapper.findEmailBySeq(friendDTO.getMember_my_id());	// my_id = 친구 시퀀스
 				String friendName = memberMapper.findNameBySeq(friendDTO.getMember_my_id());
