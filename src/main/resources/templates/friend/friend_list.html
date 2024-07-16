@@ -37,30 +37,16 @@
 					</td>
 					<!-- 별명 -->
 					<!-- 나타나 있음 -->
-					<div th:if="${friendDTO.friend_status == 'B'}">		<!-- 정방향인 경우 -->	<!-- 닉네임이 없을 시 원래 이름 보여줌 -->
-						<td class="list_td2" th:if="${friendDTO.friend_nickname == '' || friendDTO.friend_nickname == null}">
-							<input type="text" maxlength="16" style="width: 90px;"
-							th:attr="id='nameI' + ${friendDTO.friend_id}"
-							th:value="|(${friendDTO.member_name})|" class="nameI"   disabled/>
-						</td>
-						<td class="list_td2" th:unless="${friendDTO.friend_nickname == '' || friendDTO.friend_nickname == null}">
-							<input type="text" maxlength="16" style="width: 90px;"
-							th:attr="id='nameI' + ${friendDTO.friend_id}"
-							th:value="${friendDTO.friend_nickname}" class="nameI"   disabled/>
-						</td>
-					</div>
-					<div th:if="${friendDTO.friend_status == 'C'}">		<!-- 역방향인 경우 -->	<!-- 닉네임이 없을 시 원래 이름 보여줌 -->
-						<td class="list_td3" th:if="${friendDTO.friend_my_nickname == '' || friendDTO.friend_my_nickname == null}">
-							<input type="text" maxlength="16" style="width: 90px;"
-							th:attr="id='nameI' + ${friendDTO.friend_id}"
-							th:value="|(${friendDTO.member_name})|" class="nameI"   disabled/>
-						</td>
-						<td class="list_td2" th:unless="${friendDTO.friend_my_nickname == '' || friendDTO.friend_my_nickname == null}">
-							<input type="text" maxlength="16" style="width: 90px;"
-							th:attr="id='nameI' + ${friendDTO.friend_id}"
-							th:value="${friendDTO.friend_my_nickname}" class="nameI"   disabled/>
-						</td>
-					</div>
+					<td class="list_td" th:if="${friendDTO.friend_nickname == '' || friendDTO.friend_nickname == null}">
+						<input type="text" maxlength="16" style="width: 90px;"
+						th:attr="id='nameI' + ${friendDTO.friend_id}"
+						th:value="${friendDTO.member_name}" class="nameI"   disabled/>
+					</td>
+					<td th:unless="${friendDTO.friend_nickname == '' || friendDTO.friend_nickname == null}">
+						<input type="text" maxlength="16" style="width: 90px;"
+						th:attr="id='nameI' + ${friendDTO.friend_id}"
+						th:value="${friendDTO.friend_nickname}" class="nameI"   disabled/>
+					</td>
 					<td class="list_tdBtn">
 						<form action="/friend/nickname" method="post" th:attr="id='nickForm' + ${friendDTO.friend_id}">
 							<input type="hidden" name="friend_id" th:value="${friendDTO.friend_id}"	/>
@@ -99,7 +85,7 @@
 					</td>
 					<!-- 메모 -->
 					<div th:if="${friendDTO.friend_status == 'B'}">
-						<td colspan="2" class="list_td">
+						<td colspan="2" class="memo_td">
 							<div th:attr="id='memoT' + ${friendDTO.friend_id}"
 							 th:text="${friendDTO.friend_memo}" class="memoT">
 							</div>

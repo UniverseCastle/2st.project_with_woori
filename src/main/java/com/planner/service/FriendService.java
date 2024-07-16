@@ -127,40 +127,43 @@ public class FriendService {
 //	친구목록 (myId != member_my_id : 'C' / 나, 친구 위치 바꿔서 set 해줌 / friend_status = 'C')
 	@Transactional(readOnly = true)
 	public List<FriendDTO> friendList(ResMemberDetail detail) {
-		List<FriendDTO> friendList = null;
 		if (CommonUtils.isEmpty(detail.getMember_email())) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
 		}
+		long myId = memberMapper.findByMemberId(detail.getMember_email());
+		List<FriendDTO> list = friendMapper.friendList(myId);
 		
-		if (!CommonUtils.isEmpty(friendMapper.friendList(detail.getMember_id()))) {
-			friendList = friendMapper.friendList(detail.getMember_id());
-			for (FriendDTO friendDTO : friendList) {
-				if (friendDTO.getMember_friend_id().equals(detail.getMember_id())) {	// 역방향인 경우
-					friendList = friendMapper.friendListC(detail.getMember_id());
-					for (FriendDTO friendDTOC : friendList) {
-						String friendEmail = memberMapper.findEmailBySeq(friendDTOC.getMember_my_id());	// my_id = 친구 시퀀스
-						String friendName = memberMapper.findNameBySeq(friendDTOC.getMember_my_id());
-						friendDTOC.setFriend_status("C");			// 바뀐 정보임을 알려주는 변수	/ DB에 없음
-						friendDTOC.setMember_email(friendEmail);	// 친구 이메일 				/ DB에 없음
-						friendDTOC.setMember_name(friendName);		// 친구 이름 				/ DB에 없음
-					}
-					return friendList;
-					
-				}else if (friendDTO.getMember_my_id().equals(detail.getMember_id())) {	// 정방향인 경우
-					friendList = friendMapper.friendListB(detail.getMember_id());
-					for (FriendDTO friendDTOB : friendList) {
-						String friendEmail = memberMapper.findEmailBySeq(friendDTOB.getMember_friend_id());
-						String friendName = memberMapper.findNameBySeq(friendDTOB.getMember_friend_id());
-						
-						friendDTOB.setFriend_status("B");			// 바뀐 정보임을 알려주는 변수	/ DB에 없음
-						friendDTOB.setMember_email(friendEmail);	// 친구 이메일 				/ DB에 없음
-						friendDTOB.setMember_name(friendName);		// 친구 이름				/ DB에 없음
-					}
-					return friendList;
-				}
+		for (FriendDTO friendDTO : list) {
+			if (!friendDTO.getMember_my_id().equals(myId)) {		// 'C' 역방향 상태 / 나의 정보와 친구 정보의 위치가 바뀜
+				// 값의 위치를 바꿔주기 위해 변수에 대입
+				String friendEmail = memberMapper.findEmailBySeq(friendDTO.getMember_my_id());	// my_id = 친구 시퀀스
+				String friendName = memberMapper.findNameBySeq(friendDTO.getMember_my_id());
+				Long member_my_id = friendDTO.getMember_my_id();
+				Long member_friend_id = friendDTO.getMember_friend_id();
+				String friend_my_nickname = friendDTO.getFriend_my_nickname();
+				String friend_nickname = friendDTO.getFriend_nickname();
+				String friend_my_memo = friendDTO.getFriend_my_memo();
+				String friend_memo = friendDTO.getFriend_memo();
+				
+				// 나의 정보에 친구 정보를, 친구 정보에 내 정보를 대입
+				friendDTO.setMember_my_id(member_friend_id);
+				friendDTO.setMember_friend_id(member_my_id);
+				friendDTO.setFriend_my_nickname(friend_nickname);
+				friendDTO.setFriend_nickname(friend_my_nickname);
+				friendDTO.setFriend_my_memo(friend_memo);
+				friendDTO.setFriend_memo(friend_my_memo);
+				friendDTO.setFriend_status("C");			// 바뀐 정보임을 알려주는 변수	/ DB에 없음
+				friendDTO.setMember_email(friendEmail);		// 친구 이메일 				/ DB에 없음
+				friendDTO.setMember_name(friendName);		// 친구 이름 				/ DB에 없음
+			}else {											// 'B' 정방향 상태
+				String friendEmail = memberMapper.findEmailBySeq(friendDTO.getMember_friend_id());
+				String friendName = memberMapper.findNameBySeq(friendDTO.getMember_friend_id());
+				friendDTO.setMember_email(friendEmail);		// 친구 이메일 				/ DB에 없음
+				friendDTO.setMember_name(friendName);		// 친구 이름					/ DB에 없음
+				friendDTO.setFriend_status("B"); 			// 정방향으로 저장된 정보		/ DB에 없음
 			}
 		}
-		return friendList;
+		return list;
 	}
 	
 //	친구 닉네임 변경

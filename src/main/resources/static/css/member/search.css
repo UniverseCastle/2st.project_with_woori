@@ -16,6 +16,7 @@
 	justify-content: center;
 	white-space: nowrap;
     overflow: hidden;
+    width: 400px;
 }
 
 .title_text {
@@ -65,7 +66,6 @@
 .search_sub_tr {
 	font-size: 18px;
 	color: darkgray;
-	padding-bottom: 10px;
 }
 
 .search_tr {

@@ -56,14 +56,8 @@ public interface FriendMapper {
 	public void requestDelete(@Param("member_receive_id") Long member_receive_id,
 							  @Param("member_send_id") Long member_send_id);
 	
-//	친구목록 (전체)
+//	친구목록
 	public List<FriendDTO> friendList(@Param("member_my_id") Long member_my_id);
-	
-//	친구목록 (정방향)
-	public List<FriendDTO> friendListB(@Param("member_my_id") Long member_my_id);
-	
-//	친구목록 (역방향)
-	public List<FriendDTO> friendListC(@Param("member_my_id") Long member_my_id);
 	
 //	친구 닉네임 변경
 	public void friendNickName(FriendDTO friendDTO);

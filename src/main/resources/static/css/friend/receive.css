@@ -40,7 +40,6 @@
 }
 
 .receive_tr1 {
-	padding: 0 0 10px;
 	width: 120px;
 }
 
@@ -55,7 +54,6 @@
 
 .receive_td2 {
 	width: 120px;
-	padding: 0 0 10px;
     text-align: center;
 }
 .receive_td2 .td_name {
@@ -72,7 +70,6 @@
 	width: 40px;
 	display: flex;
 	align-items: center;
-	padding: 0 0 10px;
 }
 
 .receive_title {

@@ -62,7 +62,7 @@
 }
 .line-height-0 {
     line-height:0;
-    margin-right: 30px;
+    margin-right: 100px;
 }
 .line-height-0 > * {
     line-height:normal;
@@ -104,7 +104,7 @@ html.m-menu-scroll, html.m-menu-scroll > body {
 }
 
 .header > .header-inner {
-    max-width:1220px;
+/*    max-width:1220px;*/
     margin:0 auto;
     position:relative;
     display: flex;
@@ -171,7 +171,7 @@ html.m-menu-scroll, html.m-menu-scroll > body {
     position:absolute;
     top:64px;
     left:0;
-    width:100%;
+    width:100vw;
     height:0;
     background-color:ivory;
     border-top:1px solid #ccc;
