@@ -16,6 +16,11 @@
     align-items: center;
 }
 
+.list_table a {
+	text-decoration:none;
+	color: blueviolet;
+}
+
 .list_title {
 	color: gray;
 	font-weight: bold;
@@ -31,7 +36,6 @@
 .list_tr {
 	font-size: 16px;
 	color: gray;
-	height: 1.8em;
 }
 
 .infoA {
@@ -65,17 +69,49 @@
 	cursor: text;
 }
 
-.list_td {
+.list_td1 {
+/*	text-align: center;*/
+	width: 120px;
+/*	text-align: center;*/
+	overflow: hidden;
+	word-wrap: break-word;
+	display: -webkit-box;
+	-webkit-line-clamp: 1;
+	-webkit-box-orient: vertical;
+	margin-top: 1px;
+}
+.list_td1 .infoA {
+/*	vertical-align: middle;*/
+}
+
+.list_tr2 {
+	width: 136px;
 	text-align: center;
 }
+.list_td2 {
+	width: 90px;
+	text-align: right;
+}
+.list_td3 {
+	width: 130px;
+}
+
+.memo_td {
+	display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
 /* 메모 길이 1줄로 조정 / 뒷부분 .. 표시 */
 .memoT {
-	width: 180px;
+	width: 100px;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+    text-align: center;
 }
 
 .list_tdBtn {
-	width: 80px;
+	width: 40px;
 }

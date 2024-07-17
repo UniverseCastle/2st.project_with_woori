@@ -10,27 +10,28 @@ $(function() {
 	});
 
 	$(document).on("click", ".userDeleteBtn", () => {
-		const thenFn = () => {
-			if (result.isDenied) {
+		const thenFn = (result) => {
+			if (result.isConfirmed) {
+				const ajaxObj = {
+					url: API_LIST.DELETE_MEMBER,
+					method: "delete",
+					successFn: () => {
+						const thenFn = () => {
+							location.href = PAGE_LIST.MAIN_PAGE;
+						};
+						swalCall("성공", "탈퇴되었습니다", "success", thenFn);
+					},
+					errorFn: () => {
+						const thenFn = () => {
+							location.href = PAGE_LIST.MAIN_PAGE;
+						};
+						swalCall("에러", "탈퇴 못함 수구", "error", thenFn);
+					}
+				};
+				ajaxCall(ajaxObj);
+			} else{
 				return;
 			}
-			const ajaxObj = {
-				url: API_LIST.DELETE_MEMBER,
-				method: "delete",
-				successFn: () => {
-					const thenFn = () => {
-						location.href = PAGE_LIST.MAIN_PAGE;
-					};
-					swalCall("성공", "탈퇴되었습니다", "success", thenFn);
-				},
-				errorFn: () => {
-					const thenFn = () => {
-						location.href = PAGE_LIST.MAIN_PAGE;
-					};
-					swalCall("에러", "탈퇴실패", "error", thenFn);
-				}
-			};
-			ajaxCall(ajaxObj);
 		};
 		swalCall("회원탈퇴", "정말 회원탈퇴를 하시겠습니까?", "question", thenFn, "예", true);
 	});
@@ -41,7 +42,9 @@ const sendDeleteBtn = document.getElementById('sendDeleteBtn');
 const sendDelete = document.getElementById('sendDelete');
 const sendDeleteH = document.getElementById('sendDeleteH');
 const requestForm = document.getElementById('requestForm');
-sendDeleteBtn.addEventListener('click', () => {
-	sendDelete.value = sendDeleteH.value;
-	requestForm.submit();
-});
+if(sendDeleteBtn !== null){
+	sendDeleteBtn.addEventListener('click', () => {
+		sendDelete.value = sendDeleteH.value;
+		requestForm.submit();
+	});
+}

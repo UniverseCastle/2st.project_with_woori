@@ -31,15 +31,16 @@ public interface MemberMapper {
 	ResMemberDetail findByEmailAndOAuthType(@Param(value = "member_email") String member_email,
 			@Param(value = "oauth_type") String oauth_type);
 
-	// 회원 이메일로 객체 가져오기
-	MemberDTO findByUser(@Param(value = "member_email") String member_email);
-
 	/* 회원 수정 */
 	void memberUpdate(ReqMemberUpdate req);
 
 	/* 회원 상태변경 */
 	int changeMemberStatus(@Param(value = "member_id") Long member_id,
 			@Param(value = "member_status") String member_status);
+	
+	/*탈퇴시 그룹장인지 체크*/
+	int isTeamMaster(@Param(value = "member_id")Long Member_id);
+	
 	/*회원 비밀번호 변경*/
 	int changePassword(ReqChangePassword req);
 	
@@ -48,12 +49,11 @@ public interface MemberMapper {
 	
 	/*소셜 로그인회원*/
 	ResMemberDetail socialMember(@Param(value = "member_email")String member_email);
-	/* 주썽이햄=======================================================>*/
+	
+	/* -----------------universe----------------- */
+	
 //	회원 시퀀스로 객체 가져오기
 	public MemberDTO findByMemberSeq(Long member_id);	// 친구 객체 찾을 때 사용
-	
-//	회원 이메일로 시퀀스 가져오기
-	public Long findByMemberId(String member_email);
 	
 //	회원 시퀀스로 이메일 찾기
 	public String findEmailBySeq(Long member_id);	// 친구 이메일 찾을 때 사용
@@ -69,6 +69,15 @@ public interface MemberMapper {
 	public int searchCount(@Param("member_id") Long member_id,
 						   @Param("keyword") String keyword);
 	
-//	친구신청 보낸 아이디 찾기
-	public List<MemberDTO> findBySendId(@Param("member_id") Long member_id, @Param("keyword") String keyword);
+//=======================주완
+//  회원 상태보기 
+	public List<MemberDTO> memberStatus(@Param("start") int start,@Param("end") int end,@Param("member_status") String member_status);
+//  회원 상태 카운터 
+	public int memberStatusCount(@Param("member_status")String member_status);
+//  회원 전체보기 
+	public List<MemberDTO> memberAll(@Param("start") int start,@Param("end") int end);
+//  회원 전체 카운터 
+	public int memberAllCount();
+//  회원 상태 변경 
+	public void memberStatusUpdate(@Param("member_id")Long member_id,@Param("member_status")String member_status);
 }

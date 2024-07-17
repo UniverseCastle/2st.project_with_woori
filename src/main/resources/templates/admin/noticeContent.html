@@ -22,19 +22,25 @@
         height: 200px; /* td 요소의 높이를 200px로 설정 */
     }
 </style>
+<link rel="stylesheet" type="text/css" href="/css/admin_aside.css">
 </head>
 <body>
+<aside th:replace="~{/fragments/adminAside :: adminAside}"></aside>
+<main id="main">
+ <span style="font-size:30px;cursor:pointer" onclick="toggleNav()">&#9776; ADMIN</span>
     <table>
         <tr>
             <td class="noticeTitle" th:text="${noticeDTO.notice_title}" id="noticeTitel"></td>
         </tr>
         <tr>
-            <td class="noticeContent"th:text="${noticeDTO.notice_content}" id="noticeContent"></td>
+            <td class="noticeContent"th:utext="${noticeDTO.notice_content}" id="noticeContent"></td>
         </tr>
     </table>
     <input type="hidden" th:value="${noticeDTO.notice_id}" id="noticeNumber"/>
     <a th:href="@{|/admin/noticeUpdateForm/${noticeDTO.notice_id}|}"><button type="button">글 수정</button></a>
     <a th:href="@{|/admin/noticeDelete/${noticeDTO.notice_id}|}"><button type="button">글삭제</button></a>
+</main>
     <script th:src="@{/js/admin/notice.js}"></script>
+    <script src="/js/notice/admin_aside.js"></script>
 </body>
 </html>

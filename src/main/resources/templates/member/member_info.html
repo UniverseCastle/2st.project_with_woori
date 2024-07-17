@@ -2,6 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
+	<title>회원 정보</title>
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 	<link rel="stylesheet" type="text/css" href="/css/member/info.css"	/>
 	<link rel="stylesheet" type="text/css" href="/css/friend/friendBar.css"	/>
 	<link rel="stylesheet" type="text/css" href="/css/header.css"	/>

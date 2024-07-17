@@ -11,7 +11,7 @@ $('.header > .header-inner > .top-menu-bar > ul > li').mouseleave(function(){
 
 // 상단 2차 메뉴 배경
 $('.header > .header-inner > .top-menu-bar > ul > .menu-1').mouseenter(function(){
-    $('.sub-menu-bg').css('height','128px');
+    $('.sub-menu-bg').css('height','62px');
 });
 $('.header > .header-inner > .top-menu-bar > ul > .menu-1').mouseleave(function(){
     $('.sub-menu-bg').css('height','');
@@ -39,7 +39,7 @@ $('.header > .header-inner > .top-menu-bar > ul > .menu-4').mouseleave(function(
 });
 
 $('.header > .header-inner > .top-menu-bar > ul > .menu-5').mouseenter(function(){
-    $('.sub-menu-bg').css('height','0px');
+    $('.sub-menu-bg').css('height','94px');
 });
 $('.header > .header-inner > .top-menu-bar > ul > .menu-5').mouseleave(function(){
     $('.sub-menu-bg').css('height','');
@@ -86,4 +86,22 @@ $('.m-header > .m-menu-list > ul > li').click(function(){
 
 $('.m-header > .m-menu-list > ul > li > ul').click(function(e){
     e.stopPropagation();
+});
+
+/* 가로스크롤 제거 */
+document.addEventListener('DOMContentLoaded', () => {
+    const body = document.body;
+    const mHeader = document.querySelector('.m-header');
+    
+    if (mHeader.scrollWidth <= window.innerWidth) {
+        body.style.overflowX = 'hidden';
+    }
+    
+    window.addEventListener('resize', () => {
+        if (mHeader.scrollWidth <= window.innerWidth) {
+            body.style.overflowX = 'hidden';
+        } else {
+            body.style.overflowX = 'auto';
+        }
+    });
 });

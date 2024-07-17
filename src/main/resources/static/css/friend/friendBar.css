@@ -1,4 +1,5 @@
 .friend_nav {
+    position: relative;
 	margin-top: 6px;
 }
 
@@ -10,10 +11,16 @@
 .friend_menu {
 	display: flex;
 	justify-content: flex-end;
+	white-space: nowrap;
+	overflow: hidden;
+}
+.friend_menu li {
+	font-weight: bold;
+	color: darkslategray;
+	font-size: 14px;
 }
 
 .fr-container {
-	max-width: 1400px;
 	width: calc(90% - 40px);
 	margin: auto;
 }

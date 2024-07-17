@@ -2,8 +2,6 @@ package com.planner.service;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
-import org.mybatis.spring.MyBatisSystemException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,13 +12,15 @@ import com.planner.dto.request.member.ReqChangePassword;
 import com.planner.dto.request.member.ReqMemberRestore;
 import com.planner.dto.request.member.ReqMemberUpdate;
 import com.planner.dto.response.member.ResMemberDetail;
-import com.planner.enums.MemberRole;
+import com.planner.enums.CodeStatus;
 import com.planner.enums.MemberStatus;
 import com.planner.exception.CustomException;
 import com.planner.exception.ErrorCode;
 import com.planner.exception.RestCustomException;
+import com.planner.mapper.EmailMapper;
 import com.planner.mapper.FriendMapper;
 import com.planner.mapper.MemberMapper;
+import com.planner.mapper.TeamMemberMapper;
 import com.planner.util.CommonUtils;
 import com.planner.util.UserData;
 
@@ -34,14 +34,18 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberService {
 
 	private final MemberMapper memberMapper;
+	private final EmailMapper emailMapper;
 	private final FriendMapper friendMapper;
 	private final PasswordEncoder passwordEncoder;
+	private final TeamMemberMapper teamMemberMapper;
 	private static final boolean MEMBER = true;
 	private static final boolean NON_MEMBER = false;
 	
 	// 회원가입
 	@Transactional
 	public int memberInsert(MemberDTO memberDTO) {
+		String emailAuthStatus = emailMapper.findStatusByToEmail(memberDTO.getMember_email());
+		CommonUtils.throwCustomExceptionIf(CommonUtils.isEmpty(emailAuthStatus)||emailAuthStatus.equals(CodeStatus.CODE_UNCHECKED.getStatus()), ErrorCode.FAIL_CODE_AUTHENTICATION);
 		memberDTO.setUserDefaults(passwordEncoder);
 		return memberMapper.memberInsert(memberDTO);
 	}
@@ -68,6 +72,7 @@ public class MemberService {
 	/* 로그인시 회원 상태 코드 체크 */
 	public void memberStatusChk(String statusCode, HttpServletRequest request, HttpServletResponse response) {
 		if (statusCode.equals(MemberStatus.DELETE.getCode())) {
+			log.info("여기옴?");
 			memberStatusToException(request, response, ErrorCode.WITHDRAWN_MEMBER);
 		}
 		if (statusCode.equals(MemberStatus.RESTORE.getCode())) {
@@ -78,13 +83,16 @@ public class MemberService {
 	/* 비번체크 */
 	public void isPasswordValid(String currnetPw, ResMemberDetail member) {
 		CommonUtils.throwRestCustomExceptionIf(CommonUtils.isEmpty(member), ErrorCode.NO_ACCOUNT);
-		CommonUtils.throwRestCustomExceptionIf(member.getOauth_id().equals("none") && !CommonUtils.isEmpty(currnetPw), ErrorCode.NO_ACCOUNT);
-		CommonUtils.throwRestCustomExceptionIf(!passwordEncoder.matches(currnetPw, member.getMember_password()), ErrorCode.NO_ACCOUNT);
+		CommonUtils.throwRestCustomExceptionIf(member.getOauth_id().equals("none") && CommonUtils.isEmpty(currnetPw), ErrorCode.NO_ACCOUNT);
+		CommonUtils.throwRestCustomExceptionIf(member.getOauth_id().equals("none") && !passwordEncoder.matches(currnetPw, member.getMember_password()), ErrorCode.NO_ACCOUNT);
 	}
 
 	/* 회원 탈퇴 */
 	@Transactional
 	public void memberDelete(Long member_id) {
+		int isTeamMaster = memberMapper.isTeamMaster(member_id);
+		CommonUtils.throwRestCustomExceptionIf(isTeamMaster!=0, ErrorCode.GROUP_LEADER_CANNOT_WITHDRAW);
+		teamMemberMapper.deleteMember(member_id);
 		memberMapper.changeMemberStatus(member_id, MemberStatus.DELETE.getCode());
 	}
 
@@ -95,7 +103,7 @@ public class MemberService {
 		case "복구신청":
 			throw new RestCustomException(ErrorCode.REQUEST_DUPLICATE);
 		case "가입":
-		case "탈퇴":
+		case "가입미완료":
 			throw new RestCustomException(ErrorCode.INELIGIBLE_REQUEST);
 		}
 	}
@@ -143,15 +151,16 @@ public class MemberService {
 		// 회원이여야하는데 회원이아닐때
 		CommonUtils.throwRestCustomExceptionIf(shouldBeMember && CommonUtils.isEmpty(user),ErrorCode.NO_ACCOUNT);
 		// 탈퇴한 회원이면 예외 발생
-		CommonUtils.throwRestCustomExceptionIf(user.getMember_status().equals(MemberStatus.DELETE.getCode()), ErrorCode.WITHDRAWN_MEMBER);
+		CommonUtils.throwRestCustomExceptionIf(!CommonUtils.isEmpty(user) && user.getMember_status().equals(MemberStatus.DELETE.getCode()), ErrorCode.WITHDRAWN_MEMBER);
 
 	}
 
 	/*비번 찾기시 소셜로그인 회원이면 되돌리기*/
 	@Transactional(readOnly = true)
 	private void isSocialMember(String member_email) {
-		ResMemberDetail user = memberMapper.socialMember(member_email);
-		CommonUtils.throwRestCustomExceptionIf(!CommonUtils.isEmpty(user), ErrorCode.SOCIAL_LOGIN_USER);
+		ResMemberDetail socialMember = memberMapper.socialMember(member_email);
+		ResMemberDetail formMember = memberMapper.formMember(member_email);
+		CommonUtils.throwRestCustomExceptionIf(!CommonUtils.isEmpty(socialMember)&&CommonUtils.isEmpty(formMember), ErrorCode.SOCIAL_LOGIN_USER);
 	}
 	
 	/* 이메일 인증시 타입별 회원검사 */
@@ -174,15 +183,7 @@ public class MemberService {
 		CommonUtils.throwRestCustomExceptionIf(result != 1, ErrorCode.FAIL_CHANGE_PASSWORD);
 	}
 
-	/*
-	 * 주써잉행=========================================================================
-	 * =>
-	 */
-//	회원 이메일로 시퀀스 찾기
-	@Transactional(readOnly = true)
-	public Long findByMemberId(String member_email) {
-		return memberMapper.findByMemberId(member_email);
-	}
+	/* -----------------universe----------------- */
 	
 //	회원정보
 	@Transactional(readOnly = true)
@@ -223,13 +224,12 @@ public class MemberService {
 	
 //	회원 검색
 	@Transactional(readOnly = true)
-	public List<MemberDTO> search(String member_email, String keyword, int start, int end){
-		if (CommonUtils.isEmpty(member_email)) {
+	public List<MemberDTO> search(Long member_id, String keyword, int start, int end){
+		if (CommonUtils.isEmpty(member_id)) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
 		}
+		List<MemberDTO> list = memberMapper.search(member_id, keyword, start, end);
 		
-		Long myId = memberMapper.findByMemberId(member_email);
-		List<MemberDTO> list = memberMapper.search(myId, keyword, start, end);
 		return list;
 	}
 	

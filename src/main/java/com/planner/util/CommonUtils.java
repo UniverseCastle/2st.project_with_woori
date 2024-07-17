@@ -1,6 +1,9 @@
 package com.planner.util;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.web.context.request.RequestAttributes;
@@ -9,6 +12,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.async.WebAsyncManager;
 import org.springframework.web.context.request.async.WebAsyncUtils;
 
+import com.planner.dto.request.schedule.TodayInfo;
 import com.planner.exception.CustomException;
 import com.planner.exception.ErrorCode;
 import com.planner.exception.RestCustomException;
@@ -51,10 +55,32 @@ public class CommonUtils {
 		return false;
 	}
 
-	/*조건문에 따라 예외 발생*/
+	/*조건문에 따라 예외 발생(비동기)*/
 	public static void throwRestCustomExceptionIf(boolean conditionalStatement, ErrorCode errorCode) {
 		if(conditionalStatement) {
 			throw new RestCustomException(errorCode);
 		}
+	}
+	/*조건문에 따라 예외 발생(동기)*/
+	public static void throwCustomExceptionIf(boolean conditionalStatement, ErrorCode errorCode) {
+		if(conditionalStatement) {
+			throw new CustomException(errorCode);
+		}
+	}
+	
+	/*오늘 날짜 가져오기*/
+	public static  TodayInfo getTodayInfo() {
+		LocalDate today = LocalDate.now();
+		 DateTimeFormatter todayFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
+		String todayProvide = today.format(todayFormat);
+		
+		DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E", Locale.KOREAN);
+		String dayOfWeek = today.format(dayFormatter);
+		
+		TodayInfo todayInfo = TodayInfo.builder()
+				.currentDate(todayProvide)
+				.today(dayOfWeek)
+				.build();
+		return todayInfo;
 	}
 }

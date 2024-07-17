@@ -72,7 +72,10 @@ public class TeamMemberController {
 	// 가입 신청
 	@PostMapping("/insert")
 	public String tmInsert(Model model, @RequestParam(name = "team_id", defaultValue = "-1") Long team_id,
-							@UserData ResMemberDetail detail, @RequestParam("tm_nickname") String tm_nickname) {
+							@UserData ResMemberDetail detail, @RequestParam("tm_nickname") String tm_nickname) { 
+		if(team_id == -1) {
+			return "redirect:/team/main";
+		}
 		int result = tmService.tmInsert(team_id, detail.getMember_id(), tm_nickname);
 		if(result == 1) {
 			// 가입 신청 성공
@@ -190,7 +193,7 @@ public class TeamMemberController {
 		int result = tmService.tmDelete(team_id, member_id);
 		if(result == 1) {
 			HttpHeaders headers = new HttpHeaders();
-			headers.setLocation(URI.create("/planner/main")); // redirect 시킬 경로 설정
+			headers.setLocation(URI.create("/team/main")); // redirect 시킬 경로 설정
 			return new ResponseEntity<Void>(headers, HttpStatus.SEE_OTHER);
 		}else {
 			return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);

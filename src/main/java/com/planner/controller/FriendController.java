@@ -17,6 +17,8 @@ import com.planner.dto.request.member.MemberDTO;
 import com.planner.dto.response.member.ResMemberDetail;
 import com.planner.enums.Gender;
 import com.planner.enums.Masking;
+import com.planner.exception.CustomException;
+import com.planner.exception.ErrorCode;
 import com.planner.service.FriendService;
 import com.planner.util.CommonUtils;
 import com.planner.util.UserData;
@@ -75,8 +77,8 @@ public class FriendController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/receiveList")
 	public String receiveList(@UserData ResMemberDetail dtail, Model model) {
-		List<FriendRequestDTO> receiveList = friendService.receiveRequestList(dtail.getMember_email());
-		int receive_count = friendService.receiveRequestCount(dtail.getMember_email());	// 받은 친구신청 수
+		List<FriendRequestDTO> receiveList = friendService.receiveRequestList(dtail.getMember_id());
+		int receive_count = friendService.receiveRequestCount(dtail.getMember_id());	// 받은 친구신청 수
 		
 		model.addAttribute("receive_count", receive_count);
 		model.addAttribute("receiveList", receiveList);
@@ -90,8 +92,8 @@ public class FriendController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/sendList")
 	public String sendList(@UserData ResMemberDetail dtail, Model model) {
-		List<FriendRequestDTO> sendList = friendService.sendRequestList(dtail.getMember_email());
-		int receive_count = friendService.receiveRequestCount(dtail.getMember_email());	// 받은 친구신청 수
+		List<FriendRequestDTO> sendList = friendService.sendRequestList(dtail.getMember_id());
+		int receive_count = friendService.receiveRequestCount(dtail.getMember_id());	// 받은 친구신청 수
 		model.addAttribute("receive_count", receive_count);
 		model.addAttribute("sendList", sendList);
 		
@@ -141,8 +143,9 @@ public class FriendController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/list")
 	public String friendList(@UserData ResMemberDetail detail, Model model) {
-		List<FriendDTO> friendList = friendService.friendList(detail.getMember_email());
-		int receive_count = friendService.receiveRequestCount(detail.getMember_email());	// 받은 친구신청 수
+		List<FriendDTO> friendList = friendService.friendList(detail);
+		int receive_count = friendService.receiveRequestCount(detail.getMember_id());	// 받은 친구신청 수
+		
 		model.addAttribute("receive_count", receive_count);
 		model.addAttribute("friendList", friendList);
 		
@@ -169,7 +172,7 @@ public class FriendController {
 			friendService.friendMemo(friendDTO);
 		}
 		
-		int receive_count = friendService.receiveRequestCount(detail.getMember_email());	// 받은 친구신청 수
+		int receive_count = friendService.receiveRequestCount(detail.getMember_id());	// 받은 친구신청 수
 		model.addAttribute("receive_count", receive_count);
 		
 	    return String.format("redirect:/friend/info?friend_id=%d&friend_status=%s", friendDTO.getFriend_id(), friendDTO.getFriend_status());
@@ -179,34 +182,36 @@ public class FriendController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/info")
 	public String friendInfo(@RequestParam(name = "friend_id", defaultValue = "") Long friend_id, @UserData ResMemberDetail detail,
-							 @RequestParam("friend_status") String friend_status, Model model,
+							 @RequestParam(name = "friend_status", defaultValue = "") String friend_status, Model model,
 							 @RequestParam(name = "member_id", defaultValue = "") Long member_id) {
 		String phone;
 		String gender;
 		
 		if (CommonUtils.isEmpty(friend_id)) {
 			friend_id = friendService.findByFriendSeq(member_id, detail.getMember_id());	// 친구 시퀀스 찾는 메서드
+			friend_status = "C";
 			if (CommonUtils.isEmpty(friend_id)) {
 				friend_id = friendService.findByFriendSeq(detail.getMember_id(), member_id);
 				friend_status = "B";
 			}
 		}
 		
-		FriendDTO friendDTO = friendService.friendInfo(friend_id, friend_status);			// 친구정보 메서드
+		FriendDTO friendDTO = friendService.friendInfo(friend_id, friend_status);		// 친구정보 메서드
+		if (friendDTO.getMemberInfo() == null) {
+			throw new CustomException(ErrorCode.WITHDRAWN_MEMBER);
+		}
 		for (MemberDTO memberDTO : friendDTO.getMemberInfo()) {
 			gender = Gender.findNameByCode(memberDTO.getMember_gender());
+			phone = Masking.maskAs(memberDTO.getMember_phone(), Masking.PHONE);			// 마스킹 처리
+			
 			model.addAttribute("gender", gender);
+			model.addAttribute("phone", phone);
 		}
-		int receive_count = friendService.receiveRequestCount(detail.getMember_email());	// 받은 친구신청 수
+		int receive_count = friendService.receiveRequestCount(detail.getMember_id());	// 받은 친구신청 수
 
 		model.addAttribute("friendDTO", friendDTO);
 		model.addAttribute("receive_count", receive_count);
 		
-		for (MemberDTO memberDTO : friendDTO.getMemberInfo()) {
-			phone = Masking.maskAs(memberDTO.getMember_phone(), Masking.PHONE);				// 마스킹 처리
-			
-			model.addAttribute("phone", phone);
-		}
 		return "friend/friend_info";
 	}
 	

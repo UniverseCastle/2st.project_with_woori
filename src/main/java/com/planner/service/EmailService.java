@@ -8,6 +8,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.planner.enums.CodeStatus;
 import com.planner.exception.ErrorCode;
 import com.planner.exception.RestCustomException;
 import com.planner.mapper.EmailMapper;
@@ -58,7 +59,7 @@ public class EmailService {
 		}
 		deletePrevEmailAuthCode(toEmail); 				// 이전 기록삭제
 		
-		int result = emailMapper.saveAuthCode(toEmail, authCode.toString()); // 인증코드저장
+		int result = emailMapper.saveAuthCode(toEmail, authCode.toString(),CodeStatus.CODE_UNCHECKED.getStatus()); // 인증코드저장
 		CommonUtils.throwRestCustomExceptionIf(result !=1,  ErrorCode.FAIL_CREATE_AUTHCODE);
 		return authCode.toString();
 	}
@@ -67,21 +68,22 @@ public class EmailService {
 	private MimeMessage createEmail(String toEmail, String authCode) throws MessagingException, UnsupportedEncodingException {
 		MimeMessage message = javaMailSender.createMimeMessage();
 		String msg = "";
-		msg += "<div><h1>Planner 회원가입 인증 코드입니다</h1>";
+		msg += "<div><h1>Plandas 인증 코드입니다</h1>";
 		msg += "<h2>아래의 인증코드를 페이지에 입력해주세요</h2>";
 		msg += "<h3>인증코드 : " + authCode + "</h3></div>";
 		message.addRecipients(MimeMessage.RecipientType.TO, toEmail);
-		message.setFrom(new InternetAddress(senderEmail, "PLANNER 운영자"));
-		message.setSubject("Planner 회원가입 인증코드입니다.");
+		message.setFrom(new InternetAddress(senderEmail, "PLANDAS 운영자"));
+		message.setSubject("Plandas 인증코드입니다.");
 		message.setText(msg, "UTF-8", "html");
 		return message;
 	}
 	
 	//인증 번호 검증
-	@Transactional(readOnly = true)
+	@Transactional
 	public void authCodeChk(String toEmail, String authCode) {
 		int result = emailMapper.authCodeChk(toEmail, authCode);
 		CommonUtils.throwRestCustomExceptionIf(result !=1,  ErrorCode.FAIL_AUTHENTICATION);
+		emailMapper.updateCodeChk(toEmail,CodeStatus.CODE_CHECKED.getStatus());
 	}
 
 	// 스케쥴러로 정기적으로 잉여데이터 전부다 삭제

@@ -2,9 +2,11 @@ package com.planner.dto.request.schedule;
 
 import java.time.LocalDate;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class ScheduleSearchDTO {
 	private Long team_id;
 	private String so;

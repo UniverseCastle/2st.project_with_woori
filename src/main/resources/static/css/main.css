@@ -24,101 +24,62 @@
 
 .noticeBox {
 	width: 40%;
-	border: 1px solid #ddd;
-	border-radius: 10px;
+	background-color: #F8F9FA;
+	border-style: none;
+	border-radius: 20px;
+	padding: 30px;
 	display: flex;
 	flex-direction: column;
-	border: 1px solid #ddd;
 }
 
 .todayBox {
-	background-color: rgba(250, 250, 230, 0.3);
-	border-style: none;
-	border-radius: 10px;
 	width: 20%;
+	background-color: #F8F9FA;
+	border-style: none;
+	border-radius: 20px;
+	padding: 30px;
 	display: flex;
 	flex-direction: column;
 }
 
-.todaySchedule {
-	margin-top: 10px;
-	padding: 10px;
+.todaySchedule, .noticeContent {
+	border-radius: 20px;
+	background-color: white;
+	padding: 20px;
 	border-style: hidden;
 	display: flex;
 	flex-direction: column;
-	margin-bottom: 4px;
+	margin: 10px 0;
+	box-shadow: 5px 5px 3px #ddd;
 }
 
 .img {
 	width: 100%;
 }
 
-.todayTextBox,.noticeTextBox {
-	border-radius: 10px 10px 0 0;
-	text-align: center;
-	width: 100%;
-	background-color: bisque;
-}
-
-.todayText,.noticeText{
-	color: white;
+.todayText, .noticeText {
+	color: gray;
 	font-weight: bold;
 	font-size: 35px;
 	margin-bottom: 20px;
-	color: white;
-}
-
-.headText {
-	color: gray;
-	font-weight: bold;
-	font-size: 20px;
-}
-
-.head, .scheduleContent {
-	padding-left: 10px;
-}
-
-.head {
-	font-size: 15px;
-	color: rgb(100,100,100);
-	font-weight: bold;
-}
-
-.title {
-	display: flex;
-	flex-direction: column;
 }
 
 .scheduleContent {
+	padding-left: 10px;
 	font-size: 20px;
-	color: gray;
-}
-
-.top {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	width: 100%;
-	height: 20px;
-	margin-bottom: 10px;
-}
-
-.line {
-	border-bottom: 2px dashed #ddd;
+	color: #C0C6D1;
 }
 
 .deleteBtn {
 	border-style: none;
 	background-color: rgba(20, 250, 230, 0);
-	color:  rgb(180,180,180);
+	color: rgb(180, 180, 180);
 	font-size: 20px;
 	cursor: pointer;
-	transition: 0.25s ease;
 }
 
 .deleteBtn:hover {
 	color: red;
-	font-size: 25px;
 }
 
 .addScheduleBtnBox {
@@ -126,21 +87,135 @@
 }
 
 .addScheduleBtn {
-	margin: 15px;
 	cursor: pointer;
-	width: 50%;
+	width: 100%;
 	font-size: 15px;
 	font-weight: bold;
-	color:  rgb(180,180,180);
+	color: #8D94A2;
 	margin-top: 30px;
 	height: 45px;
-	border: 2px solid rgb(180,180,180);
+	border-style: none;
 	border-radius: 10px;
-	background-color: white;
+	background-color: #E9ECEF;
 }
 
-.addScheduleBtn:hover {
-	border: 2px solid bisque;
-	background-color: white;
-	color: bisque;
+.titleBox {
+	align-items: center;
+	justify-content: space-between;
+	display: flex;
+}
+
+.title {
+	font-size: 17px;
+	font-weight: bold;
+	color: #888D92;
+}
+
+.more {
+	margin-left: 20px;
+	text-decoration: none;
+	color: rgb(150, 150, 150);
+}
+
+.line {
+	color: #ddd;
+	margin: 10px 0;
+}
+
+.timeBox {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	font-weight: 600;
+	color: #495057;
+	font-size: 35px;
+	word-break: break-all;
+}
+
+.locationBox {
+	margin-top: 20px;
+	display: flex;
+}
+
+.location {
+	width: 15%;
+}
+
+.address {
+	font-weight: bold;
+	font-size: 15px;
+	color: darkgray;
+}
+
+/* 모달*/
+#noticeModal {
+	position: fixed;
+	display: none;
+	justify-content: center;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.4);
+	z-index : 999;
+}
+
+.noticeModalBody {
+	position: relative;
+	width: 1000px;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: 20px;
+	background: #ffffff;
+	border-radius: 20px;
+	height: 800PX;
+}
+
+.modalMain {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.noticeDetailBox {
+	display: flex;
+}
+
+.noticeTitle {
+	font-size: 17px;
+	font-weight: bold;
+	color: #888D92;
+	cursor: pointer;
+}
+
+.noticeDetail {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.notice_title {
+	border-bottom: 2px solid black;
+	justify-content: center;
+	font-weight: 600;
+	color: #495057;
+	font-size: 35px;
+	justify-content: center;
+	padding:5px 10px;
+}
+
+.notice_content {
+	padding: 10px 15px;	
+}
+.notice_content img{
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-use-select: none;
+	user-select: none;
+}
+.Xbtn:hover, .closeBtn:hover {
+	color: red;
 }
