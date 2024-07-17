@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.planner.mapper.MemberMapper">
 	
 	<!-- 소셜로그인 회원생성 -->
@@ -167,19 +167,6 @@
 	</update>
 	
 	<!-- ================== 주성이햄========================= -->
-<!-- 회원 이메일로 객체 가져오기 -->
-	<select id="findByUser" resultType="MemberDTO">
-		select *
-		from member
-		where member_email = #{member_email}
-	</select>
-	
-	<!-- 회원 이메일로 시퀀스 찾기 -->
-	<select id="findByMemberId" resultType="Long">
-		select member_id
-		from member
-		where member_email = #{member_email}
-	</select>
 	
 	<!-- 회원 시퀀스로 객체 가져오기 (친구 객체 찾을 때 사용) -->
 	<select id="findByMemberSeq" resultType="MemberDTO">
@@ -242,16 +229,5 @@
 			where fr.friend_request_status != 'F'
 			or fr.member_receive_id is null
 		]]>
-	</select>
-	
-	<!-- (나에게) 친구신청 보낸 아이디 찾기 -->
-	<select id="findBySendId" resultType="MemberDTO">
-		select m.*, fr.member_send_id, rownum r
-		from member m
-		left outer join friend_request fr
-		on m.member_id = fr.member_send_id
-		where fr.member_receive_id=#{member_id}
-		and m.member_status='B'
-		and substr (member_email, 1, instr(member_email, '@') - 1) like '%' || #{keyword} || '%'
 	</select>
 </mapper>

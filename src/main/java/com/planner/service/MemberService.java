@@ -183,10 +183,8 @@ public class MemberService {
 		CommonUtils.throwRestCustomExceptionIf(result != 1, ErrorCode.FAIL_CHANGE_PASSWORD);
 	}
 
-	/*
-	 * 주써잉행=========================================================================
-	 * =>
-	 */
+	/* -----------------universe----------------- */
+	
 //	회원정보
 	@Transactional(readOnly = true)
 	public MemberDTO info(Long member_id, @UserData ResMemberDetail detail) {
@@ -230,8 +228,8 @@ public class MemberService {
 		if (CommonUtils.isEmpty(member_id)) {
 			throw new CustomException(ErrorCode.NO_ACCOUNT);
 		}
-		
 		List<MemberDTO> list = memberMapper.search(member_id, keyword, start, end);
+		
 		return list;
 	}
 	
