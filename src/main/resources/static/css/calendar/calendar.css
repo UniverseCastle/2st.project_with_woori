@@ -25,7 +25,12 @@
 	-ms-use-select: none;
 	user-select: none;
 }
-
+.calendar:has(.day:nth-child(36)){
+	height:515px;
+}
+.calendar:not(:has(.day:nth-child(29))){
+	height:400px;
+}
 /* 달 이름을 가운데 정렬 */
 .month-name {
 	text-align: center;

@@ -63,7 +63,7 @@ public class MemberController {
 	public String memberInsert(@Valid MemberDTO memberDTO, RedirectAttributes rttr) {
 		int result = memberService.memberInsert(memberDTO);
 		rttr.addFlashAttribute("result", result);
-		return "redirect:/planner/main";
+		return "redirect:/member/anon/login";
 	}
 
 	/* 사용자 이메일로 인증코드 보내기 */
@@ -152,7 +152,7 @@ public class MemberController {
 			HttpServletResponse response) {
 		memberService.memberStatusChk(detail.getMember_status(), request, response);
 		if (MemberRole.SUPER_ADMIN.getType().equals(detail.getMember_role())) {
-			return "redirect:/admin/main";
+			return "redirect:/admin/notice";
 		}
 		return "redirect:/planner/main";
 	}

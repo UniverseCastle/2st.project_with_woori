@@ -63,8 +63,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="calendarPrint" parameterType="CalendarDTO" resultType="CalendarPrintDTO">
 		select schedule_id,
 			schedule_title,
-		    to_char(schedule_start, 'mmdd') as schedule_start,
-		    to_char(schedule_end, 'mmdd') as schedule_end
+		    to_char(schedule_start, 'yyyymmdd') as schedule_start,
+		    to_char(schedule_end, 'yyyymmdd') as schedule_end
 		from schedule
 		where
 		<if test='team_id eq null'>
@@ -75,7 +75,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			team_id = #{team_id}
 		</if>
 		    and (schedule_start between #{start_date} and #{end_date}+1
-		        or schedule_end between #{start_date} and #{end_date}+1)
+		        or schedule_end between #{start_date} and #{end_date}+1
+		        or <![CDATA[(schedule_start < #{start_date}
+		        	and schedule_end > #{end_date})]]>
+		        )
 		order by schedule_start asc, schedule_end asc, schedule_id asc
 	</select>
 

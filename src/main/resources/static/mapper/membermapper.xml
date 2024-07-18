@@ -89,12 +89,6 @@
 			member_id = #{member_id}
 	</update>
 		
-	<!-- 회원탈퇴시 친구삭제 -->
-<!-- 	<delete id="" > -->
-<!-- 		DELETE  -->
-<!-- 		FROM 	friend -->
-<!-- 		WHERE 	 -->
-<!-- 	</delete> -->
 	
 	<select id="isTeamMaster" resultType="int">
 		select count(*)
@@ -166,7 +160,7 @@
 			member_id = #{member_id}
 	</update>
 	
-	<!-- ================== 주성이햄========================= -->
+	<!-- ==================universe================== -->
 	
 	<!-- 회원 시퀀스로 객체 가져오기 (친구 객체 찾을 때 사용) -->
 	<select id="findByMemberSeq" resultType="MemberDTO">
@@ -230,4 +224,39 @@
 			or fr.member_receive_id is null
 		]]>
 	</select>
+	
+	<!-- ==============================주완-->
+		<!-- 멤버 회원상태  -->
+	<select id="memberStatus" resultType="MemberDTO">
+			select b.*
+			from (select m.*, rownum as rn
+			      from member m
+			      where m.member_status = #{member_status}
+			      order by m.member_id desc
+			     ) b
+			where b.rn between #{start} and #{end}
+			order by b.rn desc
+	</select>
+	
+		<!-- 멤버 회원 카운터 -->
+		<select id ="memberStatusCount" resultType="int">
+			select count(*) from member where member_status = #{member_status}
+		</select>
+	<!-- 전체 회원보기  -->
+	<select id="memberAll" resultType="MemberDTO">
+		select b.* from 
+		(select m.*, rownum as rn from member m
+		 order by member_id desc)b 
+		 where rn between #{start} and #{end}
+		 order by rn desc
+	</select>
+	<!-- 전체 회원 카운터 -->
+	<select id="memberAllCount">
+		select count(*) from member
+	</select>
+	<update id="memberStatusUpdate" parameterType="MemberDTO">
+		update member 
+		set member_status =#{member_status}
+		where member_id =#{member_id}
+	</update>
 </mapper>

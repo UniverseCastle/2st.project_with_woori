@@ -1,3 +1,15 @@
+$(function() {
+	$(document).ready(() => {
+		const status = $("#status").val();
+		if (status === null || status != 'B') {
+			const thenFn = () => {
+				location.href = PAGE_LIST.MAIN_PAGE;
+			};
+			swalCall("경고", "권한이없습니다.", "warning", thenFn);
+		}
+	});
+});
+
 /* 친구추가 버튼 클릭 시 서밋하고 친구상태 불러오기 / 비동기로 버튼 비활성화 */
 $(document).on("click", ".btn-add", function(){
 	let button = $(this);

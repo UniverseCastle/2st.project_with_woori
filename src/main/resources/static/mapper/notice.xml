@@ -42,12 +42,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-m
 	
 	
 	<select id="noticeSelect" resultType="NoticeDTO">
-		select b.* from 
-		(select n.*, rownum as rn
-			from notice n
-			order by notice_id desc) b
-		where rn between #{start} and #{end}
-		order by rn desc 
+	select c.* from
+	(select b.* , rownum as rn from (select *
+	from notice 
+	order by notice_id desc) b)c
+    where rn between #{start} and #{end}
+  	order by rn asc
 	</select>
 			<!-- 성민형 개인용 -->
 <!-- 	SELECT b.* -->
@@ -65,6 +65,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-m
 		select * from notice where notice_id = #{notice_id}
 	</select>
 	
+		
+	<!-- 잉여 이미지 데이터 전부 가져오기 -->
+	<select id="ImagesWithoutNoticeId" resultType="String">
+		SELECT 	save_name
+		FROM 	notice_img
+		WHERE
+			notice_id is null
+	</select>
 	
 	<update id="noticeUpdate" parameterType="NoticeDTO">
 		update notice
@@ -85,4 +93,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-m
 		WHERE
 			save_name = #{imgName}
 	</delete>
+	
+	<!-- 잉여데이터 삭제 -->
+	<delete id="deleteImagesWithoutNoticeId">
+		DELETE 
+		FROM	notice_img
+		WHERE
+			notice_id is null
+	</delete>
+	
 </mapper>
