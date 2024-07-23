@@ -63,7 +63,7 @@ public class MemberController {
 	public String memberInsert(@Valid MemberDTO memberDTO, RedirectAttributes rttr) {
 		int result = memberService.memberInsert(memberDTO);
 		rttr.addFlashAttribute("result", result);
-		return "redirect:/planner/main";
+		return "redirect:/member/anon/login";
 	}
 
 	/* 사용자 이메일로 인증코드 보내기 */
@@ -164,8 +164,7 @@ public class MemberController {
 	}
 
 	/* 소셜로그인에서 생긴 쿠키 제거 후 로그아웃 */
-	@PreAuthorize("isAuthenticated()")
-	@GetMapping("/auth/signout")
+	@GetMapping("/anon/signout")
 	public String signout(HttpServletRequest request, HttpServletResponse response) {
 		CommonUtils.removeCookiesAndSession(request, response);
 		return "redirect:/member/logout";

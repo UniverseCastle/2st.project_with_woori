@@ -19,7 +19,6 @@
 <body>
 	<header th:replace="~{/fragments/header :: header}"></header>
 	<main class="mainCon">
-		<input type="hidden" id="result" th:value="${result}">
 		<div class="myeongUnBox"></div>
 		<div class="middle">
 			<div class="noticeBox">
@@ -66,7 +65,6 @@
 					th:if="${todaySchedule.size() > 2}">..더보기</a>
 			</div>
 		</div>
-		
 		<!-- 공지사항 모달 -->
 		<div id="noticeModal">
 			<div class="noticeModalBody">

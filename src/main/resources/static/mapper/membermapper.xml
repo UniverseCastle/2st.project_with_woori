@@ -70,7 +70,8 @@
 			member_birth = #{member_birth},
 			member_phone = #{member_phone},
 			member_gender = #{member_gender},
-			member_status = #{member_status}
+			member_status = #{member_status},
+			member_role	= #{member_role}
 		<if test="member_email != null">
             , member_email = #{member_email}
         </if>
@@ -161,6 +162,7 @@
 	</update>
 	
 	<!-- ==================universe================== -->
+
 	
 	<!-- 회원 시퀀스로 객체 가져오기 (친구 객체 찾을 때 사용) -->
 	<select id="findByMemberSeq" resultType="MemberDTO">
@@ -232,6 +234,7 @@
 			from (select m.*, rownum as rn
 			      from member m
 			      where m.member_status = #{member_status}
+			      and m.member_role = 'ROLE_USER'
 			      order by m.member_id desc
 			     ) b
 			where b.rn between #{start} and #{end}
@@ -240,19 +243,20 @@
 	
 		<!-- 멤버 회원 카운터 -->
 		<select id ="memberStatusCount" resultType="int">
-			select count(*) from member where member_status = #{member_status}
+			select count(*) from member where member_status = #{member_status} and member_role = 'ROLE_USER'
 		</select>
 	<!-- 전체 회원보기  -->
 	<select id="memberAll" resultType="MemberDTO">
 		select b.* from 
 		(select m.*, rownum as rn from member m
+		 where m.member_role = 'ROLE_USER'
 		 order by member_id desc)b 
 		 where rn between #{start} and #{end}
 		 order by rn desc
 	</select>
 	<!-- 전체 회원 카운터 -->
 	<select id="memberAllCount">
-		select count(*) from member
+		select count(*) from member  where member_role = 'ROLE_USER'
 	</select>
 	<update id="memberStatusUpdate" parameterType="MemberDTO">
 		update member 

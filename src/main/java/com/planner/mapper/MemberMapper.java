@@ -49,7 +49,7 @@ public interface MemberMapper {
 	
 	/*소셜 로그인회원*/
 	ResMemberDetail socialMember(@Param(value = "member_email")String member_email);
-	
+
 	/* -----------------universe----------------- */
 	
 //	회원 시퀀스로 객체 가져오기

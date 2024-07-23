@@ -6,7 +6,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-ma
 		insert into notice values (
 			notice_seq.nextval,
 			#{notice_title},
-			#{notice_content}
+			#{notice_content},
+			sysdate
 		)
 	</insert>
 	
@@ -42,15 +43,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-ma
 	
 	
 	<select id="noticeSelect" resultType="NoticeDTO">
-		select b.* from 
-		(select n.*, rownum as rn
-			from notice n
-			order by notice_id desc) b
-		where rn between #{start} and #{end}
-		order by rn desc 
+		select c.* from
+		(select b.* , rownum as rn from (select *
+			from notice 
+			order by notice_id desc) b)c
+				where rn between #{start} and #{end}
+		order by rn asc
 	</select>
 			<!-- 성민형 개인용 -->
-<!-- 	SELECT b.* -->
+<!-- 		SELECT b.* -->
 <!-- 	FROM ( -->
 <!-- 	    SELECT n.*, ROW_NUMBER() OVER (ORDER BY notice_id DESC) AS rn -->
 <!-- 	    FROM notice n -->

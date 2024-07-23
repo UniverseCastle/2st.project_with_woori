@@ -2,6 +2,8 @@ package com.planner.service;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+import org.mybatis.spring.MyBatisSystemException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +15,7 @@ import com.planner.dto.request.member.ReqMemberRestore;
 import com.planner.dto.request.member.ReqMemberUpdate;
 import com.planner.dto.response.member.ResMemberDetail;
 import com.planner.enums.CodeStatus;
+import com.planner.enums.MemberRole;
 import com.planner.enums.MemberStatus;
 import com.planner.exception.CustomException;
 import com.planner.exception.ErrorCode;
@@ -38,6 +41,7 @@ public class MemberService {
 	private final FriendMapper friendMapper;
 	private final PasswordEncoder passwordEncoder;
 	private final TeamMemberMapper teamMemberMapper;
+	
 	private static final boolean MEMBER = true;
 	private static final boolean NON_MEMBER = false;
 	
@@ -84,7 +88,7 @@ public class MemberService {
 	public void isPasswordValid(String currnetPw, ResMemberDetail member) {
 		CommonUtils.throwRestCustomExceptionIf(CommonUtils.isEmpty(member), ErrorCode.NO_ACCOUNT);
 		CommonUtils.throwRestCustomExceptionIf(member.getOauth_id().equals("none") && CommonUtils.isEmpty(currnetPw), ErrorCode.NO_ACCOUNT);
-		CommonUtils.throwRestCustomExceptionIf(member.getOauth_id().equals("none") && !passwordEncoder.matches(currnetPw, member.getMember_password()), ErrorCode.NO_ACCOUNT);
+		CommonUtils.throwRestCustomExceptionIf(member.getOauth_id().equals("none") &&!passwordEncoder.matches(currnetPw, member.getMember_password()), ErrorCode.NO_ACCOUNT);
 	}
 
 	/* 회원 탈퇴 */
@@ -122,19 +126,24 @@ public class MemberService {
 	public int memberRestore(ReqMemberRestore req) {
 		// 복구시 입력정보로 회원정보 가져오기
 		ResMemberDetail memberDetail = findMemberByLoginType(req.getOauth_type(), req.getCurrentEmail());
+		log.info("??"+memberDetail.getMember_email());
 		// 회원아니면 예외
 		CommonUtils.throwRestCustomExceptionIf(CommonUtils.isEmpty(memberDetail), ErrorCode.NO_ACCOUNT);
+		
 		// 비번확인(일반로그인이용할경우)
 		isPasswordValid(req.getCurrentPassword(), memberDetail);
+		
+	
 		// 회원상태에 따른 예외
 		throwForStatus(memberDetail.getMember_status());
 		// 성공하면 복구신청상태로변경
+	
 		return memberMapper.changeMemberStatus(memberDetail.getMember_id(), MemberStatus.RESTORE.getCode());
 	}
 
 	/* 회원정보. */
 	@Transactional(readOnly = true)
-	private ResMemberDetail findSocialOrFormMember(String email) {
+	public ResMemberDetail findSocialOrFormMember(String email) {
 		ResMemberDetail user = memberMapper.socialMember(email);
 		if (CommonUtils.isEmpty(user)) {
 			user = memberMapper.formMember(email);
@@ -240,4 +249,35 @@ public class MemberService {
 		
 		return count;
 	}
+	
+	//======================>주완
+	// 멤버 회원상태 보기 
+		public List<MemberDTO> memberStatus(int pageNum, int pageSize,String member_status) {
+			int start = (pageNum -1)*pageSize +1;
+			int end = pageSize * pageNum;
+			List<MemberDTO> statusList = memberMapper.memberStatus(start,end,member_status);
+			return statusList;
+		}
+		// 멤버 회원 카운터 
+		public int memberStatusCount(String member_status) {
+			int statusCount = memberMapper.memberStatusCount(member_status);
+			return statusCount ;
+		}
+		// 전체 회원 보기 
+		public List<MemberDTO> memberAll(int pageNum , int pageSize){
+			int start = (pageNum -1)*pageSize +1;
+			int end = pageSize * pageNum;
+			List<MemberDTO> allList = memberMapper.memberAll(start, end);
+			return allList;
+		}
+		// 전체 회원 카운터 
+		public int memberAllCount() {
+			int allCount = memberMapper.memberAllCount();
+			return allCount;
+		}
+		// 회원 상태 변경 
+		public void memberStatusUpdate(Long member_id ,String member_status) {
+			memberMapper.memberStatusUpdate(member_id,member_status);
+		}
+	
 }

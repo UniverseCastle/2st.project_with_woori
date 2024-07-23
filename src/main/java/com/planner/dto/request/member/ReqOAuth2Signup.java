@@ -2,6 +2,11 @@ package com.planner.dto.request.member;
 
 import java.time.LocalDate;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.planner.enums.MemberRole;
+import com.planner.enums.MemberStatus;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -12,7 +17,7 @@ import lombok.Setter;
 @Setter
 public class ReqOAuth2Signup {
 	
-	private String member_id;				// 회원ㄴ 고유번호
+	private Long member_id;				// 회원 고유번호
 	
 	private String member_email;			// 회원이메일
 	
@@ -27,4 +32,11 @@ public class ReqOAuth2Signup {
 	private	String member_gender;	// 유저 성별
 	
 	private String member_status;		// 회원상태
+	
+	private String member_role; 		// 회원권한
+	
+	public void setUserRoles() {
+		this.member_role = MemberRole.USER.getType();
+		this.member_status = MemberStatus.BASIC.getCode();
+	}
 }

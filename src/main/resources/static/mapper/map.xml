@@ -7,6 +7,7 @@
 	<insert id="MapInsert" parameterType="MapDTO">
 		insert into map values(
 			map_seq.nextval,
+<!-- 			nextval('map_seq'), -->
 			#{schedule_id},
 			#{place},
 			#{address}
@@ -21,11 +22,11 @@
 		delete from map where schedule_id = #{schedule_id}
 	</delete>
 	<update id="MapUpdate" parameterType="MapDTO">
-	update map 
-		set place =	#{place},
-		address = #{address}
-	where schedule_id = #{schedule_id}
-</update>
+		update map 
+			set place =	#{place},
+			address = #{address}
+		where schedule_id = #{schedule_id}
+	</update>
 	
 	
 </mapper>

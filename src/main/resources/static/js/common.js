@@ -25,7 +25,8 @@ const PAGE_LIST = {
 	CHANGE_PASSWORD_FORM: "/member/anon/pw/change/",
 	MEMBER_UPDATE_FORM: "/member/auth/update",
 	LOGIN_PAGE: "/member/anon/login",
-	CALENDAR_PAGE: "/planner/calendar"
+	CALENDAR_PAGE: "/planner/calendar",
+	NOTICE_LIST : "/admin/notice"
 };
 // CSRF 토큰
 let csrfToken = $("meta[name='_csrf']").attr("content");
@@ -70,6 +71,7 @@ const swalCall = (title, text, icon, thenFn, confirmButtonText = "확인", showC
 		cancelButtonText: cancelButtonText
 	}).then((result) => {
 		if (typeof thenFn == "function") {
+			console.log(thenFn);
 			thenFn(result);
 		}
 	});
